@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\basic">
+      <UniqueIdentifier>{72b8de49-157d-4059-9abc-2cb994afa2eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\hash">
+      <UniqueIdentifier>{1422b2a1-6247-414b-9fc0-a70621503364}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\store">
+      <UniqueIdentifier>{f2c45318-8619-4158-91a2-e7ad2351d2a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\basic\msvc">
+      <UniqueIdentifier>{dba6ae01-9249-4d99-8842-32c29490ca6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\jstd">
+      <UniqueIdentifier>{0a9cd6e0-f70f-437c-a24e-760e5425bd6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\support">
+      <UniqueIdentifier>{ff84d9c8-7452-4498-8db6-638316146f89}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\all.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\basic\stddef.h">
+      <Filter>src\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\hash\Dictionary.h">
+      <Filter>src\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\hash\HashHelper.h">
+      <Filter>src\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\hash\Hash.h">
+      <Filter>src\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\store\Slice.h">
+      <Filter>src\store</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\basic\msvc\inttypes.h">
+      <Filter>src\basic\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\basic\msvc\stdbool.h">
+      <Filter>src\basic\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\basic\msvc\stdint.h">
+      <Filter>src\basic\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\basic\stdint.h">
+      <Filter>src\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\basic\stdsize.h">
+      <Filter>src\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\basic\inttypes.h">
+      <Filter>src\basic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\char_traits.h">
+      <Filter>src\jstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\string_utils.h">
+      <Filter>src\jstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\strlen.h">
+      <Filter>src\jstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_forward.h">
+      <Filter>src\support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_reverse.h">
+      <Filter>src\support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\support\popcnt.h">
+      <Filter>src\support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\support\Power2.h">
+      <Filter>src\support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\support\SSEHelper.h">
+      <Filter>src\support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\support\StopWatch.h">
+      <Filter>src\support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\hash\crc32c.h">
+      <Filter>src\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\hash\DictionaryTraits.h">
+      <Filter>src\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\nothrow_deleter.h">
+      <Filter>src\jstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\nothrow_new.h">
+      <Filter>src\jstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\hash\DictionaryOld.h">
+      <Filter>src\hash</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\main\kvdb\all.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

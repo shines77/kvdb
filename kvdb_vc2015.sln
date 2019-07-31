@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "main", "main", "{64874E37-E9A4-4C13-9DCD-FA2204199EE5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kvdb-cli", "projects\vc2015\main\kvdb-cli\kvdb-cli.vcxproj", "{8EA65E91-D24D-4679-87F1-9B64BA73180C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9} = {25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kvdb-server", "projects\vc2015\main\kvdb-server\kvdb-server.vcxproj", "{F93202C8-108E-4FA7-917B-BF28E078A484}"
+	ProjectSection(ProjectDependencies) = postProject
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9} = {25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libkvdb", "projects\vc2015\main\libkvdb\libkvdb.vcxproj", "{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{294F335C-B980-44A4-9A8A-653C8830DF94}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "perf", "perf", "{21DC2B40-FE61-40A0-9F54-550D489FF4D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8EA65E91-D24D-4679-87F1-9B64BA73180C}.Debug|x64.ActiveCfg = Debug|x64
+		{8EA65E91-D24D-4679-87F1-9B64BA73180C}.Debug|x64.Build.0 = Debug|x64
+		{8EA65E91-D24D-4679-87F1-9B64BA73180C}.Debug|x86.ActiveCfg = Debug|Win32
+		{8EA65E91-D24D-4679-87F1-9B64BA73180C}.Debug|x86.Build.0 = Debug|Win32
+		{8EA65E91-D24D-4679-87F1-9B64BA73180C}.Release|x64.ActiveCfg = Release|x64
+		{8EA65E91-D24D-4679-87F1-9B64BA73180C}.Release|x64.Build.0 = Release|x64
+		{8EA65E91-D24D-4679-87F1-9B64BA73180C}.Release|x86.ActiveCfg = Release|Win32
+		{8EA65E91-D24D-4679-87F1-9B64BA73180C}.Release|x86.Build.0 = Release|Win32
+		{F93202C8-108E-4FA7-917B-BF28E078A484}.Debug|x64.ActiveCfg = Debug|x64
+		{F93202C8-108E-4FA7-917B-BF28E078A484}.Debug|x64.Build.0 = Debug|x64
+		{F93202C8-108E-4FA7-917B-BF28E078A484}.Debug|x86.ActiveCfg = Debug|Win32
+		{F93202C8-108E-4FA7-917B-BF28E078A484}.Debug|x86.Build.0 = Debug|Win32
+		{F93202C8-108E-4FA7-917B-BF28E078A484}.Release|x64.ActiveCfg = Release|x64
+		{F93202C8-108E-4FA7-917B-BF28E078A484}.Release|x64.Build.0 = Release|x64
+		{F93202C8-108E-4FA7-917B-BF28E078A484}.Release|x86.ActiveCfg = Release|Win32
+		{F93202C8-108E-4FA7-917B-BF28E078A484}.Release|x86.Build.0 = Release|Win32
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}.Debug|x64.ActiveCfg = Debug|x64
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}.Debug|x64.Build.0 = Debug|x64
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}.Debug|x86.ActiveCfg = Debug|Win32
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}.Debug|x86.Build.0 = Debug|Win32
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}.Release|x64.ActiveCfg = Release|x64
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}.Release|x64.Build.0 = Release|x64
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}.Release|x86.ActiveCfg = Release|Win32
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8EA65E91-D24D-4679-87F1-9B64BA73180C} = {64874E37-E9A4-4C13-9DCD-FA2204199EE5}
+		{F93202C8-108E-4FA7-917B-BF28E078A484} = {64874E37-E9A4-4C13-9DCD-FA2204199EE5}
+		{25DA6247-C5FC-4F78-94B8-F69F0C3A0CC9} = {64874E37-E9A4-4C13-9DCD-FA2204199EE5}
+	EndGlobalSection
+EndGlobal

@@ -1,2 +1,3 @@
-# kvdb
-A memory key-value nosql database.
+# KVCache
+
+A memory key-value cache.
