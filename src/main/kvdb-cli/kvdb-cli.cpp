@@ -22,12 +22,12 @@
 
 using namespace kvdb;
 
-#define CLIENT_PREFIX   "KVCache-127.0.0.1:7707> "
+#define CLIENT_PREFIX   "kvdb-127.0.0.1:7707> "
 
 int main(int argc, char * argv[])
 {
     printf("\n");
-    printf("KVDB Client 1.0\n");
+    printf("kvdb client 1.0\n");
     printf("\n");
 
     bool exit = false;
