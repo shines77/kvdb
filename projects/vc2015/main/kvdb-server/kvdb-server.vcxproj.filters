@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\basic">
+      <UniqueIdentifier>{2a71d903-0ac4-4a12-ad4b-1e5799003068}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\server">
+      <UniqueIdentifier>{bcc9eb17-47a0-497c-b8bc-4920fb370a73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\server\common">
+      <UniqueIdentifier>{fa68bc99-4581-4660-bbcb-0c7bf99b840e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\server\http_server">
+      <UniqueIdentifier>{064812c4-a953-47f0-82ae-caa78b3a5aac}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\main\kvdb-server\kvdb-server.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\io_service_pool.hpp">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\asio_connection.hpp">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\asio_session.hpp">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\async_aiso_echo_serv_ex.hpp">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\async_asio_echo_serv.hpp">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\boost_asio_msvc.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\common.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\common\cmd_utils.hpp">
+      <Filter>src\server\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\common\aligned_atomic.hpp">
+      <Filter>src\server\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\http_server\asio_http_session.hpp">
+      <Filter>src\server\http_server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\http_server\async_asio_http_server.hpp">
+      <Filter>src\server\http_server</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

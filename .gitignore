@@ -195,10 +195,8 @@ _ReSharper*/
 
 # Ignore kvc-cli exe filename
 /kvdb-cli
-kvdb-cli
 kvdb-cli.exe
 
 # Ignore kvc-server exe filename
 /kvdb-server
-kvdb-server
 kvdb-server.exe
