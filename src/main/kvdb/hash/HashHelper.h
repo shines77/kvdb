@@ -236,6 +236,6 @@ struct hash {
     }
 };
 
-} // namespace KVCache
+} // namespace kvdb
 
 #endif // KVDB_HASH_HELPER_H

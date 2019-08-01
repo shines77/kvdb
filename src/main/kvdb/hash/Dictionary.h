@@ -632,7 +632,7 @@ private:
 
 public:
     void dump() {
-        printf("KVCache::BasicDictionary<K, V>::dump()\n\n");
+        printf("kvdb::BasicDictionary<K, V>::dump()\n\n");
     }
 
     void reserve(size_type new_capacity) {
@@ -1072,15 +1072,15 @@ public:
     static const char * name() {
         switch (HashFunc) {
         case HashFunc_CRC32C:
-            return "KVCache::Dictionary<K, V>";
+            return "kvdb::Dictionary<K, V>";
         case HashFunc_Time31:
-            return "KVCache::Dictionary_v1<K, V>";
+            return "kvdb::Dictionary_v1<K, V>";
         case HashFunc_Time31Std:
-            return "KVCache::Dictionary_v2<K, V>";
+            return "kvdb::Dictionary_v2<K, V>";
         case HashFunc_SHA1_MSG2:
-            return "KVCache::Dictionary_v3<K, V>";
+            return "kvdb::Dictionary_v3<K, V>";
         case HashFunc_SHA1:
-            return "KVCache::Dictionary_v4<K, V>";
+            return "kvdb::Dictionary_v4<K, V>";
         default:
             return "Unknown class name";
         }
@@ -1118,6 +1118,6 @@ template <typename Key, typename Value>
 using Dictionary = BasicDictionary<Key, Value, HashFunc_Time31Std>;
 #endif
 
-} // namespace KVCache
+} // namespace kvdb
 
 #endif // KVDB_HASH_DICTIONARY_H

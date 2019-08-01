@@ -38,6 +38,6 @@ struct SSEHelper<wchar_t> {
     static const int kWordSize = 2;
 };
 
-} // namespace KVCache
+} // namespace kvdb
 
 #endif // KVDB_SSE_HELPER_H

@@ -159,6 +159,6 @@ inline size_t Slice::difference_offset(const Slice & b) const {
     return off;
 }
 
-} // namespace KVCache
+} // namespace kvdb
 
 #endif // KVDB_STORE_SLICE_H

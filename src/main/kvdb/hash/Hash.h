@@ -1062,6 +1062,6 @@ HashUtils<std::uint64_t>::decodeValue<8U>(const char * data, std::uint32_t missa
     return value;
 }
 
-} // namespace KVCache
+} // namespace kvdb
 
 #endif // KVDB_HASH_HASH_H

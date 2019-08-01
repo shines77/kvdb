@@ -40,7 +40,7 @@ struct DefaultDictionaryHasher {
     hash_type hash_code(const key_type & key) const {
         // All of the following two methods can get the hash value.
 #if 0
-        hash_type hash = KVCache::HashHelper<key_type, hash_type, HashFunc>::getHashCode(key);
+        hash_type hash = kvdb::HashHelper<key_type, hash_type, HashFunc>::getHashCode(key);
 #else
         kvdb::hash<key_type, hash_type, HashFunc> hasher;
         hash_type hash = hasher(key);
@@ -167,6 +167,6 @@ struct DefaultDictionaryTraits {
 
 };
 
-} // namespace KVCache
+} // namespace kvdb
 
 #endif // KVDB_DICTIONARY_TRAITS_H

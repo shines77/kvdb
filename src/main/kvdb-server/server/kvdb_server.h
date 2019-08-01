@@ -135,4 +135,4 @@ private:
     }
 };
 
-} // namespace KVCache
+} // namespace kvdb

@@ -724,6 +724,6 @@ static uint32_t sha1_x86(const char * data, size_t length)
 }
 
 } // namespace sha1
-} // namespace KVCache
+} // namespace kvdb
 
 #endif // KVDB_HASH_CRC32C_H

@@ -65,6 +65,6 @@ std::size_t aligned_to(std::size_t size, std::size_t alignment)
 }
 
 } // namespace detail
-} // namespace KVCache
+} // namespace kvdb
 
 #endif // KVDB_SUPPORT_POWER2_H

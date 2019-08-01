@@ -439,7 +439,7 @@ private:
     }
 };
 
-} // namespace KVCache
+} // namespace kvdb
 
 #undef USE_ATOMIC_REALTIME_UPDATE
 #undef QUERY_COUNTER_INTERVAL
