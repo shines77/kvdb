@@ -69,8 +69,9 @@ public:
     void stop()
     {
         // Explicitly stop all io_services.
-        for (std::size_t i = 0; i < io_services_.size(); ++i)
+        for (std::size_t i = 0; i < io_services_.size(); ++i) {
             io_services_[i]->stop();
+        }
     }
 
     /// Get an io_service to use.

@@ -1,4 +1,10 @@
+
+#ifndef BOOST_ASIO_MSVC_H
+#define BOOST_ASIO_MSVC_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
 
 #if defined(_WIN32) || defined(WIN32) || defined(OS_WINDOWS) || defined(_WINDOWS)
 #  if !defined(_WIN32_WINNT) || (_WIN32_WINNT < 0x0501)
@@ -15,3 +21,5 @@
 #    define BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
 #  endif // (_MSC_VER >= 1900)
 #endif // defined(BOOST_ASIO_MSVC)
+
+#endif // BOOST_ASIO_MSVC_H

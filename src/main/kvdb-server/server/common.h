@@ -3,7 +3,9 @@
 #include <stdint.h>
 #include <string>
 #include <atomic>
-#include "common/aligned_atomic.hpp"
+
+#include "server/common/boost_asio_msvc.h"
+#include "server/common/aligned_atomic.h"
 
 extern uint32_t g_test_mode;
 extern uint32_t g_test_method;

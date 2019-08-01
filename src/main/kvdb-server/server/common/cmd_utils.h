@@ -1,5 +1,10 @@
 
+#ifndef KVDB_CMD_UTILS_H
+#define KVDB_CMD_UTILS_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
 
 #include <string>
 
@@ -122,3 +127,5 @@ bool get_cmd_value(const std::string & cmd, char sep, std::string & cmd_value)
     }
     return false;
 }
+
+#endif // KVDB_CMD_UTILS_H

@@ -14,11 +14,9 @@
 
 #include "kvdb/all.h"
 
-#include "common.h"
-#include "common/cmd_utils.hpp"
-#include "async_asio_echo_serv.hpp"
-#include "async_aiso_echo_serv_ex.hpp"
-#include "http_server/async_asio_http_server.hpp"
+#include "server/common.h"
+#include "server/common/cmd_utils.h"
+#include "server/kvdb_server.h"
 
 // String compare mode
 #define STRING_COMPARE_STDC     0
@@ -50,12 +48,13 @@ kvdb::aligned_atomic<uint32_t> kvdb::g_client_count(0);
 kvdb::aligned_atomic<uint64_t> kvdb::g_recv_bytes(0);
 kvdb::aligned_atomic<uint64_t> kvdb::g_send_bytes(0);
 
-void run_asio_echo_serv(const std::string & ip, const std::string & port,
-                        uint32_t packet_size, uint32_t thread_num,
-                        bool confirm = false)
+void run_kvdb_server(const std::string & ip, const std::string & port,
+                     uint32_t packet_size, uint32_t thread_num,
+                     bool confirm = false)
 {
+    static const uint32_t kSeesionBufferSize = 65536;
     try {
-        async_asio_echo_serv server(ip, port, packet_size, thread_num);
+        kvdb_server server(ip, port, kSeesionBufferSize, packet_size, thread_num);
         server.run();
 
         std::cout << "Server has bind and listening ..." << std::endl;
@@ -81,104 +80,6 @@ void run_asio_echo_serv(const std::string & ip, const std::string & port,
                       << std::right << std::setw(6)
                       << std::setiosflags(std::ios::fixed) << std::setprecision(3)
                       << ((qps * packet_size) / (1024.0 * 1024.0))
-                      << " MB/s" << std::endl;
-            std::cout << std::right;
-            last_query_count = cur_succeed_count;
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        }
-
-        server.join();
-    }
-    catch (const std::exception & e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
-    }
-}
-
-void run_asio_echo_serv_ex(const std::string & ip, const std::string & port,
-                           uint32_t packet_size, uint32_t thread_num,
-                           bool confirm = false)
-{
-    static const uint32_t kSeesionBufferSize = 65536;
-    try {
-        async_asio_echo_serv_ex server(ip, port, kSeesionBufferSize, packet_size, thread_num);
-        server.run();
-
-        std::cout << "Server has bind and listening ..." << std::endl;
-        if (confirm) {
-            std::cout << "press [enter] key to continue ...";
-            getchar();
-        }
-        std::cout << std::endl;
-
-        uint64_t last_query_count = 0;
-        while (true) {
-            auto cur_succeed_count = (uint64_t)g_query_count;
-            auto client_count = (uint32_t)g_client_count;
-            auto qps = (cur_succeed_count - last_query_count);
-            std::cout << ip.c_str() << ":" << port.c_str() << " - " << packet_size << " bytes : "
-                      << thread_num << " threads : "
-                      << "[" << std::left << std::setw(4) << client_count << "] conns : "
-                      << "nodelay:" << g_nodelay << ", "
-                      << "mode:" << g_test_mode_str.c_str() << ", "
-                      << "test:" << g_test_method_str.c_str() << ", "
-                      << "qps=" << std::right << std::setw(7) << qps << ", "
-                      << "BW="
-                      << std::right << std::setw(6)
-                      << std::setiosflags(std::ios::fixed) << std::setprecision(3)
-                      << ((qps * packet_size) / (1024.0 * 1024.0))
-                      << " MB/s" << std::endl;
-            std::cout << std::right;
-            last_query_count = cur_succeed_count;
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        }
-
-        server.join();
-    }
-    catch (const std::exception & e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
-    }
-}
-
-void run_asio_http_server(const std::string & ip, const std::string & port,
-                          uint32_t packet_size, uint32_t thread_num,
-                          bool confirm = false)
-{
-    static const uint32_t kSeesionBufferSize = 65536;
-    try {
-        async_asio_http_server server(ip, port, kSeesionBufferSize, packet_size, thread_num);
-        server.run();
-
-        std::cout << "Http Server has bind and listening ..." << std::endl;
-        if (confirm) {
-            std::cout << "press [enter] key to continue ...";
-            getchar();
-        }
-        std::cout << std::endl;
-
-        static const std::size_t response_html_size = g_response_html.size();
-
-        uint64_t last_query_count = 0;
-        while (true) {
-            auto cur_succeed_count = (uint64_t)g_query_count;
-            auto client_count = (uint32_t)g_client_count;
-            auto qps = (cur_succeed_count - last_query_count);
-            packet_size = g_packet_size;
-            std::cout << ip.c_str() << ":" << port.c_str() << " - " << packet_size << " bytes : "
-                      << thread_num << " threads : "
-                      << "[" << std::left << std::setw(4) << client_count << "] conns : "
-                      << "nodelay:" << g_nodelay << ", "
-                      << "mode:" << g_test_mode_str.c_str() << ", "
-                      << "test:" << g_test_method_str.c_str() << ", "
-                      << "qps=" << std::right << std::setw(7) << qps << ", "
-                      << "Recv BW: "
-                      << std::right << std::setw(6)
-                      << std::setiosflags(std::ios::fixed) << std::setprecision(3)
-                      << ((qps * packet_size) / (1024.0 * 1024.0))
-                      << " MB/s, "
-                      << "Send BW: "
-                      << std::right << std::setw(6)
-                      << std::setiosflags(std::ios::fixed) << std::setprecision(3)
-                      << ((qps * response_html_size) / (1024.0 * 1024.0))
                       << " MB/s" << std::endl;
             std::cout << std::right;
             last_query_count = cur_succeed_count;
@@ -364,17 +265,7 @@ int main(int argc, char * argv[])
     std::cout << "packet_size: " << packet_size << ", thread_num: " << thread_num << std::endl;
     std::cout << std::endl;
 
-    if (g_test_mode == test_mode_http_server) {
-        run_asio_http_server(server_ip, server_port, packet_size, thread_num);
-    }
-    else if (g_test_mode == test_mode_no_echo_server) {
-        // TODO:
-        std::cout << "TODO: test_mode_no_echo_server." << std::endl;
-    }
-    else {
-        //run_asio_echo_serv(server_ip, server_port, packet_size, thread_num);
-        run_asio_echo_serv_ex(server_ip, server_port, packet_size, thread_num);
-    }
+    run_kvdb_server(server_ip, server_port, packet_size, thread_num);
 
 #ifdef _WIN32
     ::system("pause");

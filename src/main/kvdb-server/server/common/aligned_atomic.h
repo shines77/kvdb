@@ -1,5 +1,10 @@
 
+#ifndef KVDB_ALIGNED_ATOMIC_H
+#define KVDB_ALIGNED_ATOMIC_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
 
 #include <atomic>
 #include <type_traits>
@@ -174,8 +179,8 @@ struct aligned_atomic_wrapper : public base_aligned_data
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-} // namespace KVCache
+} // namespace kvdb
 
 #pragma pack(pop)
 
-#undef CACHE_LINE_SIZE
+#endif // KVDB_ALIGNED_ATOMIC_H
