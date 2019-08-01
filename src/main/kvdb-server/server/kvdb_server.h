@@ -13,7 +13,7 @@
 
 #include "server/common.h"
 #include "server/io_service_pool.h"
-#include "server/asio_session.h"
+#include "server/kvdb_connection.h"
 
 using namespace boost::asio;
 
@@ -26,22 +26,22 @@ class kvdb_server : public boost::enable_shared_from_this<kvdb_server>,
                     private boost::noncopyable
 {
 private:
-    io_service_pool					io_service_pool_;
-    boost::asio::ip::tcp::acceptor	acceptor_;
-    std::shared_ptr<asio_session>	session_;
-    std::shared_ptr<std::thread>	thread_;
-    uint32_t                        buffer_size_;
-    uint32_t					    packet_size_;
+    io_service_pool					    io_service_pool_;
+    boost::asio::ip::tcp::acceptor	    acceptor_;
+    std::shared_ptr<kvdb_connection>	session_;
+    std::shared_ptr<std::thread>	    thread_;
+    uint32_t                            buffer_size_;
+    uint32_t					        packet_size_;
 
 public:
-    kvdb_server(const std::string & ip_addr, const std::string & port,
+    kvdb_server(const std::string & address, const std::string & port,
         uint32_t buffer_size = 32768,
         uint32_t packet_size = 64,
         uint32_t pool_size = std::thread::hardware_concurrency())
         : io_service_pool_(pool_size), acceptor_(io_service_pool_.get_first_io_service()),
           buffer_size_(buffer_size), packet_size_(packet_size)
     {
-        start(ip_addr, port);
+        start(address, port);
     }
 
     kvdb_server(short port, uint32_t buffer_size = 32768,
@@ -59,10 +59,10 @@ public:
         this->stop();
     }
 
-    void start(const std::string & ip_addr, const std::string & port)
+    void start(const std::string & address, const std::string & port)
     {
         ip::tcp::resolver resolver(io_service_pool_.get_now_io_service());
-        ip::tcp::resolver::query query(ip_addr, port);
+        ip::tcp::resolver::query query(address, port);
         ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
         boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
 
@@ -70,7 +70,7 @@ public:
         acceptor_.open(endpoint.protocol(), ec);
         if (ec) {
             // Open endpoint error
-            std::cout << "async_asio_echo_serv_ex::start() - Error: (code = " << ec.value() << ") "
+            std::cout << "kvdb_server::start() - Error: (code = " << ec.value() << ") "
                       << ec.message().c_str() << std::endl;
             return;
         }
@@ -89,6 +89,8 @@ public:
             acceptor_.cancel();
             acceptor_.close();
         }
+
+        io_service_pool_.stop();
     }
 
     void run()
@@ -103,51 +105,33 @@ public:
     }
 
 private:
-    void handle_accept(const boost::system::error_code & ec, asio_session * session)
+    void handle_accept(const boost::system::error_code & ec, kvdb_connection * connection)
     {
         if (!ec) {
-            if (session) {
-                session->start();
+            if (connection) {
+                connection->start();
             }
             do_accept();
         }
         else {
-            // Accept error
-            std::cout << "kvdb_server::handle_accept() - Error: (code = " << ec.value() << ") "
-                      << ec.message().c_str() << std::endl;
-            if (session) {
-                session->stop();
-                delete session;
+            if (ec != boost::asio::error::operation_aborted) {
+                // Accept error
+                std::cout << "kvdb_server::handle_accept() - Error: (code = " << ec.value() << ") "
+                          << ec.message().c_str() << std::endl;
+                if (connection) {
+                    connection->stop();
+                    delete connection;
+                }
             }
         }
     }
 
     void do_accept()
     {
-        asio_session * new_session = new asio_session(io_service_pool_.get_io_service(), buffer_size_, packet_size_, g_test_mode);
-        acceptor_.async_accept(new_session->socket(), boost::bind(&kvdb_server::handle_accept,
-                               this, boost::asio::placeholders::error, new_session));
-    }
-
-    void do_accept_lambda()
-    {
-        session_.reset(new asio_session(io_service_pool_.get_io_service(), buffer_size_, packet_size_, g_test_mode));
-        acceptor_.async_accept(session_->socket(),
-            [this](const boost::system::error_code & ec)
-            {
-                if (!ec) {
-                    session_->start();
-                }
-                else {
-                    // Accept error
-                    std::cout << "kvdb_server::handle_accept_lambda() - Error: (code = " << ec.value() << ") "
-                              << ec.message().c_str() << std::endl;
-                    session_->stop();
-                    session_.reset();
-                }
-
-                do_accept_lambda();
-            });
+        kvdb_connection * new_connection = new kvdb_connection(io_service_pool_.get_io_service(),
+                                                               buffer_size_, packet_size_, g_test_mode);
+        acceptor_.async_accept(new_connection->socket(), boost::bind(&kvdb_server::handle_accept,
+                               this, boost::asio::placeholders::error, new_connection));
     }
 };
 

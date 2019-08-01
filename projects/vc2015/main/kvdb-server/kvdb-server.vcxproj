@@ -27,7 +27,7 @@
     <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\response.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\asio_session.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\kvdb_connection.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\kvdb_server.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common\aligned_atomic.h" />

@@ -66,9 +66,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\io_service_pool.h">
       <Filter>src\server</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\asio_session.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common\boost_asio_msvc.h">
       <Filter>src\server\common</Filter>
     </ClInclude>
@@ -76,6 +73,9 @@
       <Filter>src\server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\kvdb_server.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\kvdb_connection.h">
       <Filter>src\server</Filter>
     </ClInclude>
   </ItemGroup>

@@ -28,8 +28,8 @@ using namespace boost::asio;
 
 namespace kvdb {
 
-class asio_session : public boost::enable_shared_from_this<asio_session>,
-                     private boost::noncopyable {
+class kvdb_connection : public boost::enable_shared_from_this<kvdb_connection>,
+                        private boost::noncopyable {
 private:
     enum { PACKET_SIZE = MAX_PACKET_SIZE };
 
@@ -51,7 +51,7 @@ private:
     char data_[PACKET_SIZE];
 
 public:
-    asio_session(boost::asio::io_service & io_service, uint32_t buffer_size,
+    kvdb_connection(boost::asio::io_service & io_service, uint32_t buffer_size,
                  uint32_t packet_size, uint32_t need_echo = mode_need_echo)
         : socket_(io_service), need_echo_(need_echo), buffer_size_(buffer_size), packet_size_(packet_size),
           query_count_(0), recieved_bytes_(0), send_bytes_(0), recieved_cnt_(0), sent_cnt_(0),
@@ -64,7 +64,7 @@ public:
         ::memset(data_, 0, sizeof(data_));
     }
 
-    ~asio_session()
+    ~kvdb_connection()
     {
         stop(false);
     }
@@ -111,9 +111,9 @@ public:
         return socket_;
     }
 
-    static boost::shared_ptr<asio_session> create_new(
+    static boost::shared_ptr<kvdb_connection> create_new(
         boost::asio::io_service & io_service, uint32_t buffer_size, uint32_t packet_size) {
-        return boost::shared_ptr<asio_session>(new asio_session(io_service, buffer_size, packet_size, g_test_mode));
+        return boost::shared_ptr<kvdb_connection>(new kvdb_connection(io_service, buffer_size, packet_size, g_test_mode));
     }
 
 private:
