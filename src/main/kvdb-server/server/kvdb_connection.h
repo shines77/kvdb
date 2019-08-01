@@ -7,6 +7,7 @@
 #include <atomic>
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/smart_ptr.hpp>
 
 #include "server/common.h"
@@ -27,6 +28,7 @@ using namespace boost::system;
 using namespace boost::asio;
 
 namespace kvdb {
+namespace server {
 
 class kvdb_connection : public boost::enable_shared_from_this<kvdb_connection>,
                         private boost::noncopyable {
@@ -66,45 +68,21 @@ public:
 
     ~kvdb_connection()
     {
-        stop(false);
+        stop();
     }
 
-    void start()
-    {      
-        set_socket_send_bufsize(MAX_PACKET_SIZE);
-        set_socket_recv_bufsize(MAX_PACKET_SIZE);
+    void start();
 
-        static const int kNetSendTimeout = 45 * 1000;    // Send timeout is 45 seconds.
-        static const int kNetRecvTimeout = 45 * 1000;    // Recieve timeout is 45 seconds.
-        ::setsockopt(socket_.native_handle(), SOL_SOCKET, SO_SNDTIMEO, (const char *)&kNetSendTimeout, sizeof(kNetSendTimeout));
-        ::setsockopt(socket_.native_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char *)&kNetRecvTimeout, sizeof(kNetRecvTimeout));
-
-        linger sLinger;
-        sLinger.l_onoff = 1;    // Enable linger
-        sLinger.l_linger = 5;   // After shutdown(), socket send/recv 5 second data yet.
-        ::setsockopt(socket_.native_handle(), SOL_SOCKET, SO_LINGER, (const char *)&sLinger, sizeof(sLinger));
-
-        g_client_count++;
-
-        do_read_some();
-    }
-
-    void stop(bool delete_self = false)
+    void shutdown_both()
     {
-        //socket_.shutdown(socket_base::shutdown_both);
-        if (socket_.is_open()) {
-#if !defined(_WIN32_WINNT) || (_WIN32_WINNT >= 0x0600)
-            socket_.cancel();
-#endif
-            socket_.close();
-
-            if (g_client_count.load() != 0)
-                g_client_count--;
-        }
-
-        if (delete_self)
-            delete this;
+        // Initiate graceful connection closure.
+        boost::system::error_code ignored_ec;
+        socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
     }
+
+    void stop();
+
+    void stop_connection(const boost::system::error_code & ec);
 
     ip::tcp::socket & socket()
     {
@@ -267,7 +245,8 @@ private:
                     // Write error log
                     std::cout << "asio_session::do_read() - Error: (code = " << ec.value() << ") "
                               << ec.message().c_str() << std::endl;
-                    stop(true);
+
+                    stop_connection(ec);
                 }
             }
         );
@@ -297,7 +276,8 @@ private:
                     // Write error log
                     std::cout << "asio_session::do_write() - Error: (code = " << ec.value() << ") "
                               << ec.message().c_str() << std::endl;
-                    stop(true);
+
+                    stop_connection(ec);
                 }
             }
         );
@@ -364,7 +344,8 @@ private:
                     // Write error log
                     std::cout << "asio_session::do_read_some() - Error: (code = " << ec.value() << ") "
                               << ec.message().c_str() << std::endl;
-                    stop(true);
+
+                    stop_connection(ec);
                 }
             }
         );
@@ -402,7 +383,8 @@ private:
                         // Write error log
                         std::cout << "asio_session::do_write_some() - Error: (code = " << ec.value() << ") "
                                   << ec.message().c_str() << std::endl;
-                        stop(true);
+                        
+                        stop_connection(ec);
                     }
                 }
             );
@@ -429,7 +411,8 @@ private:
                         // Write error log
                         std::cout << "asio_session::do_write_some() - Error: (code = " << ec.value() << ") "
                                   << ec.message().c_str() << std::endl;
-                        stop(true);
+                        
+                        stop_connection(ec);
                     }
                 }
             );
@@ -439,6 +422,9 @@ private:
     }
 };
 
+typedef boost::shared_ptr<kvdb_connection> connection_ptr;
+
+} // namespace server
 } // namespace kvdb
 
 #undef USE_ATOMIC_REALTIME_UPDATE

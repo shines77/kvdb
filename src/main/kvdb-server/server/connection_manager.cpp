@@ -22,7 +22,7 @@ void connection_manager::stop(connection_ptr conn)
 void connection_manager::stop_all()
 {
     std::for_each(connections_.begin(), connections_.end(),
-                  boost::bind(&connection::stop, _1));
+                  boost::bind(&kvdb_connection::stop, _1));
     connections_.clear();
 }
 

@@ -13,12 +13,16 @@
 #endif
 
 #if defined(_MSC_VER)
-  #define BOOST_ASIO_MSVC   _MSC_VER
+#  ifndef BOOST_ASIO_MSVC
+#    define BOOST_ASIO_MSVC   _MSC_VER
+#  endif
 #endif
 
 #if defined(BOOST_ASIO_MSVC)
 #  if (_MSC_VER >= 1900)
-#    define BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
+#    ifndef BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT
+#      define BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
+#    endif
 #  endif // (_MSC_VER >= 1900)
 #endif // defined(BOOST_ASIO_MSVC)
 

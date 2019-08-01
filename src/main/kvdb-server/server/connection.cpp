@@ -77,7 +77,7 @@ void connection::handle_read(const boost::system::error_code & ec,
     }
     else if (ec != boost::asio::error::operation_aborted)
     {
-        connection_manager_.stop(shared_from_this());
+        //connection_manager_.stop(shared_from_this());
     }
 }
 
@@ -92,7 +92,7 @@ void connection::handle_write(const boost::system::error_code & ec)
 
     if (ec != boost::asio::error::operation_aborted)
     {
-        connection_manager_.stop(shared_from_this());
+        //connection_manager_.stop(this->shared_from_this());
     }
 }
 

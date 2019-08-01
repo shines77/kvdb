@@ -9,6 +9,7 @@
 #include <set>
 #include <boost/noncopyable.hpp>
 #include "server/connection.h"
+#include "server/kvdb_connection.h"
 
 namespace kvdb {
 namespace server {

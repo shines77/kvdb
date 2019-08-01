@@ -76,7 +76,7 @@ private:
     response response_;
 };
 
-typedef boost::shared_ptr<connection> connection_ptr;
+//typedef boost::shared_ptr<connection> connection_ptr;
 
 } // namespace server
 } // namespace kvdb

@@ -10,6 +10,7 @@
 using namespace boost::asio;
 
 namespace kvdb {
+namespace server {
 
 class io_service_pool : private boost::noncopyable {
 private:
@@ -30,8 +31,9 @@ public:
     explicit io_service_pool(uint32_t pool_size)
         : next_io_service_(0)
     {
-        if (pool_size == 0)
+        if (pool_size == 0) {
             throw std::runtime_error("io_service_pool size is 0.");
+        }
 
         // Give all the io_services work to do so that their run() functions will not
         // exit until they are explicitly stopped.
@@ -53,16 +55,16 @@ public:
     {
         // Create a pool of threads to run all of the io_services.
         std::vector< boost::shared_ptr<boost::thread> > threads;
-        for (std::size_t i = 0; i < io_services_.size(); ++i)
-        {
+        for (std::size_t i = 0; i < io_services_.size(); ++i) {
             boost::shared_ptr<boost::thread> thread(new boost::thread(
                 boost::bind(&boost::asio::io_service::run, io_services_[i])));
             threads.push_back(thread);
         }
 
         // Wait for all threads in the pool to exit.
-        for (std::size_t i = 0; i < threads.size(); ++i)
+        for (std::size_t i = 0; i < threads.size(); ++i) {
             threads[i]->join();
+        }
     }
 
     /// Stop all io_service objects in the pool.
@@ -104,4 +106,5 @@ public:
     }
 };
 
+} // namespace server
 } // namespace kvdb

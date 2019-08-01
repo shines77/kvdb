@@ -26,6 +26,7 @@
 #define STRING_COMPARE_MODE     STRING_COMPARE_SSE42
 
 using namespace kvdb;
+using namespace kvdb::server;
 
 uint32_t g_test_mode    = kvdb::test_mode_echo_server;
 uint32_t g_test_method  = kvdb::test_method_pingpong;
@@ -48,13 +49,13 @@ kvdb::aligned_atomic<uint32_t> kvdb::g_client_count(0);
 kvdb::aligned_atomic<uint64_t> kvdb::g_recv_bytes(0);
 kvdb::aligned_atomic<uint64_t> kvdb::g_send_bytes(0);
 
-void run_kvdb_server(const std::string & ip, const std::string & port,
+void run_kvdb_server(const std::string & address, const std::string & port,
                      uint32_t packet_size, uint32_t thread_num,
                      bool confirm = false)
 {
     static const uint32_t kSeesionBufferSize = 65536;
     try {
-        kvdb_server server(ip, port, kSeesionBufferSize, packet_size, thread_num);
+        kvdb_server server(address, port, kSeesionBufferSize, packet_size, thread_num);
         server.run();
 
         std::cout << "Server has bind and listening ..." << std::endl;
@@ -69,7 +70,7 @@ void run_kvdb_server(const std::string & ip, const std::string & port,
             auto cur_succeed_count = (uint64_t)g_query_count;
             auto client_count = (uint32_t)g_client_count;
             auto qps = (cur_succeed_count - last_query_count);
-            std::cout << ip.c_str() << ":" << port.c_str() << " - " << packet_size << " bytes : "
+            std::cout << address.c_str() << ":" << port.c_str() << " - " << packet_size << " bytes : "
                       << thread_num << " threads : "
                       << "[" << std::left << std::setw(4) << client_count << "] conns : "
                       << "nodelay:" << g_nodelay << ", "
@@ -79,7 +80,7 @@ void run_kvdb_server(const std::string & ip, const std::string & port,
                       << "BW="
                       << std::right << std::setw(6)
                       << std::setiosflags(std::ios::fixed) << std::setprecision(3)
-                      << ((qps * packet_size) / (1024.0 * 1024.0))
+                      << ((qps * packet_size) * 8 / (1024.0 * 1024.0))
                       << " MB/s" << std::endl;
             std::cout << std::right;
             last_query_count = cur_succeed_count;
