@@ -231,7 +231,7 @@ private:
             [this](const boost::system::error_code & ec, std::size_t received_bytes)
             {
                 if ((uint32_t)received_bytes != packet_size_) {
-                    std::cout << "asio_session::do_read(): async_read(), received_bytes = "
+                    std::cout << "kvdb_connection::do_read(): async_read(), received_bytes = "
                               << received_bytes << " bytes." << std::endl;
                 }
                 if (!ec) {
@@ -243,7 +243,7 @@ private:
                 }
                 else {
                     // Write error log
-                    std::cout << "asio_session::do_read() - Error: (code = " << ec.value() << ") "
+                    std::cout << "kvdb_connection::do_read() - Error: (code = " << ec.value() << ") "
                               << ec.message().c_str() << std::endl;
 
                     stop_connection(ec);
@@ -266,7 +266,7 @@ private:
                     do_query_counter_write_some((uint32_t)send_bytes);
 
                     if ((uint32_t)send_bytes != packet_size_) {
-                        std::cout << "asio_session::do_write(): async_write(), send_bytes = "
+                        std::cout << "kvdb_connection::do_write(): async_write(), send_bytes = "
                                   << send_bytes << " bytes." << std::endl;
                     }
 
@@ -274,7 +274,7 @@ private:
                 }
                 else {
                     // Write error log
-                    std::cout << "asio_session::do_write() - Error: (code = " << ec.value() << ") "
+                    std::cout << "kvdb_connection::do_write() - Error: (code = " << ec.value() << ") "
                               << ec.message().c_str() << std::endl;
 
                     stop_connection(ec);
@@ -318,7 +318,7 @@ private:
                 }
                 if (cnt < 15) {
                     if ((uint32_t)received_bytes != buffer_size_) {
-                        std::cout << "asio_session::do_read_some(): async_read(), received_bytes = "
+                        std::cout << "kvdb_connection::do_read_some(): async_read(), received_bytes = "
                                   << received_bytes << " bytes." << std::endl;
                     }
                     cnt++;
@@ -342,7 +342,7 @@ private:
                 }
                 else {
                     // Write error log
-                    std::cout << "asio_session::do_read_some() - Error: (code = " << ec.value() << ") "
+                    std::cout << "kvdb_connection::do_read_some() - Error: (code = " << ec.value() << ") "
                               << ec.message().c_str() << std::endl;
 
                     stop_connection(ec);
@@ -373,7 +373,7 @@ private:
                         do_query_counter_write_some((uint32_t)send_bytes);
 
                         if ((uint32_t)send_bytes != buffer_size) {
-                            std::cout << "asio_session::do_write_some(): async_write(), send_bytes = "
+                            std::cout << "kvdb_connection::do_write_some(): async_write(), send_bytes = "
                                       << send_bytes << " bytes." << std::endl;
                         }
 
@@ -381,7 +381,7 @@ private:
                     }
                     else {
                         // Write error log
-                        std::cout << "asio_session::do_write_some() - Error: (code = " << ec.value() << ") "
+                        std::cout << "kvdb_connection::do_write_some() - Error: (code = " << ec.value() << ") "
                                   << ec.message().c_str() << std::endl;
                         
                         stop_connection(ec);
@@ -401,7 +401,7 @@ private:
                         do_query_counter_write_some((uint32_t)send_bytes);
 
                         if ((uint32_t)send_bytes != buffer_size) {
-                            std::cout << "asio_session::do_write_some(): async_write(), send_bytes = "
+                            std::cout << "kvdb_connection::do_write_some(): async_write(), send_bytes = "
                                       << send_bytes << " bytes." << std::endl;
                         }
 
@@ -409,7 +409,7 @@ private:
                     }
                     else {
                         // Write error log
-                        std::cout << "asio_session::do_write_some() - Error: (code = " << ec.value() << ") "
+                        std::cout << "kvdb_connection::do_write_some() - Error: (code = " << ec.value() << ") "
                                   << ec.message().c_str() << std::endl;
                         
                         stop_connection(ec);

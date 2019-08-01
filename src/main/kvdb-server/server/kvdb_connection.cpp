@@ -53,13 +53,5 @@ void kvdb_connection::stop_connection(const boost::system::error_code & ec)
 }
 
 
-typedef boost::shared_ptr<kvdb_connection> connection_ptr;
-
 } // namespace server
 } // namespace kvdb
-
-#undef USE_ATOMIC_REALTIME_UPDATE
-#undef QUERY_COUNTER_INTERVAL
-
-#undef MAX_UPDATE_CNT
-#undef MAX_UPDATE_BYTES
