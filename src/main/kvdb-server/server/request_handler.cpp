@@ -21,7 +21,7 @@ void request_handler::handle_request(const request & req, response & res)
 {
     // Decode url to path.
     std::string request_path;
-    if (!url_decode(req.uri, request_path))
+    if (!url_decode(req.data, request_path))
     {
         res = response::stock_response(response::bad_request);
         return;

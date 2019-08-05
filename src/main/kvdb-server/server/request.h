@@ -25,15 +25,90 @@
 namespace kvdb {
 namespace server {
 
+struct DataType {
+    enum Type {
+        Unknown,
+        Bit,
+        Bool,
+        Byte,
+        Int8,
+        Int16,
+        Int32,
+        Int64,
+        UInt8,
+        UInt16,
+        UInt32,
+        UInt64,
+        Float,
+        Double,
+        LongDouble,
+        Decimal,
+        String,
+        String1B,
+        String2B,
+        String3B,
+        String4B,
+        Binary,
+        Binary1B,
+        Binary2B,
+        Binary3B,
+        Binary4B,
+        Date,
+        Time,
+        Year,
+        DateTime,
+        TimeStamp,
+        Bitmap,
+        Last
+    };
+};
+
+struct CommandType {
+    enum Type {
+        Unknown,
+        Login,
+        HandShake,
+        Connect,
+        Query,
+        Logout,
+        Last
+    };
+};
+
+struct Status {
+    enum Type {
+        Unknown,
+
+        LoginFailed,
+        LoginOK,
+
+        HandShakeFailed,
+        HandShakeOK,
+
+        ConnectFailed,
+        Connected,
+
+        QueryError,
+        QueryOK,
+
+        LogoutFailed,
+        LogoutOK,
+
+        Last
+    };
+};
+
+struct request_header
+{
+    uint32_t    command;
+    uint32_t    size;
+};
+
 /// A request received from a client.
 struct request
 {
-    uint8_t     major;
-    uint8_t     minor;
-    uint16_t    length;
-    uint32_t    command;
-    std::string uri;
-    std::vector<header_field> fields;
+    request_header  header;
+    char            data[8];
 };
 
 } // namespace server

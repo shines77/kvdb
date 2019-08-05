@@ -10,13 +10,15 @@
 #include <string>
 #include <utility>
 
-#include <boost/program_options.hpp>
-
-#include "kvdb/all.h"
+#include "server/common/boost_asio_msvc.h"
 
 #include "server/common.h"
 #include "server/common/cmd_utils.h"
 #include "server/kvdb_server.h"
+
+#include "kvdb/all.h"
+
+#include <boost/program_options.hpp>
 
 // String compare mode
 #define STRING_COMPARE_STDC     0
@@ -81,7 +83,7 @@ void run_kvdb_server(const std::string & address, const std::string & port,
                       << std::right << std::setw(6)
                       << std::setiosflags(std::ios::fixed) << std::setprecision(3)
                       << ((qps * packet_size) * 8 / (1024.0 * 1024.0))
-                      << " MB/s" << std::endl;
+                      << " Mb/s" << std::endl;
             std::cout << std::right;
             last_query_count = cur_succeed_count;
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -254,7 +256,7 @@ int main(int argc, char * argv[])
         need_echo = args_map["echo"].as<int32_t>();
     }
     std::cout << "need_echo: " << need_echo << std::endl;
-    g_need_echo =  need_echo;
+    g_need_echo = need_echo;
 
     // Run the server
     std::cout << std::endl;

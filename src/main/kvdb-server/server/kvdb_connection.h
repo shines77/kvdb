@@ -71,6 +71,25 @@ public:
         stop();
     }
 
+    void set_socket_options()
+    {
+        get_socket_send_bufsize();
+        get_socket_recv_bufsize();
+
+        set_socket_send_bufsize(MAX_PACKET_SIZE);
+        set_socket_recv_bufsize(MAX_PACKET_SIZE);
+
+        static const int kNetSendTimeout = 45 * 1000;    // Send timeout is 45 seconds.
+        static const int kNetRecvTimeout = 45 * 1000;    // Recieve timeout is 45 seconds.
+        ::setsockopt(socket_.native_handle(), SOL_SOCKET, SO_SNDTIMEO, (const char *)&kNetSendTimeout, sizeof(kNetSendTimeout));
+        ::setsockopt(socket_.native_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char *)&kNetRecvTimeout, sizeof(kNetRecvTimeout));
+
+        linger sLinger;
+        sLinger.l_onoff = 1;    // Enable linger
+        sLinger.l_linger = 5;   // After shutdown(), socket send/recv 5 second data yet.
+        ::setsockopt(socket_.native_handle(), SOL_SOCKET, SO_LINGER, (const char *)&sLinger, sizeof(sLinger));
+    }
+
     void start();
 
     void shutdown_both()
@@ -100,8 +119,17 @@ private:
         boost::asio::socket_base::send_buffer_size send_bufsize_option;
         socket_.get_option(send_bufsize_option);
 
-        //std::cout << "send_buffer_size: " << send_bufsize_option.value() << " bytes" << std::endl;
+        std::cout << "send_buffer_size: " << send_bufsize_option.value() << " bytes" << std::endl;
         return send_bufsize_option.value();
+    }
+
+    int get_socket_recv_bufsize() const
+    {
+        boost::asio::socket_base::receive_buffer_size recv_bufsize_option;
+        socket_.get_option(recv_bufsize_option);
+
+        std::cout << "receive_buffer_size: " << recv_bufsize_option.value() << " bytes" << std::endl;
+        return recv_bufsize_option.value();
     }
 
     void set_socket_send_bufsize(int buffer_size)
@@ -110,15 +138,6 @@ private:
         socket_.set_option(send_bufsize_option);
 
         //std::cout << "set_socket_send_buffer_size(): " << buffer_size << " bytes" << std::endl;
-    }
-
-    int get_socket_recv_bufsize() const
-    {
-        boost::asio::socket_base::receive_buffer_size recv_bufsize_option;
-        socket_.get_option(recv_bufsize_option);
-
-        //std::cout << "receive_buffer_size: " << recv_bufsize_option.value() << " bytes" << std::endl;
-        return recv_bufsize_option.value();
     }
 
     void set_socket_recv_bufsize(int buffer_size)

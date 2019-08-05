@@ -8,6 +8,7 @@
 #include <boost/logic/tribool.hpp>
 
 #include "server/connection_manager.h"
+#include "server/request_parser.h"
 #include "server/request_handler.h"
 
 namespace kvdb {
@@ -47,36 +48,31 @@ void connection::stop()
 void connection::handle_read(const boost::system::error_code & ec,
                              std::size_t bytes_transferred)
 {
-    if (!ec)
-    {
-        boost::tribool result;
-        boost::tie(result, boost::tuples::ignore) = request_parser_.parse(
-            request_, buffer_.data(), buffer_.data() + bytes_transferred);
-
-        if (result)
-        {
+    if (!ec) {
+        int result = request_parser_.parse(request_, buffer_.data(), buffer_.data() + bytes_transferred);
+        if (result == ParseStatus::Success) {
             request_handler_.handle_request(request_, response_);
             boost::asio::async_write(socket_, response_.to_buffers(),
                 boost::bind(&connection::handle_write, shared_from_this(),
                             boost::asio::placeholders::error));
         }
-        else if (!result)
-        {
+        else if (result == ParseStatus::Failed) {
             response_ = response::stock_response(response::bad_request);
             boost::asio::async_write(socket_, response_.to_buffers(),
                 boost::bind(&connection::handle_write, shared_from_this(),
                             boost::asio::placeholders::error));
         }
-        else
-        {
+        else if (result == ParseStatus::TooSmall) {
             socket_.async_read_some(boost::asio::buffer(buffer_),
                 boost::bind(&connection::handle_read, shared_from_this(),
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::bytes_transferred));
         }
+        else {
+            //
+        }
     }
-    else if (ec != boost::asio::error::operation_aborted)
-    {
+    else if (ec != boost::asio::error::operation_aborted) {
         //connection_manager_.stop(shared_from_this());
     }
 }
@@ -92,7 +88,7 @@ void connection::handle_write(const boost::system::error_code & ec)
 
     if (ec != boost::asio::error::operation_aborted)
     {
-        //connection_manager_.stop(this->shared_from_this());
+        //connection_manager_.stop(shared_from_this());
     }
 }
 

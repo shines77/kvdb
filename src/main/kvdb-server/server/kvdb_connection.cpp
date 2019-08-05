@@ -8,19 +8,8 @@ namespace kvdb {
 namespace server {
 
 void kvdb_connection::start()
-{      
-    set_socket_send_bufsize(MAX_PACKET_SIZE);
-    set_socket_recv_bufsize(MAX_PACKET_SIZE);
-
-    static const int kNetSendTimeout = 45 * 1000;    // Send timeout is 45 seconds.
-    static const int kNetRecvTimeout = 45 * 1000;    // Recieve timeout is 45 seconds.
-    ::setsockopt(socket_.native_handle(), SOL_SOCKET, SO_SNDTIMEO, (const char *)&kNetSendTimeout, sizeof(kNetSendTimeout));
-    ::setsockopt(socket_.native_handle(), SOL_SOCKET, SO_RCVTIMEO, (const char *)&kNetRecvTimeout, sizeof(kNetRecvTimeout));
-
-    linger sLinger;
-    sLinger.l_onoff = 1;    // Enable linger
-    sLinger.l_linger = 5;   // After shutdown(), socket send/recv 5 second data yet.
-    ::setsockopt(socket_.native_handle(), SOL_SOCKET, SO_LINGER, (const char *)&sLinger, sizeof(sLinger));
+{
+    set_socket_options();
 
     g_client_count++;
 
@@ -51,7 +40,6 @@ void kvdb_connection::stop_connection(const boost::system::error_code & ec)
         stop();
     }
 }
-
 
 } // namespace server
 } // namespace kvdb
