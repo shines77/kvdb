@@ -23,6 +23,12 @@
     <Filter Include="src\support">
       <UniqueIdentifier>{ff84d9c8-7452-4498-8db6-638316146f89}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\stream">
+      <UniqueIdentifier>{6fc97e8a-6d91-4102-846b-7e58751723ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\server">
+      <UniqueIdentifier>{af1145a3-1a1d-469f-a00b-64846b50d7fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb\all.h">
@@ -102,6 +108,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\hash\DictionaryOld.h">
       <Filter>src\hash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\InputStream.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\DataType.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\server\CommandType.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\server\ServerStatus.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseStatus.h">
+      <Filter>src\stream</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

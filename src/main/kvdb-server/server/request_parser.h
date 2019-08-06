@@ -16,78 +16,35 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
 
+#include <kvdb/stream/InputStream.h>
+#include <kvdb/stream/ParseStatus.h>
+#include <kvdb/server/CommandType.h>
+#include <kvdb/server/ServerStatus.h>
+
 namespace kvdb {
 namespace server {
-
-template <typename T>
-class InputStream {
-public:
-    typedef typename std::remove_pointer<T>::type   value_type;
-
-private:
-    value_type * current_;
-
-public:
-    InputStream() : current_(nullptr) {}
-    InputStream(T value) : current_(value) {}
-    ~InputStream() {}
-
-    char readChar() const {
-        return *(char *)current_;
-    }
-
-    unsigned char readUChar() const {
-        return *(unsigned char *)current_;
-    }
-
-    int8_t readInt8() const {
-        return *(int8_t *)current_;
-    }
-
-    int16_t readInt16() const {
-        return *(int16_t *)current_;
-    }
-
-    int32_t readInt32() const {
-        return *(int32_t *)current_;
-    }
-
-    int64_t readInt64() const {
-        return *(int64_t *)current_;
-    }
-
-    uint8_t readUInt8() const {
-        return *(uint8_t *)current_;
-    }
-
-    uint16_t readUInt16() const {
-        return *(uint16_t *)current_;
-    }
-
-    uint32_t readUInt32() const {
-        return *(uint32_t *)current_;
-    }
-
-    uint64_t readUInt64() const {
-        return *(uint64_t *)current_;
-    }
-};
-
-struct ParseStatus {
-    enum Type {
-        Unknown,
-        Success,
-        TooSmall,
-        Failed,
-        Last
-    };
-};
 
 struct request;
 
 /// Parser for incoming requests.
 class request_parser
 {
+private:
+    /// The current state of the parser.
+    struct State {
+        enum Type {
+            Start,
+            Login,
+            HandShake,
+            Connect,
+            Disconnect,
+            Logout,
+            Last
+        };
+    };
+
+    int state_;
+
 public:
     /// Construct ready to parse the request method.
     request_parser();
@@ -100,26 +57,14 @@ public:
     /// data is required. The InputIterator return value indicates how much of the
     /// input has been consumed.
     template <typename InputIterator>
-    int parse(request & req, InputIterator begin, InputIterator end) {
-        InputStream<InputIterator> stream(begin);
-        uint32_t command = stream.readUInt32();
-        uint32_t total_size = stream.readUInt32();
+    int parse(request & req, InputIterator begin, InputIterator end);
 
-        size_t kHeaderSize = sizeof(uint32_t) * 2;
+    int handle_login_command(InputStream & stream);
+    int handle_handshake_command(InputStream & stream);
 
-        size_t length = (size_t)(end - begin);
-        if (length >= (total_size + kHeaderSize)) {
-            return ParseStatus::Success;
-        }
-        else {
-            return ParseStatus::TooSmall;
-        }
-    }
+    int handle_request_data(const char * data);
 
 private:
-    /// Handle the next character of input.
-    boost::tribool consume(request& req, char input);
-
     /// Check if a byte is an HTTP character.
     static bool is_char(int c);
 
@@ -131,32 +76,54 @@ private:
 
     /// Check if a byte is a digit.
     static bool is_digit(int c);
-
-    /// The current state of the parser.
-    enum state
-    {
-        method_start,
-        method,
-        uri,
-        http_version_h,
-        http_version_t_1,
-        http_version_t_2,
-        http_version_p,
-        http_version_slash,
-        http_version_major_start,
-        http_version_major,
-        http_version_minor_start,
-        http_version_minor,
-        expecting_newline_1,
-        header_line_start,
-        header_lws,
-        header_name,
-        space_before_header_value,
-        header_value,
-        expecting_newline_2,
-        expecting_newline_3
-    } state_;
 };
+
+template <typename InputIterator>
+int request_parser::parse(request & req, InputIterator begin, InputIterator end)
+{
+    InputStream stream(begin);
+    uint32_t command = stream.readUInt32();
+    uint32_t total_size = stream.readUInt32();
+
+    size_t kHeaderSize = sizeof(request_header);
+
+    size_t length = (size_t)(end - begin);
+    if (length >= ((size_t)total_size + kHeaderSize)) {
+        req.header.command = command;
+        req.header.size = total_size;
+
+        const char * first = stream.current();
+        int result = 0;
+        switch (command) {
+        case CommandType::Login:
+            {
+                result = handle_login_command(stream);
+            }
+            break;
+
+        case CommandType::HandShake:
+            {
+                //handle_handshake_command(stream);
+            }
+            break;
+
+        default:
+            // Unknown command
+            break;
+        }
+
+        const char * last = stream.current();
+        if ((last - first) == (size_t)total_size) {
+            return ParseStatus::Success;
+        }
+        else {
+            return ParseStatus::Failed;
+        }
+    }
+    else {
+        return ParseStatus::TooSmall;
+    }
+}
 
 } // namespace server2
 } // namespace http

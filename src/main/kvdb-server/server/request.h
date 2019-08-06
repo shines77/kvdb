@@ -25,90 +25,29 @@
 namespace kvdb {
 namespace server {
 
-struct DataType {
-    enum Type {
-        Unknown,
-        Bit,
-        Bool,
-        Byte,
-        Int8,
-        Int16,
-        Int32,
-        Int64,
-        UInt8,
-        UInt16,
-        UInt32,
-        UInt64,
-        Float,
-        Double,
-        LongDouble,
-        Decimal,
-        String,
-        String1B,
-        String2B,
-        String3B,
-        String4B,
-        Binary,
-        Binary1B,
-        Binary2B,
-        Binary3B,
-        Binary4B,
-        Date,
-        Time,
-        Year,
-        DateTime,
-        TimeStamp,
-        Bitmap,
-        Last
-    };
-};
-
-struct CommandType {
-    enum Type {
-        Unknown,
-        Login,
-        HandShake,
-        Connect,
-        Query,
-        Logout,
-        Last
-    };
-};
-
-struct Status {
-    enum Type {
-        Unknown,
-
-        LoginFailed,
-        LoginOK,
-
-        HandShakeFailed,
-        HandShakeOK,
-
-        ConnectFailed,
-        Connected,
-
-        QueryError,
-        QueryOK,
-
-        LogoutFailed,
-        LogoutOK,
-
-        Last
-    };
-};
-
 struct request_header
 {
     uint32_t    command;
     uint32_t    size;
 };
 
+#pragma warning (push)
+#pragma warning (disable: 4200)
+
+/// A request received from a client.
+struct request_data
+{
+    request_header  header;
+    char            data[0];
+};
+
+#pragma warning (pop)
+
 /// A request received from a client.
 struct request
 {
     request_header  header;
-    char            data[8];
+    const char *    data;
 };
 
 } // namespace server

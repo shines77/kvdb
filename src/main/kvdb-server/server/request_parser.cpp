@@ -6,35 +6,66 @@ namespace kvdb {
 namespace server {
 
 request_parser::request_parser()
-    : state_(method_start)
+    : state_(State::Start)
 {
 }
 
 void request_parser::reset()
 {
-    state_ = method_start;
+    state_ = State::Start;
 }
 
-boost::tribool request_parser::consume(request & req, char input)
+int request_parser::handle_login_command(InputStream & stream)
 {
-    switch (state_)
-    {
-    case expecting_newline_2:
-        if (input == '\n')
-        {
-            state_ = header_line_start;
-            return boost::indeterminate;
+    std::string username, password, database;
+    int result = stream.parseString(username);
+    if (result == 0) {
+        int result = stream.parseString(password);
+        if (result == 0) {
+            int result = stream.parseString(database);
+            if (result == 0) {
+                return ParseStatus::Success;
+            }
         }
-        else
-        {
-            return false;
-        }
-    case expecting_newline_3:
-        return (input == '\n');
-
-    default:
-        return false;
     }
+    else {
+        //
+    }
+    return ParseStatus::Failed;
+}
+
+int request_parser::handle_handshake_command(InputStream & stream)
+{
+    return 0;
+}
+
+int request_parser::handle_request_data(const char * data)
+{
+    InputStream stream(data);
+    bool isEndOf = false;
+    while (!isEndOf) {
+        uint8_t data_type = stream.getUInt8();
+        switch (data_type) {
+        case DataType::EndOf:
+            {
+                stream.next();
+                uint8_t end_of = stream.getUInt8();
+                if (end_of == '\0') {
+                    isEndOf = true;
+                }
+                stream.next();
+            }
+            break;
+
+        case DataType::Bool:
+            break;
+
+        default:
+            // Unknown errors
+            break;
+        }
+    }
+    return 0;
 }
 
 bool request_parser::is_char(int c)
