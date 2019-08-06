@@ -30,7 +30,7 @@ public:
     void handle_request(const request & req, response & res);
 };
 
-} // namespace server2
+} // namespace server
 } // namespace http
 
 #endif // KVDB_REQUEST_HANDLER_H

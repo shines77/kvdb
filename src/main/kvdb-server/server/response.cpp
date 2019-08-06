@@ -243,5 +243,5 @@ response response::stock_response(response::status_type status)
     return res;
 }
 
-} // namespace server2
+} // namespace server
 } // namespace http

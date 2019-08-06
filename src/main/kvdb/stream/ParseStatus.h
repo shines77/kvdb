@@ -10,10 +10,9 @@ namespace kvdb {
 
 struct ParseStatus {
     enum Type {
-        Unknown,
-        Success,
-        TooSmall,
+        Success = 0,
         Failed,
+        TooSmall,
         Last
     };
 };

@@ -1,12 +1,3 @@
-//
-// request_parser.hpp
-// ~~~~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2003-2017 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 #ifndef HTTP_SERVER2_REQUEST_PARSER_HPP
 #define HTTP_SERVER2_REQUEST_PARSER_HPP
@@ -125,7 +116,7 @@ int request_parser::parse(request & req, InputIterator begin, InputIterator end)
     }
 }
 
-} // namespace server2
+} // namespace server
 } // namespace http
 
 #endif // HTTP_SERVER2_REQUEST_PARSER_HPP

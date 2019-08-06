@@ -103,5 +103,5 @@ bool request_handler::url_decode(const std::string & in, std::string & out)
     return true;
 }
 
-} // namespace server2
+} // namespace server
 } // namespace http

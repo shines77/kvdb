@@ -36,7 +36,7 @@ int request_parser::handle_login_command(InputStream & stream)
 
 int request_parser::handle_handshake_command(InputStream & stream)
 {
-    return 0;
+    return ParseStatus::Success;
 }
 
 int request_parser::handle_request_data(const char * data)
@@ -97,5 +97,5 @@ bool request_parser::is_digit(int c)
     return c >= '0' && c <= '9';
 }
 
-} // namespace server2
+} // namespace server
 } // namespace http
