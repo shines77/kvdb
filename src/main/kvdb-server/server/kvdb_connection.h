@@ -347,10 +347,10 @@ private:
                     // Count the recieved bytes
                     do_recieve_counter((uint32_t)received_bytes);
 
-                    if (need_echo_ == mode_no_echo) {
-                        // Counter the recieved qps
-                        do_query_counter_read_some((int32_t)received_bytes);
+                    // Counter the recieved qps
+                    do_query_counter_read_some((int32_t)received_bytes);
 
+                    if (need_echo_ == mode_no_echo) {
                         // Needn't respond the request and read data again.
                         do_read_some();
                     }
@@ -372,7 +372,6 @@ private:
 
     void do_write_some(int32_t total_send_bytes)
     {
-        //auto self(this->shared_from_this());
         while (total_send_bytes > 0) {
             std::size_t buffer_size;
             if (total_send_bytes < PACKET_SIZE)
@@ -389,7 +388,7 @@ private:
                         do_send_counter((uint32_t)send_bytes);
 
                         // If get a circle of ping-pong, we count the query one time.
-                        do_query_counter_write_some((uint32_t)send_bytes);
+                        //do_query_counter_write_some((uint32_t)send_bytes);
 
                         if ((uint32_t)send_bytes != buffer_size) {
                             std::cout << "kvdb_connection::do_write_some(): async_write(), send_bytes = "

@@ -145,9 +145,9 @@ private:
     void do_accept()
     {
         new_connection_.reset(new kvdb_connection(io_service_pool_.get_io_service(),
-                                                  buffer_size_, packet_size_, g_test_mode));
+                                                  buffer_size_, packet_size_, g_need_echo));
         acceptor_.async_accept(new_connection_->socket(), boost::bind(&kvdb_server::handle_accept,
-                               shared_from_this(), boost::asio::placeholders::error, new_connection_));
+                               this, boost::asio::placeholders::error, new_connection_));
     }
 
     void handle_accept(const boost::system::error_code & ec,

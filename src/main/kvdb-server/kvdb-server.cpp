@@ -91,8 +91,8 @@ void run_kvdb_server(const std::string & address, const std::string & port,
 
         server.join();
     }
-    catch (const std::exception & e) {
-        std::cerr << "Exception: " << e.what() << std::endl;
+    catch (const std::exception & ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl;
     }
 }
 
