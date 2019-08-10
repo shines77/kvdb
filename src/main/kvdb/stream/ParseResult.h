@@ -1,6 +1,6 @@
 
-#ifndef KVDB_STREAM_PARSESTATUS_H
-#define KVDB_STREAM_PARSESTATUS_H
+#ifndef KVDB_STREAM_PARSERESULT_H
+#define KVDB_STREAM_PARSERESULT_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -8,16 +8,16 @@
 
 namespace kvdb {
 
-struct ParseStatus {
+struct ParseResult {
     enum Type {
         Failed = -1,
-        Success = 0,
+        OK = 0,
+        Success = OK,
         Error,
-        TooSmall,
         Last
     };
 };
 
 } // namespace kvdb
 
-#endif // KVDB_STREAM_PARSESTATUS_H
+#endif // KVDB_STREAM_PARSERESULT_H

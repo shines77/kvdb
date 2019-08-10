@@ -34,8 +34,12 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\hash\Hash.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\hash\HashHelper.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\char_traits.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\iterator.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\nothrow_deleter.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\nothrow_new.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\StringRef.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\StringRefList.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\string_iterator.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\string_utils.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\strlen.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\server\CommandType.h" />
@@ -43,6 +47,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\store\Slice.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\DataType.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\InputStream.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseResult.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseStatus.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_forward.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_reverse.h" />

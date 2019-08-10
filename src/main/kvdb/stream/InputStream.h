@@ -17,6 +17,7 @@
 #include <type_traits>
 
 #include "kvdb/stream/DataType.h"
+#include "kvdb/jstd/StringRef.h"
 
 namespace kvdb {
 
@@ -30,7 +31,8 @@ public:
                 typename std::remove_cv<VauleType>::type
             >::type     value_type;
 
-    typedef std::basic_string<char_type>    string_type;
+    typedef std::basic_string<char_type>        string_type;
+    typedef jstd::BasicStringRef<char_type>     stringref_type;
 
 private:
     char_type * current_;
@@ -226,7 +228,7 @@ public:
     }
 
     int parseString(string_type & value) {
-        int result = 0;
+        int result = ParseResult::OK;
         uint32_t length;
 
         uint8_t data_type = readUInt8();
@@ -253,7 +255,46 @@ public:
 
         default:
             back();
-            result = -1;
+            result = ParseResult::Failed;
+            break;
+        }
+
+        return result;
+    }
+
+    void readString(stringref_type & value, size_t length) {
+        value.assign((const char_type *)current_, length);
+    }
+
+    int parseString(stringref_type & value) {
+        int result = ParseResult::OK;
+        uint32_t length;
+
+        uint8_t data_type = readUInt8();
+        switch (data_type) {
+        case DataType::String:
+            length = readUInt32();
+            readString(value, length);
+            break;
+
+        case DataType::String1B:
+            length = readUInt8();
+            readString(value, length);
+
+        case DataType::String2B:
+            length = readUInt16();
+            readString(value, length);
+            break;
+
+        case DataType::String3B:
+            length = getUInt32() & 0x00FFFFFFU;
+            next(3);
+            readString(value, length);
+            break;
+
+        default:
+            back();
+            result = ParseResult::Failed;
             break;
         }
 

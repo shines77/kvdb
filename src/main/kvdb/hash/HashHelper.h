@@ -34,7 +34,7 @@
                                                                                 \
         static HashType getHashCode(char_type * data) {                         \
             return (HashType)HashFunc((const char *)data,                       \
-                             jstd::detail::strlen((const decay_type *)data));   \
+                             jstd::detail::StrLen((const decay_type *)data));   \
         }                                                                       \
     }
 

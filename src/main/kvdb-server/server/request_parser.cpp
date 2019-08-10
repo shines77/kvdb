@@ -19,11 +19,11 @@ int request_parser::handle_login_command(InputStream & stream)
 {
     std::string username, password, database;
     int result = stream.parseString(username);
-    if (result == 0) {
+    if (result == ParseResult::OK) {
         int result = stream.parseString(password);
-        if (result == 0) {
+        if (result == ParseResult::OK) {
             int result = stream.parseString(database);
-            if (result == 0) {
+            if (result == ParseResult::OK) {
                 return ParseStatus::Success;
             }
         }
@@ -37,6 +37,46 @@ int request_parser::handle_login_command(InputStream & stream)
 int request_parser::handle_handshake_command(InputStream & stream)
 {
     return ParseStatus::Success;
+}
+
+int request_parser::parse_first_query_command(jstd::StringRef & cmd, const jstd::StringRef & qurey)
+{
+    size_t first = 0, last;
+    size_t i;
+    for (i = 0; i < qurey.size(); ++i) {
+        if (qurey[i] != ' ') {
+            break;
+        }
+        first++;
+    }
+
+    last = first;
+    for ( ; i < qurey.size(); ++i) {
+        if (qurey[i] != ' ') {
+            last++;
+        }
+        else {
+            break;
+        }
+    }
+
+    cmd.set_data(qurey.data(), first, last);
+    return (int)cmd.size();
+}
+
+int request_parser::handle_query_command(InputStream & stream)
+{
+    jstd::StringRef qurey;
+    int result = stream.parseString(qurey);
+    if (result == ParseResult::OK) {
+        jstd::StringRef cmd;
+        int result = parse_first_query_command(cmd, qurey);
+        return (result > 0) ? ParseStatus::Success : ParseStatus::Error;
+    }
+    else {
+        //
+    }
+    return ParseStatus::Failed;
 }
 
 int request_parser::handle_request_data(const char * data)

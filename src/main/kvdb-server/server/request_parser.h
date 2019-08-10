@@ -8,9 +8,12 @@
 #include <boost/tuple/tuple.hpp>
 
 #include <kvdb/stream/InputStream.h>
+#include <kvdb/stream/ParseResult.h>
 #include <kvdb/stream/ParseStatus.h>
 #include <kvdb/server/CommandType.h>
 #include <kvdb/server/ServerStatus.h>
+
+#include <kvdb/jstd/StringRef.h>
 
 namespace kvdb {
 namespace server {
@@ -52,6 +55,9 @@ public:
 
     int handle_login_command(InputStream & stream);
     int handle_handshake_command(InputStream & stream);
+    int handle_query_command(InputStream & stream);
+
+    int parse_first_query_command(jstd::StringRef & cmd, const jstd::StringRef & qurey);
 
     int handle_request_data(const char * data);
 
@@ -94,7 +100,13 @@ int request_parser::parse(request & req, InputIterator begin, InputIterator end)
 
         case CommandType::HandShake:
             {
-                //handle_handshake_command(stream);
+                //result = handle_handshake_command(stream);
+            }
+            break;
+
+        case CommandType::Query:
+            {
+                //result = handle_query_command(stream);
             }
             break;
 

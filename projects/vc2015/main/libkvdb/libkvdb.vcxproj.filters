@@ -73,9 +73,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\string_utils.h">
       <Filter>src\jstd</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\strlen.h">
-      <Filter>src\jstd</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_forward.h">
       <Filter>src\support</Filter>
     </ClInclude>
@@ -123,6 +120,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseStatus.h">
       <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseResult.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\StringRef.h">
+      <Filter>src\jstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\StringRefList.h">
+      <Filter>src\jstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\string_iterator.h">
+      <Filter>src\jstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\iterator.h">
+      <Filter>src\jstd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\strlen.h">
+      <Filter>src\jstd</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
