@@ -1,5 +1,5 @@
 
-#include "server/connection.h"
+#include "server/Connection.h"
 
 #include <vector>
 #include <boost/bind.hpp>
@@ -7,45 +7,45 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/logic/tribool.hpp>
 
-#include "server/connection_manager.h"
-#include "server/request_parser.h"
-#include "server/request_handler.h"
+#include "server/ConnectionManager.h"
+#include "server/RequestParser.h"
+#include "server/RequestHandler.h"
 
 namespace kvdb {
 namespace server {
 
-connection::connection(boost::asio::io_service & io_service,
-                       connection_manager & manager, request_handler & handler)
+Connection::Connection(boost::asio::io_service & io_service,
+                       ConnectionManager & manager, RequestHandler & handler)
     : socket_(io_service),
       connection_manager_(manager),
       request_handler_(handler)
 {
 }
 
-connection::~connection(void)
+Connection::~Connection(void)
 {
     //
 }
 
-boost::asio::ip::tcp::socket & connection::socket()
+boost::asio::ip::tcp::socket & Connection::socket()
 {
     return socket_;
 }
 
-void connection::start()
+void Connection::start()
 {
     socket_.async_read_some(boost::asio::buffer(buffer_),
-        boost::bind(&connection::handle_read, shared_from_this(),
+        boost::bind(&Connection::handle_read, shared_from_this(),
                     boost::asio::placeholders::error,
                     boost::asio::placeholders::bytes_transferred));
 }
 
-void connection::stop()
+void Connection::stop()
 {
     socket_.close();
 }
 
-void connection::handle_read(const boost::system::error_code & ec,
+void Connection::handle_read(const boost::system::error_code & ec,
                              std::size_t bytes_transferred)
 {
     if (!ec) {
@@ -53,18 +53,18 @@ void connection::handle_read(const boost::system::error_code & ec,
         if (result == ParseStatus::Success) {
             request_handler_.handle_request(request_, response_);
             boost::asio::async_write(socket_, response_.to_buffers(),
-                boost::bind(&connection::handle_write, shared_from_this(),
+                boost::bind(&Connection::handle_write, shared_from_this(),
                             boost::asio::placeholders::error));
         }
         else if (result == ParseStatus::Failed) {
-            response_ = response::stock_response(response::bad_request);
+            response_ = Response::stock_response(Response::bad_request);
             boost::asio::async_write(socket_, response_.to_buffers(),
-                boost::bind(&connection::handle_write, shared_from_this(),
+                boost::bind(&Connection::handle_write, shared_from_this(),
                             boost::asio::placeholders::error));
         }
         else if (result == ParseStatus::TooSmall) {
             socket_.async_read_some(boost::asio::buffer(buffer_),
-                boost::bind(&connection::handle_read, shared_from_this(),
+                boost::bind(&Connection::handle_read, shared_from_this(),
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::bytes_transferred));
         }
@@ -77,7 +77,7 @@ void connection::handle_read(const boost::system::error_code & ec,
     }
 }
 
-void connection::handle_write(const boost::system::error_code & ec)
+void Connection::handle_write(const boost::system::error_code & ec)
 {
     if (!ec)
     {

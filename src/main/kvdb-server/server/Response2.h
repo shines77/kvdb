@@ -1,21 +1,21 @@
 
-#ifndef KVDB_RESPONSE_HPP
-#define KVDB_RESPONSE_HPP
+#ifndef KVDB_RESPONSE_H
+#define KVDB_RESPONSE_H
 
 #include <string>
 #include <vector>
 #include <boost/asio.hpp>
 
-#include "server/header_field.h"
+#include "server/HeaderField.h"
 
 namespace kvdb {
 namespace server {
 
 /// A reply to be sent to a client.
-struct response
+struct Response
 {
     /// The status of the reply.
-    enum status_type
+    enum StatusType
     {
         ok = 200,
         created = 201,
@@ -36,7 +36,7 @@ struct response
     } status;
 
     /// The headers to be included in the reply.
-    std::vector<header_field> fields;
+    std::vector<HeaderField> fields;
 
     /// The content to be sent in the reply.
     std::string content;
@@ -47,10 +47,10 @@ struct response
     std::vector<boost::asio::const_buffer> to_buffers();
 
     /// Get a stock reply.
-    static response stock_response(status_type status);
+    static Response stock_response(StatusType status);
 };
 
 } // namespace server
 } // namespace kvdb
 
-#endif // KVDB_RESPONSE_HPP
+#endif // KVDB_RESPONSE_H

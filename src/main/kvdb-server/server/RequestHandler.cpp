@@ -1,29 +1,29 @@
 
-#include "server/request_handler.h"
+#include "server/RequestHandler.h"
 
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <boost/lexical_cast.hpp>
 
-#include "server/response.h"
-#include "server/request.h"
+#include "server/Response.h"
+#include "server/Request.h"
 
 namespace kvdb {
 namespace server {
 
-request_handler::request_handler(const std::string& doc_root)
+RequestHandler::RequestHandler(const std::string & doc_root)
     : doc_root_(doc_root)
 {
 }
 
-void request_handler::handle_request(const request & req, response & res)
+void RequestHandler::handle_request(const Request & req, Response & res)
 {
     // Decode url to path.
     std::string request_path;
     if (!url_decode(req.data, request_path))
     {
-        res = response::stock_response(response::bad_request);
+        res = Response::stock_response(Response::bad_request);
         return;
     }
 
@@ -31,7 +31,7 @@ void request_handler::handle_request(const request & req, response & res)
     if (request_path.empty() || request_path[0] != '/'
         || request_path.find("..") != std::string::npos)
     {
-        res = response::stock_response(response::bad_request);
+        res = Response::stock_response(Response::bad_request);
         return;
     }
 
@@ -55,12 +55,12 @@ void request_handler::handle_request(const request & req, response & res)
     std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
     if (!is)
     {
-        res = response::stock_response(response::not_found);
+        res = Response::stock_response(Response::not_found);
         return;
     }
 
     // Fill out the reply to be sent to the client.
-    res.status = response::ok;
+    res.status = Response::ok;
     char buf[512];
     while (is.read(buf, sizeof(buf)).gcount() > 0)
         res.content.append(buf, is.gcount());
@@ -72,7 +72,7 @@ void request_handler::handle_request(const request & req, response & res)
     res.fields[1].value = "html/text";
 }
 
-bool request_handler::url_decode(const std::string & in, std::string & out)
+bool RequestHandler::url_decode(const std::string & in, std::string & out)
 {
     out.clear();
     out.reserve(in.size());

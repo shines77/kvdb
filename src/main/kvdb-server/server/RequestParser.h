@@ -1,6 +1,6 @@
 
-#ifndef HTTP_SERVER2_REQUEST_PARSER_HPP
-#define HTTP_SERVER2_REQUEST_PARSER_HPP
+#ifndef KVDB_REQUEST_PARSER_H
+#define KVDB_REQUEST_PARSER_H
 
 #include <type_traits>
 
@@ -18,10 +18,10 @@
 namespace kvdb {
 namespace server {
 
-struct request;
+struct Request;
 
 /// Parser for incoming requests.
-class request_parser
+class RequestParser
 {
 private:
     /// The current state of the parser.
@@ -41,7 +41,7 @@ private:
 
 public:
     /// Construct ready to parse the request method.
-    request_parser();
+    RequestParser();
 
     /// Reset to initial parser state.
     void reset();
@@ -51,7 +51,7 @@ public:
     /// data is required. The InputIterator return value indicates how much of the
     /// input has been consumed.
     template <typename InputIterator>
-    int parse(request & req, InputIterator begin, InputIterator end);
+    int parse(Request & req, InputIterator begin, InputIterator end);
 
     int handle_login_command(InputStream & stream);
     int handle_handshake_command(InputStream & stream);
@@ -76,13 +76,13 @@ private:
 };
 
 template <typename InputIterator>
-int request_parser::parse(request & req, InputIterator begin, InputIterator end)
+int RequestParser::parse(Request & req, InputIterator begin, InputIterator end)
 {
     InputStream stream(begin);
     uint32_t command = stream.readUInt32();
     uint32_t total_size = stream.readUInt32();
 
-    size_t kHeaderSize = sizeof(request_header);
+    size_t kHeaderSize = sizeof(RequestHeader);
 
     size_t length = (size_t)(end - begin);
     if (length >= ((size_t)total_size + kHeaderSize)) {
@@ -131,4 +131,4 @@ int request_parser::parse(request & req, InputIterator begin, InputIterator end)
 } // namespace server
 } // namespace http
 
-#endif // HTTP_SERVER2_REQUEST_PARSER_HPP
+#endif // KVDB_REQUEST_PARSER_H

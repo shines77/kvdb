@@ -20,12 +20,12 @@
 #include <string>
 #include <vector>
 
-#include "server/header_field.h"
+#include "server/HeaderField.h"
 
 namespace kvdb {
 namespace server {
 
-struct request_header
+struct RequestHeader
 {
     uint32_t    command;
     uint32_t    size;
@@ -35,19 +35,19 @@ struct request_header
 #pragma warning (disable: 4200)
 
 /// A request received from a client.
-struct request_data
+struct RequestData
 {
-    request_header  header;
-    char            data[0];
+    RequestHeader  header;
+    char           data[0];
 };
 
 #pragma warning (pop)
 
 /// A request received from a client.
-struct request
+struct Request
 {
-    request_header  header;
-    const char *    data;
+    RequestHeader  header;
+    const char *   data;
 };
 
 } // namespace server

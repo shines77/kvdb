@@ -1,21 +1,21 @@
 
-#include "server/request_parser.h"
-#include "server/request.h"
+#include "server/RequestParser.h"
+#include "server/Request.h"
 
 namespace kvdb {
 namespace server {
 
-request_parser::request_parser()
+RequestParser::RequestParser()
     : state_(State::Start)
 {
 }
 
-void request_parser::reset()
+void RequestParser::reset()
 {
     state_ = State::Start;
 }
 
-int request_parser::handle_login_command(InputStream & stream)
+int RequestParser::handle_login_command(InputStream & stream)
 {
     std::string username, password, database;
     int result = stream.parseString(username);
@@ -34,12 +34,12 @@ int request_parser::handle_login_command(InputStream & stream)
     return ParseStatus::Failed;
 }
 
-int request_parser::handle_handshake_command(InputStream & stream)
+int RequestParser::handle_handshake_command(InputStream & stream)
 {
     return ParseStatus::Success;
 }
 
-int request_parser::parse_first_query_command(jstd::StringRef & cmd, const jstd::StringRef & qurey)
+int RequestParser::parse_first_query_command(jstd::StringRef & cmd, const jstd::StringRef & qurey)
 {
     size_t first = 0, last;
     size_t i;
@@ -64,7 +64,7 @@ int request_parser::parse_first_query_command(jstd::StringRef & cmd, const jstd:
     return (int)cmd.size();
 }
 
-int request_parser::handle_query_command(InputStream & stream)
+int RequestParser::handle_query_command(InputStream & stream)
 {
     jstd::StringRef qurey;
     int result = stream.parseString(qurey);
@@ -79,7 +79,7 @@ int request_parser::handle_query_command(InputStream & stream)
     return ParseStatus::Failed;
 }
 
-int request_parser::handle_request_data(const char * data)
+int RequestParser::handle_request_data(const char * data)
 {
     InputStream stream(data);
     bool isEndOf = false;
@@ -108,17 +108,17 @@ int request_parser::handle_request_data(const char * data)
     return 0;
 }
 
-bool request_parser::is_char(int c)
+bool RequestParser::is_char(int c)
 {
     return (c >= 0 && c <= 127);
 }
 
-bool request_parser::is_ctl(int c)
+bool RequestParser::is_ctl(int c)
 {
     return (c >= 0 && c <= 31) || (c == 127);
 }
 
-bool request_parser::is_tspecial(int c)
+bool RequestParser::is_tspecial(int c)
 {
     switch (c) {
     case '(': case ')': case '<': case '>': case '@':
@@ -132,7 +132,7 @@ bool request_parser::is_tspecial(int c)
     }
 }
 
-bool request_parser::is_digit(int c)
+bool RequestParser::is_digit(int c)
 {
     return c >= '0' && c <= '9';
 }

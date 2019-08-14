@@ -12,10 +12,10 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
-#include "server/response.h"
-#include "server/request.h"
-#include "server/request_handler.h"
-#include "server/request_parser.h"
+#include "server/Response.h"
+#include "server/Request.h"
+#include "server/RequestHandler.h"
+#include "server/RequestParser.h"
 
 //
 // Since boost.asio 1.66, it has changed from asio::io_service to asio::io_context.
@@ -24,18 +24,18 @@
 namespace kvdb {
 namespace server {
 
-class connection_manager;
+class ConnectionManager;
 
 /// Represents a single connection from a client.
-class connection : public boost::enable_shared_from_this<connection>,
+class Connection : public boost::enable_shared_from_this<Connection>,
                    private boost::noncopyable
 {
 public:
     /// Construct a connection with the given io_context.
-    explicit connection(boost::asio::io_service & io_service,
-                        connection_manager & manager, request_handler & handler);
+    explicit Connection(boost::asio::io_service & io_service,
+                        ConnectionManager & manager, RequestHandler & handler);
 
-    ~connection();
+    ~Connection();
 
     /// Get the socket associated with the connection.
     boost::asio::ip::tcp::socket & socket();
@@ -58,22 +58,22 @@ private:
     boost::asio::ip::tcp::socket socket_;
 
     /// The manager for this connection.
-    connection_manager & connection_manager_;
+    ConnectionManager & connection_manager_;
 
     /// The handler used to process the incoming request.
-    request_handler & request_handler_;
+    RequestHandler & request_handler_;
 
     /// Buffer for incoming data.
     boost::array<char, 8192> buffer_;
 
     /// The incoming request.
-    request request_;
+    Request request_;
 
     /// The parser for the incoming request.
-    request_parser request_parser_;
+    RequestParser request_parser_;
 
     /// The reply to be sent back to the client.
-    response response_;
+    Response response_;
 };
 
 //typedef boost::shared_ptr<connection> connection_ptr;

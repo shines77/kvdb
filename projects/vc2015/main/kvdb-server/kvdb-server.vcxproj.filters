@@ -19,55 +19,31 @@
     <ClCompile Include="..\..\..\..\src\main\kvdb-server\kvdb-server.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\connection_manager.cpp">
+    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\RequestHandler.cpp">
       <Filter>src\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\connection.cpp">
+    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\RequestParser.cpp">
       <Filter>src\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\request_handler.cpp">
+    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\Response.cpp">
       <Filter>src\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\request_parser.cpp">
+    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\ConnectionManager.cpp">
       <Filter>src\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\response.cpp">
+    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\Connection.cpp">
       <Filter>src\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\kvdb_connection.cpp">
+    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\KvdbConnection.cpp">
       <Filter>src\server</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\connection_manager.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\connection.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\request.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\request_handler.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\request_parser.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\header_field.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\response.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common\cmd_utils.h">
       <Filter>src\server\common</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common\aligned_atomic.h">
       <Filter>src\server\common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\io_service_pool.h">
-      <Filter>src\server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common\boost_asio_msvc.h">
       <Filter>src\server\common</Filter>
@@ -75,10 +51,34 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common.h">
       <Filter>src\server</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\kvdb_server.h">
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbServer.h">
       <Filter>src\server</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\kvdb_connection.h">
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\RequestHandler.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\RequestParser.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Response.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Request.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\IoServicePool.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\HeaderField.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\ConnectionManager.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Connection.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbConnection.h">
       <Filter>src\server</Filter>
     </ClInclude>
   </ItemGroup>

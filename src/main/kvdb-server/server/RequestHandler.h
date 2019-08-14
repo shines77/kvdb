@@ -8,11 +8,11 @@
 namespace kvdb {
 namespace server {
 
-struct response;
-struct request;
+struct Response;
+struct Request;
 
 /// The common handler for all incoming requests.
-class request_handler : private boost::noncopyable
+class RequestHandler : private boost::noncopyable
 {
 private:
     /// The directory containing the files to be served.
@@ -24,10 +24,10 @@ private:
 
 public:
     /// Construct with a directory containing files to be served.
-    explicit request_handler(const std::string & doc_root);
+    explicit RequestHandler(const std::string & doc_root);
 
     /// Handle a request and produce a response.
-    void handle_request(const request & req, response & res);
+    void handle_request(const Request & req, Response & res);
 };
 
 } // namespace server

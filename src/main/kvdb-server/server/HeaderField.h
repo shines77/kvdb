@@ -11,7 +11,7 @@
 namespace kvdb {
 namespace server {
 
-struct header_field
+struct HeaderField
 {
     std::string name;
     std::string value;

@@ -8,15 +8,15 @@
 
 #include <set>
 #include <boost/noncopyable.hpp>
-#include "server/connection.h"
-#include "server/kvdb_connection.h"
+#include "server/Connection.h"
+#include "server/KvdbConnection.h"
 
 namespace kvdb {
 namespace server {
 
 /// Manages open connections so that they may be cleanly stopped when the server
 /// needs to shut down.
-class connection_manager : private boost::noncopyable
+class ConnectionManager : private boost::noncopyable
 {
 private:
     /// The managed connections.

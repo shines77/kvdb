@@ -15,7 +15,7 @@
 using namespace boost::system;
 
 #define MIN_PACKET_SIZE             64
-#define MAX_PACKET_SIZE	            (64 * 1024)
+#define MAX_PACKET_SIZE             (64 * 1024)
 
 // Whether use atomic update realtime?
 #define USE_ATOMIC_REALTIME_UPDATE  0
@@ -30,8 +30,8 @@ using namespace boost::asio;
 namespace kvdb {
 namespace server {
 
-class kvdb_connection : public boost::enable_shared_from_this<kvdb_connection>,
-                        private boost::noncopyable {
+class KvdbConnection : public boost::enable_shared_from_this<KvdbConnection>,
+                       private boost::noncopyable {
 private:
     enum { PACKET_SIZE = MAX_PACKET_SIZE };
 
@@ -53,7 +53,7 @@ private:
     char data_[PACKET_SIZE];
 
 public:
-    kvdb_connection(boost::asio::io_service & io_service, uint32_t buffer_size,
+    KvdbConnection(boost::asio::io_service & io_service, uint32_t buffer_size,
                  uint32_t packet_size, uint32_t need_echo = mode_need_echo)
         : socket_(io_service), need_echo_(need_echo), buffer_size_(buffer_size), packet_size_(packet_size),
           query_count_(0), recieved_bytes_(0), send_bytes_(0), recieved_cnt_(0), sent_cnt_(0),
@@ -66,7 +66,7 @@ public:
         ::memset(data_, 0, sizeof(data_));
     }
 
-    ~kvdb_connection()
+    ~KvdbConnection()
     {
         stop();
     }
@@ -108,9 +108,9 @@ public:
         return socket_;
     }
 
-    static boost::shared_ptr<kvdb_connection> create_new(
+    static boost::shared_ptr<KvdbConnection> create_new(
         boost::asio::io_service & io_service, uint32_t buffer_size, uint32_t packet_size) {
-        return boost::shared_ptr<kvdb_connection>(new kvdb_connection(io_service, buffer_size, packet_size, g_test_mode));
+        return boost::shared_ptr<KvdbConnection>(new KvdbConnection(io_service, buffer_size, packet_size, g_test_mode));
     }
 
 private:
@@ -440,7 +440,7 @@ private:
     }
 };
 
-typedef boost::shared_ptr<kvdb_connection> connection_ptr;
+typedef boost::shared_ptr<KvdbConnection> connection_ptr;
 
 } // namespace server
 } // namespace kvdb

@@ -1,5 +1,5 @@
 
-#include "server/connection_manager.h"
+#include "server/ConnectionManager.h"
 
 #include <algorithm>
 #include <boost/bind.hpp>
@@ -7,22 +7,22 @@
 namespace kvdb {
 namespace server {
 
-void connection_manager::start(connection_ptr conn)
+void ConnectionManager::start(connection_ptr conn)
 {
     connections_.insert(conn);
     conn->start();
 }
 
-void connection_manager::stop(connection_ptr conn)
+void ConnectionManager::stop(connection_ptr conn)
 {
     connections_.erase(conn);
     conn->stop();
 }
 
-void connection_manager::stop_all()
+void ConnectionManager::stop_all()
 {
     std::for_each(connections_.begin(), connections_.end(),
-                  boost::bind(&kvdb_connection::stop, _1));
+                  boost::bind(&KvdbConnection::stop, _1));
     connections_.clear();
 }
 

@@ -13,9 +13,9 @@
 #include <boost/asio/signal_set.hpp>
 
 #include "server/common.h"
-#include "server/io_service_pool.h"
-#include "server/kvdb_connection.h"
-#include "server/connection_manager.h"
+#include "server/IoServicePool.h"
+#include "server/KvdbConnection.h"
+#include "server/ConnectionManager.h"
 
 using namespace boost::asio;
 
@@ -25,27 +25,27 @@ namespace server {
 //
 // See: http://www.boost.org/doc/libs/1_36_0/doc/html/boost_asio/example/echo/async_tcp_echo_server.cpp
 //
-class kvdb_server : public boost::enable_shared_from_this<kvdb_server>,
-                    private boost::noncopyable
+class KvdbServer : public boost::enable_shared_from_this<KvdbServer>,
+                   private boost::noncopyable
 {
 private:
-    io_service_pool					    io_service_pool_;
-    boost::asio::ip::tcp::acceptor	    acceptor_;
-    connection_ptr	                    new_connection_;
+    IoServicePool                       io_service_pool_;
+    boost::asio::ip::tcp::acceptor      acceptor_;
+    connection_ptr                      new_connection_;
 
     /// The connection manager which owns all live connections.
-    connection_manager                  connection_manager_;
+    ConnectionManager                   connection_manager_;
 
-    std::shared_ptr<std::thread>	    thread_;
+    std::shared_ptr<std::thread>        thread_;
 
     /// The signal_set is used to register for process termination notifications.
     boost::asio::signal_set             signals_;
 
     uint32_t                            buffer_size_;
-    uint32_t					        packet_size_;
+    uint32_t                            packet_size_;
 
 public:
-    kvdb_server(const std::string & address, const std::string & port,
+    KvdbServer(const std::string & address, const std::string & port,
         uint32_t buffer_size = 32768,
         uint32_t packet_size = 64,
         uint32_t pool_size = std::thread::hardware_concurrency())
@@ -58,7 +58,7 @@ public:
         start(address, port);
     }
 
-    kvdb_server(short port, uint32_t buffer_size = 32768,
+    KvdbServer(short port, uint32_t buffer_size = 32768,
         uint32_t packet_size = 64,
         uint32_t pool_size = std::thread::hardware_concurrency())
         : io_service_pool_(pool_size), acceptor_(io_service_pool_.get_first_io_service(),
@@ -71,7 +71,7 @@ public:
         do_accept();
     }
 
-    ~kvdb_server()
+    ~KvdbServer()
     {
         this->stop();
     }
@@ -88,7 +88,7 @@ public:
         signals_.add(SIGQUIT);
 #endif // defined(SIGQUIT)
 
-        signals_.async_wait(boost::bind(&kvdb_server::handle_stop, this));
+        signals_.async_wait(boost::bind(&KvdbServer::handle_stop, this));
     }
 
     void start(const std::string & address, const std::string & port)
@@ -144,9 +144,9 @@ public:
 private:
     void do_accept()
     {
-        new_connection_.reset(new kvdb_connection(io_service_pool_.get_io_service(),
+        new_connection_.reset(new KvdbConnection(io_service_pool_.get_io_service(),
                                                   buffer_size_, packet_size_, g_need_echo));
-        acceptor_.async_accept(new_connection_->socket(), boost::bind(&kvdb_server::handle_accept,
+        acceptor_.async_accept(new_connection_->socket(), boost::bind(&KvdbServer::handle_accept,
                                this, boost::asio::placeholders::error, new_connection_));
     }
 

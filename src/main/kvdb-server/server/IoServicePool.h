@@ -12,10 +12,11 @@ using namespace boost::asio;
 namespace kvdb {
 namespace server {
 
-class io_service_pool : private boost::noncopyable {
+class IoServicePool : private boost::noncopyable
+{
 private:
-    typedef boost::shared_ptr<boost::asio::io_service>			io_service_ptr;
-    typedef boost::shared_ptr<boost::asio::io_service::work>	io_work_ptr;
+    typedef boost::shared_ptr<boost::asio::io_service>          io_service_ptr;
+    typedef boost::shared_ptr<boost::asio::io_service::work>    io_work_ptr;
 
     /// The pool of io_services.
     std::vector<io_service_ptr> io_services_;
@@ -28,7 +29,7 @@ private:
 
 public:
     /// Construct the io_service pool.
-    explicit io_service_pool(uint32_t pool_size)
+    explicit IoServicePool(uint32_t pool_size)
         : next_io_service_(0)
     {
         if (pool_size == 0) {
@@ -45,7 +46,7 @@ public:
         }
     }
 
-    ~io_service_pool()
+    ~IoServicePool()
     {
         stop();
     }

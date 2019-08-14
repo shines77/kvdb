@@ -1,5 +1,5 @@
 
-#include "server/kvdb_connection.h"
+#include "server/KvdbConnection.h"
 
 using namespace boost::system;
 using namespace boost::asio;
@@ -7,7 +7,7 @@ using namespace boost::asio;
 namespace kvdb {
 namespace server {
 
-void kvdb_connection::start()
+void KvdbConnection::start()
 {
     set_socket_options();
 
@@ -16,7 +16,7 @@ void kvdb_connection::start()
     do_read_some();
 }
 
-void kvdb_connection::stop()
+void KvdbConnection::stop()
 {
     if (socket_.is_open()) {
         shutdown_both();
@@ -31,7 +31,7 @@ void kvdb_connection::stop()
     }
 }
 
-void kvdb_connection::stop_connection(const boost::system::error_code & ec)
+void KvdbConnection::stop_connection(const boost::system::error_code & ec)
 {
     if (ec != boost::asio::error::operation_aborted)
     {

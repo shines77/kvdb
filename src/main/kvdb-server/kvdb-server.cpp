@@ -14,7 +14,7 @@
 
 #include "server/common.h"
 #include "server/common/cmd_utils.h"
-#include "server/kvdb_server.h"
+#include "server/KvdbServer.h"
 
 #include "kvdb/all.h"
 
@@ -57,7 +57,7 @@ void run_kvdb_server(const std::string & address, const std::string & port,
 {
     static const uint32_t kSeesionBufferSize = 65536;
     try {
-        kvdb_server server(address, port, kSeesionBufferSize, packet_size, thread_num);
+        KvdbServer server(address, port, kSeesionBufferSize, packet_size, thread_num);
         server.run();
 
         std::cout << "Server has bind and listening ..." << std::endl;
