@@ -81,5 +81,8 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbConnection.h">
       <Filter>src\server</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\ConnectionContext.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

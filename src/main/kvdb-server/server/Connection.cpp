@@ -17,6 +17,7 @@ namespace server {
 Connection::Connection(boost::asio::io_service & io_service,
                        ConnectionManager & manager, RequestHandler & handler)
     : socket_(io_service),
+      context_(io_service),
       connection_manager_(manager),
       request_handler_(handler)
 {
@@ -49,7 +50,8 @@ void Connection::handle_read(const boost::system::error_code & ec,
                              std::size_t bytes_transferred)
 {
     if (!ec) {
-        int result = request_parser_.parse(request_, buffer_.data(), buffer_.data() + bytes_transferred);
+        int result = request_parser_.parse(context_, request_, buffer_.data(),
+                                           buffer_.data() + bytes_transferred);
         if (result == ParseStatus::Success) {
             request_handler_.handle_request(request_, response_);
             boost::asio::async_write(socket_, response_.to_buffers(),
@@ -79,15 +81,13 @@ void Connection::handle_read(const boost::system::error_code & ec,
 
 void Connection::handle_write(const boost::system::error_code & ec)
 {
-    if (!ec)
-    {
+    if (!ec) {
         // Initiate graceful connection closure.
         boost::system::error_code ignored_ec;
         socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
     }
 
-    if (ec != boost::asio::error::operation_aborted)
-    {
+    if (ec != boost::asio::error::operation_aborted) {
         //connection_manager_.stop(shared_from_this());
     }
 }

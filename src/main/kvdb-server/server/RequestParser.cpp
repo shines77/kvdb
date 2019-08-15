@@ -15,7 +15,7 @@ void RequestParser::reset()
     state_ = State::Start;
 }
 
-int RequestParser::handle_login_command(InputStream & stream)
+int RequestParser::handle_login_command(ConnectionContext & context, InputStream & stream)
 {
     std::string username, password, database;
     int result = stream.parseString(username);
@@ -121,9 +121,9 @@ bool RequestParser::is_ctl(int c)
 bool RequestParser::is_tspecial(int c)
 {
     switch (c) {
-    case '(': case ')': case '<': case '>': case '@':
+    case '(': case ')': case '<': case '>':  case '@':
     case ',': case ';': case ':': case '\\': case '"':
-    case '/': case '[': case ']': case '?': case '=':
+    case '/': case '[': case ']': case '?':  case '=':
     case '{': case '}': case ' ': case '\t':
         return true;
 
@@ -138,4 +138,4 @@ bool RequestParser::is_digit(int c)
 }
 
 } // namespace server
-} // namespace http
+} // namespace kvdb

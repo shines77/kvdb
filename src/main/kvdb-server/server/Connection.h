@@ -12,6 +12,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
+#include "server/ConnectionContext.h"
 #include "server/Response.h"
 #include "server/Request.h"
 #include "server/RequestHandler.h"
@@ -30,6 +31,30 @@ class ConnectionManager;
 class Connection : public boost::enable_shared_from_this<Connection>,
                    private boost::noncopyable
 {
+private:
+    /// Socket for the connection.
+    boost::asio::ip::tcp::socket socket_;
+
+    ConnectionContext context_;
+
+    /// The manager for this connection.
+    ConnectionManager & connection_manager_;
+
+    /// Buffer for incoming data.
+    boost::array<char, 8192> buffer_;
+
+    /// The handler used to process the incoming request.
+    RequestHandler & request_handler_;
+
+    /// The incoming request.
+    Request request_;
+
+    /// The parser for the incoming request.
+    RequestParser request_parser_;
+
+    /// The reply to be sent back to the client.
+    Response response_;
+
 public:
     /// Construct a connection with the given io_context.
     explicit Connection(boost::asio::io_service & io_service,
@@ -53,27 +78,6 @@ private:
 
     /// Handle completion of a write operation.
     void handle_write(const boost::system::error_code & ec);
-
-    /// Socket for the connection.
-    boost::asio::ip::tcp::socket socket_;
-
-    /// The manager for this connection.
-    ConnectionManager & connection_manager_;
-
-    /// The handler used to process the incoming request.
-    RequestHandler & request_handler_;
-
-    /// Buffer for incoming data.
-    boost::array<char, 8192> buffer_;
-
-    /// The incoming request.
-    Request request_;
-
-    /// The parser for the incoming request.
-    RequestParser request_parser_;
-
-    /// The reply to be sent back to the client.
-    Response response_;
 };
 
 //typedef boost::shared_ptr<connection> connection_ptr;

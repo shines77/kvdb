@@ -21,6 +21,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\main\kvdb-cli\kvdb-cli.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\common\aligned_atomic.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\common\boost_asio_msvc.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\common\cmd_utils.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8EA65E91-D24D-4679-87F1-9B64BA73180C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

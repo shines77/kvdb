@@ -28,6 +28,7 @@
     <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\Response.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\ConnectionContext.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbConnection.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbServer.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common.h" />

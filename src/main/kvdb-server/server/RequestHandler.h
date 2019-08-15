@@ -31,6 +31,6 @@ public:
 };
 
 } // namespace server
-} // namespace http
+} // namespace kvdb
 
 #endif // KVDB_REQUEST_HANDLER_H

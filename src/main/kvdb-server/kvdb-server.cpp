@@ -11,6 +11,7 @@
 #include <utility>
 
 #include "server/common/boost_asio_msvc.h"
+#include <boost/asio.hpp>
 
 #include "server/common.h"
 #include "server/common/cmd_utils.h"

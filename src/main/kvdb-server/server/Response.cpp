@@ -244,4 +244,4 @@ Response Response::stock_response(Response::StatusType status)
 }
 
 } // namespace server
-} // namespace http
+} // namespace kvdb

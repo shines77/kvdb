@@ -15,6 +15,8 @@
 
 #include <kvdb/jstd/StringRef.h>
 
+#include "server/ConnectionContext.h"
+
 namespace kvdb {
 namespace server {
 
@@ -51,9 +53,9 @@ public:
     /// data is required. The InputIterator return value indicates how much of the
     /// input has been consumed.
     template <typename InputIterator>
-    int parse(Request & req, InputIterator begin, InputIterator end);
+    int parse(ConnectionContext & context, Request & req, InputIterator begin, InputIterator end);
 
-    int handle_login_command(InputStream & stream);
+    int handle_login_command(ConnectionContext & context, InputStream & stream);
     int handle_handshake_command(InputStream & stream);
     int handle_query_command(InputStream & stream);
 
@@ -76,7 +78,7 @@ private:
 };
 
 template <typename InputIterator>
-int RequestParser::parse(Request & req, InputIterator begin, InputIterator end)
+int RequestParser::parse(ConnectionContext & context, Request & req, InputIterator begin, InputIterator end)
 {
     InputStream stream(begin);
     uint32_t command = stream.readUInt32();
@@ -94,7 +96,7 @@ int RequestParser::parse(Request & req, InputIterator begin, InputIterator end)
         switch (command) {
         case CommandType::Login:
             {
-                result = handle_login_command(stream);
+                result = handle_login_command(context, stream);
             }
             break;
 
@@ -129,6 +131,6 @@ int RequestParser::parse(Request & req, InputIterator begin, InputIterator end)
 }
 
 } // namespace server
-} // namespace http
+} // namespace kvdb
 
 #endif // KVDB_REQUEST_PARSER_H
