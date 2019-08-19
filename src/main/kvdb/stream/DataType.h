@@ -10,7 +10,8 @@ namespace kvdb {
 
 struct DataType {
     enum Type {
-        EndOf,
+        EndOf = 0,
+        Unknown = EndOf,
         Bit,
         Bool,
         Byte,
@@ -22,6 +23,7 @@ struct DataType {
         UInt16,
         UInt32,
         UInt64,
+        Pointer,
         Float,
         Double,
         LongDouble,

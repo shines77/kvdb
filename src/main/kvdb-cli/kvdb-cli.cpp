@@ -42,7 +42,7 @@ using namespace kvdb;
 
 #define CLIENT_PREFIX           APP_NAME"-"DEFAULT_SERVER_HOST"> "
 
-struct KvdbClientConfig {    
+struct KvdbClientConfig {
     std::string host;
     std::string address;
     uint16_t port;
@@ -206,6 +206,10 @@ int main(int argc, char * argv[])
 
     clientConfig.database = database;
 
+    NetPacket packet;
+    OutputStream stream;
+    packet.serialize(stream);
+
     printf("\n");
 
     bool exit = false;
@@ -274,6 +278,7 @@ int main(int argc, char * argv[])
 
         // Exit now ??
         if (exit) {
+            printf("\n");
             printf("byebye.\n");
             printf("\n");
             break;

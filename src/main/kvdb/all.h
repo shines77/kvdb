@@ -13,4 +13,6 @@
 #include "kvdb/hash/Dictionary.h"
 #include "kvdb/hash/DictionaryOld.h"
 
+#include "kvdb/stream/NetPacket.h"
+
 #endif // __KVDB_ALL_H__
