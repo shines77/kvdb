@@ -16,162 +16,33 @@
 #include <string>
 #include <type_traits>
 
-#include "kvdb/stream/DataType.h"
-#include "kvdb/jstd/StringRef.h"
+#include "kvdb/stream/BasicStream.h"
 
 namespace kvdb {
 
 template <typename T, typename VauleType = T>
-class BasicInputStream {
+class BasicInputStream : public BasicStream<T, VauleType> {
 public:
-    typedef typename std::remove_pointer<
-                typename std::remove_cv<T>::type
-            >::type     char_type;
-    typedef typename std::remove_pointer<
-                typename std::remove_cv<VauleType>::type
-            >::type     value_type;
+    typedef BasicStream<T, VauleType>           base_type;
+    typedef typename base_type::char_type       char_type;
+    typedef typename base_type::value_type      value_type;
 
     typedef std::basic_string<char_type>        string_type;
     typedef jstd::BasicStringRef<char_type>     stringref_type;
 
-private:
-    char_type * current_;
-
-public:
-    BasicInputStream() : current_(nullptr) {}
-    BasicInputStream(const char_type * value) : current_(const_cast<char_type *>(value)) {}
-    BasicInputStream(value_type * value) : current_(static_cast<char_type *>(value)) {}
+    BasicInputStream() : base_type(nullptr) {}
+    BasicInputStream(const char_type * value) : base_type(value) {}
     ~BasicInputStream() {}
 
-    char * current() const {
-        return (char *)current_;
-    }
-
-    char_type * currentPtr() const {
-        return current_;
-    }
-
-    void back() {
-        backChar();
-    }
-
-    void back(int skip) {
-        current_ = (char_type *)((char *)current_ - skip);
-    }
-
-    void backChar() {
-        current_ = (char_type *)((char *)current_ - sizeof(char));
-    }
-
-    void backUChar() {
-        current_ = (char_type *)((char *)current_ - sizeof(unsigned char));
-    }
-
-    void next() {
-        nextChar();
-    }
-
-    void next(int skip) {
-        current_ = (char_type *)((char *)current_ + skip);
-    }
-
-    void nextChar() {
-        current_ = (char_type *)((char *)current_ + sizeof(char));
-    }
-
-    void nextUChar() {
-        current_ = (char_type *)((char *)current_ + sizeof(unsigned char));
-    }
-
-    void nextInt8() {
-        current_ = (char_type *)((char *)current_ + sizeof(int8_t));
-    }
-
-    void nextInt16() {
-        current_ = (char_type *)((char *)current_ + sizeof(int16_t));
-    }
-
-    void nextInt32() {
-        current_ = (char_type *)((char *)current_ + sizeof(int32_t));
-    }
-
-    void nextInt64() {
-        current_ = (char_type *)((char *)current_ + sizeof(int64_t));
-    }
-
-    void nextUInt8() {
-        current_ = (char_type *)((char *)current_ + sizeof(uint8_t));
-    }
-
-    void nextUInt16() {
-        current_ = (char_type *)((char *)current_ + sizeof(uint16_t));
-    }
-
-    void nextUInt32() {
-        current_ = (char_type *)((char *)current_ + sizeof(uint32_t));
-    }
-
-    void nextUInt64() {
-        current_ = (char_type *)((char *)current_ + sizeof(uint64_t));
-    }
-
-    char get() const {
-        return *(char *)current_;
-    }
-
-    unsigned char getu() const {
-        return *(unsigned char *)current_;
-    }
-
-    char getChar() const {
-        return *(char *)current_;
-    }
-
-    unsigned char getUChar() const {
-        return *(unsigned char *)current_;
-    }
-
-    int8_t getInt8() const {
-        return *(int8_t *)current_;
-    }
-
-    int16_t getInt16() const {
-        return *(int16_t *)current_;
-    }
-
-    int32_t getInt32() const {
-        return *(int32_t *)current_;
-    }
-
-    int64_t getInt64() const {
-        return *(int64_t *)current_;
-    }
-
-    uint8_t getUInt8() const {
-        return *(uint8_t *)current_;
-    }
-
-    uint16_t getUInt16() const {
-        return *(uint16_t *)current_;
-    }
-
-    uint32_t getUInt32() const {
-        return *(uint32_t *)current_;
-    }
-
-    uint64_t getUInt64() const {
-        return *(uint64_t *)current_;
-    }
-
-    char readChar() {
-        char value = getChar();
-        nextChar();
+    uint8_t readByte() {
+        uint8_t value = getByte();
+        nextByte();
         return value;
     }
 
-    unsigned char readUChar() {
-        unsigned char value = getUChar();
-        nextUChar();
+    value_type readChar() {
+        value_type value = getChar();
+        nextChar();
         return value;
     }
 
@@ -223,8 +94,30 @@ public:
         return value;
     }
 
+    void * readPointer() {
+        void * value = getPointer();
+        nextPointer();
+        return value;
+    }
+
+    float readFloat() {
+        float value = getFloat();
+        nextFloat();
+        return value;
+    }
+
+    double readDouble() {
+        float value = getDouble();
+        nextDouble();
+        return value;
+    }
+
     void readString(string_type & value, size_t length) {
-        value.assign((const char_type *)current_, length);
+        value.assign((const char_type *)cur_, length);
+    }
+
+    void readString(stringref_type & value, size_t length) {
+        value.assign((const char_type *)cur_, length);
     }
 
     int parseString(string_type & value) {
@@ -260,10 +153,6 @@ public:
         }
 
         return result;
-    }
-
-    void readString(stringref_type & value, size_t length) {
-        value.assign((const char_type *)current_, length);
     }
 
     int parseString(stringref_type & value) {

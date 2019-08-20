@@ -145,6 +145,12 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\Variant.h">
       <Filter>src\stream</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\OutputStream.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\BasicStream.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\main\kvdb\all.cpp">

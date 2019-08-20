@@ -45,9 +45,11 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\server\CommandType.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\server\ServerStatus.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\store\Slice.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\BasicStream.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\DataType.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\InputStream.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\NetPacket.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\OutputStream.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseResult.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseStatus.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\Variant.h" />

@@ -15,7 +15,7 @@ namespace kvdb {
 class Variant {
 public:
     union Value {
-        bool        boolean;
+        bool        b;
         int8_t      i8;
         uint8_t     u8;
         int16_t     i16;
@@ -27,7 +27,6 @@ public:
         float       f;
         double      d;
         void *      ptr;
-        void *      data;
     };
 
 private:
@@ -47,7 +46,7 @@ public:
 
     Variant & operator = (bool value) {
         type_ = DataType::Bool;
-        value_.boolean = value;
+        value_.b = value;
         return *this;
     }
 
@@ -127,6 +126,7 @@ public:
         return value_;
     }
 
+    bool      getBool()   const { return value_.b;   }
     int8_t    getInt8()   const { return value_.i8;  }
     uint8_t   getUInt8()  const { return value_.u8;  }
     int16_t   getInt16()  const { return value_.i16; }
@@ -136,8 +136,7 @@ public:
     int64_t   getInt64()  const { return value_.i64; }
     uint64_t  getUInt64() const { return value_.u64; }
 
-    void *    getPointer() const { return value_.ptr;  }
-    void *    getData()    const { return value_.data; }
+    void *    getPointer() const { return value_.ptr; }
 
     float     getFloat()  const { return value_.f; }
     double    getDouble() const { return value_.d; }
@@ -145,6 +144,11 @@ public:
     void setValue(const Variant & src) {
         type_ = src.getType();
         value_ = src.getValue();
+    }
+
+    void setBool(bool value) {
+        type_ = DataType::Bool;
+        value_.b = value;
     }
 
     void setInt8(int8_t value) {
@@ -190,11 +194,6 @@ public:
     void setPointer(void * value) {
         type_ = DataType::Pointer;
         value_.ptr = value;
-    }
-
-    void setData(void * value) {
-        type_ = DataType::Pointer;
-        value_.data = value;
     }
 
     void setFloat(float value) {
