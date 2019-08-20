@@ -15,12 +15,11 @@
 
 #include <kvdb/jstd/StringRef.h>
 
+#include "server/Request.h"
 #include "server/ConnectionContext.h"
 
 namespace kvdb {
 namespace server {
-
-struct Request;
 
 /// Parser for incoming requests.
 class RequestParser
@@ -55,13 +54,13 @@ public:
     template <typename InputIterator>
     int parse(ConnectionContext & context, Request & req, InputIterator begin, InputIterator end);
 
-    int handle_login_command(ConnectionContext & context, InputStream & stream);
-    int handle_handshake_command(InputStream & stream);
-    int handle_query_command(InputStream & stream);
+    int handleLoginCommand(ConnectionContext & context, InputStream & stream);
+    int handleHandshakeCommand(InputStream & stream);
+    int handleQueryCommand(InputStream & stream);
 
-    int parse_first_query_command(jstd::StringRef & cmd, const jstd::StringRef & qurey);
+    int parseFirstQueryCommand(jstd::StringRef & cmd, const jstd::StringRef & qurey);
 
-    int handle_request_data(const char * data);
+    int handleRequestData(const char * data);
 
 private:
     /// Check if a byte is an HTTP character.
@@ -82,21 +81,21 @@ int RequestParser::parse(ConnectionContext & context, Request & req, InputIterat
 {
     InputStream stream(begin);
     uint32_t command = stream.readUInt32();
+    uint32_t count = stream.readUInt32();
     uint32_t total_size = stream.readUInt32();
 
-    size_t kHeaderSize = sizeof(RequestHeader);
-
     size_t length = (size_t)(end - begin);
-    if (length >= ((size_t)total_size + kHeaderSize)) {
+    if (length >= ((size_t)total_size)) {
         req.header.command = command;
-        req.header.size = total_size;
+        req.header.count = count;
+        req.header.total_size = total_size;
 
         const char * first = stream.current();
         int result = 0;
         switch (command) {
         case CommandType::Login:
             {
-                result = handle_login_command(context, stream);
+                result = handleLoginCommand(context, stream);
             }
             break;
 

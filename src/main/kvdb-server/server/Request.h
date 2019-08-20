@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "server/HeaderField.h"
+#include "kvdb/stream/NetPacket.h"
 
 namespace kvdb {
 namespace server {
@@ -44,10 +45,14 @@ struct RequestData
 #pragma warning (pop)
 
 /// A request received from a client.
-struct Request
+class Request : public NetPacket
 {
-    RequestHeader  header;
-    const char *   data;
+public:
+    char * data;
+
+public:
+    Request() : NetPacket(), data(nullptr) {}
+    virtual ~Request() {}
 };
 
 } // namespace server

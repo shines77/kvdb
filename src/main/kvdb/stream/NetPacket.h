@@ -42,55 +42,56 @@ struct PacketBody
 };
 
 class NetPacket {
-private:
-    bool little_endian_;
-
-    PacketHeader header_;
-    std::vector<Variant> values_;
+protected:
+    bool is_little_endian_;
 
 public:
-    NetPacket() : little_endian_(false) { init(); }
-    ~NetPacket() {}
+    PacketHeader header;
+    std::vector<Variant> values;
 
-    uint32_t getCommand() const { return header_.command; }
+public:
+    NetPacket() : is_little_endian_(false) { init(); }
+    virtual ~NetPacket() {}
+
+    uint32_t getCommand() const { return header.command; }
 
     void setCommand(uint32_t command) {
-        header_.command = command;
+        header.command = command;
     }
 
-    PacketHeader & getHeaderInfo() { return header_; }
-    const PacketHeader & getHeaderInfo() const { return header_; }
+    PacketHeader & getHeaderInfo() { return header; }
+    const PacketHeader & getHeaderInfo() const { return header; }
 
     void init() {
         Variant value;
         value.setUInt32(118);
-        values_.push_back(value);
+        values.push_back(value);
 
         value.setUInt64(1118);
-        values_.push_back(value);
+        values.push_back(value);
 
         value.setInt8(11);
-        values_.push_back(value);
+        values.push_back(value);
 
         value.setPointer(NULL);
-        values_.push_back(value);
+        values.push_back(value);
 
         value.setPointer(nullptr);
-        values_.push_back(value);
+        values.push_back(value);
 
         value = true;
-        values_.push_back(value);
+        values.push_back(value);
 
         value = 8ULL;
-        values_.push_back(value);
+        values.push_back(value);
     }
 
     size_t calcRequireSize(OutputStream & stream, size_t & count) {
         size_t totalSize = sizeof(PacketHeader);
-        size_t valid_cnt = values_.size();
+        size_t valid_count = values.size();
         // Calculation the body sizes.
-        for (size_t i = 0; i < values_.size(); ++i) {
-            Variant & value = values_[i];
+        for (size_t i = 0; i < values.size(); ++i) {
+            Variant & value = values[i];
             uint32_t type = value.getType();
             // Write the data type.
             totalSize++;
@@ -128,78 +129,89 @@ public:
                 break;
             default:
                 totalSize--;
-                valid_cnt--;
+                valid_count--;
                 break;
             }
         }
         // Write the ending mark.
         totalSize += 1 + sizeof(uint8_t);
 
-        count = valid_cnt;
+        count = valid_count;
         return totalSize;
     }
 
     int writeTo(OutputStream & stream) {
-        size_t count = values_.size();
+        size_t count = values.size();
 
-        size_t valid_cnt;
-        size_t totalSize = calcRequireSize(stream, valid_cnt);
+        size_t valid_count;
+        size_t totalSize = calcRequireSize(stream, valid_count);
 
         // Write the header info.
-        header_.count = (uint32_t)valid_cnt;
-        header_.total_size = (uint32_t)totalSize;
-        stream.writeUInt32(header_.command);
-        stream.writeUInt32(header_.count);
-        stream.writeUInt32(header_.total_size);
+        header.count = (uint32_t)valid_count;
+        header.total_size = (uint32_t)totalSize;
+        stream.writeUInt32(header.command);
+        stream.writeUInt32(header.count);
+        stream.writeUInt32(header.total_size);
 
         // Write the body info.
-        for (size_t i = 0; i < values_.size(); ++i) {
-            Variant & var = values_[i];
+        for (size_t i = 0; i < values.size(); ++i) {
+            Variant & var = values[i];
             uint32_t type = var.getType();
             // Write the data type.
-            stream.writeType(type);
+            
             // Write the datas.
             switch (type) {
             case DataType::EndOf:
                 break;
             case DataType::Bool:
+                stream.writeType(type);
                 stream.writeBool(var.getValue().b);
                 break;
             case DataType::Int8:
+                stream.writeType(type);
                 stream.writeInt8(var.getValue().i8);
                 break;
             case DataType::UInt8:
+                stream.writeType(type);
                 stream.writeUInt8(var.getValue().u8);
                 break;
             case DataType::Int16:
+                stream.writeType(type);
                 stream.writeInt16(var.getValue().i16);
                 break;
             case DataType::UInt16:
+                stream.writeType(type);
                 stream.writeUInt16(var.getValue().u16);
                 break;
             case DataType::Int32:
+                stream.writeType(type);
                 stream.writeInt32(var.getValue().i32);
                 break;
             case DataType::UInt32:
+                stream.writeType(type);
                 stream.writeUInt32(var.getValue().u32);
                 break;
             case DataType::Int64:
+                stream.writeType(type);
                 stream.writeInt64(var.getValue().i64);
                 break;
             case DataType::UInt64:
+                stream.writeType(type);
                 stream.writeUInt64(var.getValue().u64);
                 break;
             case DataType::Pointer:
+                stream.writeType(type);
                 stream.writePointer(var.getValue().ptr);
                 break;
             case DataType::Float:
+                stream.writeType(type);
                 stream.writeFloat(var.getValue().f);
                 break;
             case DataType::Double:
+                stream.writeType(type);
                 stream.writeDouble(var.getValue().d);
                 break;
             default:
-                stream.back();
                 count--;
                 break;
             }
@@ -212,17 +224,17 @@ public:
     }
 
     int readFrom(InputStream & stream) {
-        size_t valid_counts = 0;
+        size_t valid_count = 0;
         size_t count;
 
-        values_.clear();
+        values.clear();
 
         // Read the header info.
-        header_.command = stream.readUInt32();
-        header_.count = stream.readUInt32();
-        header_.total_size = stream.readUInt32();
+        header.command = stream.readUInt32();
+        header.count = stream.readUInt32();
+        header.total_size = stream.readUInt32();
 
-        count = valid_counts = header_.count;
+        count = valid_count = header.count;
 
         // Read the body info.
         for (size_t i = 0; i < count; ++i) {
@@ -236,8 +248,10 @@ public:
             // Read the datas.
             switch (type) {
             case DataType::EndOf:
-                value.u8 = stream.readUInt8();
-                variant.setUInt8(value.u8);
+                isValidData = false;
+                valid_count--;
+                // Exit the for loop immediately.
+                i = count;
                 break;
             case DataType::Bool:
                 value.b = stream.readBool();
@@ -289,16 +303,16 @@ public:
                 break;
             default:
                 isValidData = false;
-                valid_counts--;
+                valid_count--;
                 break;
             }
 
             if (isValidData) {
-                values_.push_back(variant);
+                values.push_back(variant);
             }
         }
 
-        return (int)valid_counts;
+        return (int)valid_count;
     }
 };
 

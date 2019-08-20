@@ -5,11 +5,11 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 
+#include "server/Request.h"
+#include "server/Response.h"
+
 namespace kvdb {
 namespace server {
-
-struct Response;
-struct Request;
 
 /// The common handler for all incoming requests.
 class RequestHandler : private boost::noncopyable

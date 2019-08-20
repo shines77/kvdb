@@ -6,8 +6,8 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 
-#include "server/Response.h"
 #include "server/Request.h"
+#include "server/Response.h"
 
 namespace kvdb {
 namespace server {
