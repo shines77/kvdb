@@ -32,7 +32,17 @@ public:
 
     BasicOutputStream() : base_type() {}
     BasicOutputStream(const char_type * value) : base_type(value) {}
+    template <size_t N>
+    BasicOutputStream(const char_type(&data)[N]) : base_type(data) {}
     ~BasicOutputStream() {}
+
+    void writeType(uint8_t type) {
+        writeUInt8(type);
+    }
+
+    void writeType(uint32_t type) {
+        writeUInt8((uint8_t)type);
+    }
 
     void writeByte(uint8_t value) {
         setByte(value);
@@ -81,7 +91,7 @@ public:
 
     void writeUInt32(uint32_t value) {
         setUInt32(value);
-        nextUInt16();
+        nextUInt32();
     }
 
     void writeUInt64(uint64_t value) {

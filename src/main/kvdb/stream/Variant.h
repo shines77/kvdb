@@ -30,7 +30,7 @@ public:
     };
 
 private:
-    int type_;
+    uint32_t type_;
     Value value_;
 
 public:
@@ -116,9 +116,9 @@ public:
         return *this;
     }
 
-    int getType() const { return type_; }
+    uint32_t getType() const { return type_; }
 
-    void setType(int type) {
+    void setType(uint32_t type) {
         type_ =  type;
     }
 
@@ -166,7 +166,7 @@ public:
         value_.i16 = value;
     }
 
-    void setInt16(uint16_t value) {
+    void setUInt16(uint16_t value) {
         type_ = DataType::UInt16;
         value_.u16 = value;
     }

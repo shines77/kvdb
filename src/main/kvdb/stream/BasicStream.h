@@ -41,7 +41,20 @@ protected:
 public:
     BasicStream() : cur_(nullptr), head_(nullptr) {}
     BasicStream(const char_type * ptr) : cur_(const_cast<char_type *>(ptr)), head_(const_cast<char_type *>(ptr)) {}
+    template <size_t N>
+    BasicStream(const char_type(&data)[N]) : cur_(data), head_(data) {}
     ~BasicStream() {}
+
+    void setStream(const char_type * ptr) {
+        cur_ = (char_type *)ptr;
+        head_ = (char_type *)ptr;
+    }
+
+    template <size_t N>
+    void setStream(const char_type(&data)[N]) {
+        cur_ = (char_type *)data;
+        head_ = (char_type *)data;
+    }
 
     char_type * head() const {
         return head_;
@@ -55,10 +68,11 @@ public:
         return (value_type *)cur_;
     }
 
-    ptrdiff_t length() const { return (cur_ - head_); }
+    ptrdiff_t length() const   { return (cur_ - head_); }
+    ptrdiff_t position() const { return this->length(); }
 
-    bool is_overflow()  const { return false; }
-    bool is_underflow() const { return (cur_ < head_); }
+    bool isOverflow()  const { return false; }
+    bool isUnderflow() const { return (cur_ < head_); }
 
     void reset() {
         cur_ = head_;

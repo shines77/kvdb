@@ -32,7 +32,13 @@ public:
 
     BasicInputStream() : base_type(nullptr) {}
     BasicInputStream(const char_type * value) : base_type(value) {}
+    template <size_t N>
+    BasicInputStream(const char_type(&data)[N]) : base_type(data) {}
     ~BasicInputStream() {}
+
+    uint8_t readType() {
+        return readUInt8();
+    }
 
     uint8_t readByte() {
         uint8_t value = getByte();
@@ -43,6 +49,12 @@ public:
     value_type readChar() {
         value_type value = getChar();
         nextChar();
+        return value;
+    }
+
+    bool readBool() {
+        bool value = getBool();
+        nextBool();
         return value;
     }
 
@@ -107,7 +119,7 @@ public:
     }
 
     double readDouble() {
-        float value = getDouble();
+        double value = getDouble();
         nextDouble();
         return value;
     }

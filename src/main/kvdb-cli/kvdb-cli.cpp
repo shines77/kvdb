@@ -206,9 +206,18 @@ int main(int argc, char * argv[])
 
     clientConfig.database = database;
 
+    char packetBuf[4096];
+
     NetPacket packet;
-    OutputStream stream;
-    packet.serialize(stream);
+    OutputStream stream(packetBuf);
+    stream.setStream(packetBuf);
+    packet.writeTo(stream);
+
+    PacketHeader & header = packet.getHeaderInfo();
+    ptrdiff_t length = stream.length();
+
+    InputStream istream(packetBuf);
+    int count = packet.readFrom(istream);
 
     printf("\n");
 
