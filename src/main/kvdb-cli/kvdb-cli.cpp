@@ -15,12 +15,11 @@
 #include <boost/asio.hpp>
 
 #include "client/common.h"
+#include "client/KvdbClient.h"
 
 #include "kvdb/all.h"
 
 #include <boost/program_options.hpp>
-
-using namespace kvdb;
 
 // String compare mode
 #define STRING_COMPARE_STDC     0
@@ -42,6 +41,30 @@ using namespace kvdb;
 #define DEFAULT_SERVER_HOST     DEFAULT_SERVER_ADDRESS":"DEFAULT_SERVER_PORT_S
 
 #define CLIENT_PREFIX           APP_NAME"-"DEFAULT_SERVER_HOST"> "
+
+using namespace kvdb;
+using namespace kvdb::client;
+
+uint32_t g_test_mode    = kvdb::test_mode_echo_server;
+uint32_t g_test_method  = kvdb::test_method_pingpong;
+uint32_t g_nodelay      = 0;
+uint32_t g_need_echo    = 1;
+uint32_t g_packet_size  = 64;
+
+std::string g_test_mode_str      = "echo";
+std::string g_test_method_str    = "pingpong";
+std::string g_test_mode_full_str = "echo server";
+std::string g_nodelay_str        = "false";
+std::string g_rpc_topic;
+
+std::string g_server_ip;
+std::string g_server_port;
+
+kvdb::aligned_atomic<uint64_t> kvdb::g_query_count(0);
+kvdb::aligned_atomic<uint32_t> kvdb::g_client_count(0);
+
+kvdb::aligned_atomic<uint64_t> kvdb::g_recv_bytes(0);
+kvdb::aligned_atomic<uint64_t> kvdb::g_send_bytes(0);
 
 struct KvdbClientConfig {
     std::string remote;
@@ -84,6 +107,47 @@ void net_packet_test()
 
     InputStream istream(packetBuf);
     int count = packet.readFrom(istream);
+}
+
+void run_kvdb_client(const std::string & address, uint16_t port)
+{
+    try {
+        // Alias of size_t
+        //std::string::size_type sz;
+        //int i_port = std::stoi(port, &sz);
+
+        boost::asio::io_service io_service;
+        KvdbClient client(io_service, address, port);
+        client.run();
+
+        std::cout << "Client is connectting ..." << std::endl;
+        std::cout << std::endl;
+
+        uint64_t last_query_count = 0;
+        while (true) {
+            auto cur_succeed_count = (uint64_t)g_query_count;
+            auto client_count = (uint32_t)g_client_count;
+            auto qps = (cur_succeed_count - last_query_count);
+            std::cout << address.c_str() << ":" << port << " - "
+                      << "nodelay:" << g_nodelay << ", "
+                      << "mode:" << g_test_mode_str.c_str() << ", "
+                      << "test:" << g_test_method_str.c_str() << ", "
+                      << "qps=" << std::right << std::setw(7) << qps << ", "
+                      << "BW="
+                      << std::right << std::setw(6)
+                      << std::setiosflags(std::ios::fixed) << std::setprecision(3)
+                      << (qps * 8 / (1024.0 * 1024.0))
+                      << " Mb/s" << std::endl;
+            std::cout << std::right;
+            last_query_count = cur_succeed_count;
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+
+        client.join();
+    }
+    catch (const std::exception & ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl;
+    }
 }
 
 void make_spaces(std::string & spaces, std::size_t size)
@@ -233,6 +297,8 @@ int main(int argc, char * argv[])
     printf("\n");
 
     net_packet_test();
+
+    run_kvdb_client(server_address, server_port);
 
     bool exit = false;
 

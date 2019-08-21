@@ -49,11 +49,11 @@ enum test_method_t {
     test_method_default = -1
 };
 
-extern aligned_atomic<uint64_t> g_query_count;
-extern aligned_atomic<uint32_t> g_client_count;
+extern kvdb::aligned_atomic<uint64_t> g_query_count;
+extern kvdb::aligned_atomic<uint32_t> g_client_count;
 
-extern aligned_atomic<uint64_t> g_recv_bytes;
-extern aligned_atomic<uint64_t> g_send_bytes;
+extern kvdb::aligned_atomic<uint64_t> g_recv_bytes;
+extern kvdb::aligned_atomic<uint64_t> g_send_bytes;
 
 extern const std::string g_response_html;
 

@@ -1,9 +1,13 @@
 
 #pragma once
 
+#include <iostream>
+#include <streambuf>
+#include <string>
 #include <memory>
 #include <thread>
 #include <functional>
+
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -53,22 +57,22 @@ public:
           signals_(io_service_pool_.get_first_io_service()),
           buffer_size_(buffer_size), packet_size_(packet_size)
     {
-        do_async_wait();
+        do_signal_set();
 
         start(address, port);
     }
 
-    KvdbServer(short port, uint32_t buffer_size = 32768,
+    KvdbServer(const std::string & address, uint16_t port,
+        uint32_t buffer_size = 32768,
         uint32_t packet_size = 64,
         uint32_t pool_size = std::thread::hardware_concurrency())
-        : io_service_pool_(pool_size), acceptor_(io_service_pool_.get_first_io_service(),
-          ip::tcp::endpoint(ip::tcp::v4(), port)),
+        : io_service_pool_(pool_size), acceptor_(io_service_pool_.get_first_io_service()),
           signals_(io_service_pool_.get_first_io_service()),
           buffer_size_(buffer_size), packet_size_(packet_size)
     {
-        do_async_wait();
+        do_signal_set();
 
-        do_accept();
+        start(address, std::to_string(port));
     }
 
     ~KvdbServer()
@@ -76,7 +80,7 @@ public:
         this->stop();
     }
 
-    void do_async_wait() {
+    void do_signal_set() {
         //
         // Register to handle the signals that indicate when the server should exit.
         // It is safe to register for the same signal multiple times in a program,
@@ -93,17 +97,21 @@ public:
 
     void start(const std::string & address, const std::string & port)
     {
-        ip::tcp::resolver resolver(io_service_pool_.get_now_io_service());
+        ip::tcp::resolver resolver(io_service_pool_.get_first_io_service());
         ip::tcp::resolver::query query(address, port);
         ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-        boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
+        boost::asio::ip::tcp::endpoint endpoint = *endpoint_iterator;
 
-        boost::system::error_code ec;
-        acceptor_.open(endpoint.protocol(), ec);
-        if (ec) {
+        boost::system::error_code err;
+        acceptor_.open(endpoint.protocol(), err); 
+        if (err) {
             // Open endpoint error
-            std::cout << "kvdb_server::start() - Error: (code = " << ec.value() << ") "
-                      << ec.message().c_str() << std::endl;
+            std::stringbuf err_info;
+            std::ostream os(&err_info);
+            os << "kvdb_server::start() - Error: (code = " << err.value() << ") "
+               << err.message().c_str();
+            std::cout << err_info.str().c_str() << std::endl;
+            throw std::exception(err_info.str().c_str());
             return;
         }
 
@@ -145,7 +153,7 @@ private:
     void do_accept()
     {
         new_connection_.reset(new KvdbConnection(io_service_pool_.get_io_service(),
-                                                  buffer_size_, packet_size_, g_need_echo));
+                                                 buffer_size_, packet_size_, g_need_echo));
         acceptor_.async_accept(new_connection_->socket(), boost::bind(&KvdbServer::handle_accept,
                                this, boost::asio::placeholders::error, new_connection_));
     }

@@ -6,8 +6,8 @@
 #pragma once
 #endif
 
-#include <boost/asio.hpp>
 #include <boost/array.hpp>
+#include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -40,9 +40,6 @@ private:
     /// The manager for this connection.
     ConnectionManager & connection_manager_;
 
-    /// Buffer for incoming data.
-    boost::array<char, 8192> buffer_;
-
     /// The handler used to process the incoming request.
     RequestHandler & request_handler_;
 
@@ -54,6 +51,9 @@ private:
 
     /// The reply to be sent back to the client.
     Response response_;
+
+    /// Buffer for incoming data.
+    boost::array<char, 8192> buffer_;
 
 public:
     /// Construct a connection with the given io_context.
