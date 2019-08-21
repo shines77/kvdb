@@ -32,9 +32,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbConnection.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbServer.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common.h" />
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common\aligned_atomic.h" />
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common\boost_asio_msvc.h" />
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common\cmd_utils.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Connection.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\ConnectionManager.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\HeaderField.h" />

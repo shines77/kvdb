@@ -29,6 +29,9 @@
     <Filter Include="src\server">
       <UniqueIdentifier>{af1145a3-1a1d-469f-a00b-64846b50d7fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\common">
+      <UniqueIdentifier>{e701dd03-a324-4238-a3a8-767548f8348e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb\all.h">
@@ -150,6 +153,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\BasicStream.h">
       <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\common\aligned_atomic.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\common\boost_asio_msvc.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\common\cmd_utils.h">
+      <Filter>src\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

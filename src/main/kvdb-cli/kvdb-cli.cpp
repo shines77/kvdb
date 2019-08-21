@@ -11,11 +11,10 @@
 #include <string>
 #include <utility>
 
-#include "client/common/boost_asio_msvc.h"
+#include "kvdb/common/boost_asio_msvc.h"
 #include <boost/asio.hpp>
 
 #include "client/common.h"
-#include "client/common/cmd_utils.h"
 
 #include "kvdb/all.h"
 
@@ -38,12 +37,15 @@ using namespace kvdb;
 #define DEFAULT_SERVER_PORT     8077
 #define DEFAULT_SERVER_PORT_S   "8077"
 
+#define DEFAULT_LOCAL_IP        "127.0.0.1"
+
 #define DEFAULT_SERVER_HOST     DEFAULT_SERVER_ADDRESS":"DEFAULT_SERVER_PORT_S
 
 #define CLIENT_PREFIX           APP_NAME"-"DEFAULT_SERVER_HOST"> "
 
 struct KvdbClientConfig {
-    std::string host;
+    std::string remote;
+    std::string local;
     std::string address;
     uint16_t port;
 
@@ -55,8 +57,8 @@ struct KvdbClientConfig {
 
     KvdbClientConfig() : port(0) {}
 
-    KvdbClientConfig(const std::string & _host)
-        : host(_host), port(0) {
+    KvdbClientConfig(const std::string & host)
+        : remote(host), port(0) {
         //
     }
 
@@ -67,6 +69,22 @@ struct KvdbClientConfig {
 };
 
 KvdbClientConfig clientConfig;
+
+void net_packet_test()
+{
+    char packetBuf[4096];
+
+    NetPacket packet;
+    OutputStream ostream(packetBuf);
+    ostream.setStream(packetBuf);
+    packet.writeTo(ostream);
+
+    PacketHeader & header = packet.getHeaderInfo();
+    ptrdiff_t length = ostream.length();
+
+    InputStream istream(packetBuf);
+    int count = packet.readFrom(istream);
+}
 
 void make_spaces(std::string & spaces, std::size_t size)
 {
@@ -84,14 +102,18 @@ void print_usage(const std::string & app_name, const boost::program_options::opt
     std::cerr << options_desc << std::endl;
 
     std::cerr << "Usage: " << std::endl << std::endl
-              << "  " << app_name.c_str()      << " --host=<host> --username=<username> --password=<password>" << std::endl
+              << "  " << app_name.c_str()      << " --host=<host> --local=<local> --username=<username> --password=<password>" << std::endl
               << "  " << leader_spaces.c_str() << " --database=<database> [--echo=[0,1]]" << std::endl
               << std::endl
               << "For example: " << std::endl << std::endl
-              << "  " << app_name.c_str()      << " --host=" << DEFAULT_SERVER_HOST << " --username=root --password=user1234" << std::endl
+              << "  " << app_name.c_str()      << " --host=" << DEFAULT_SERVER_HOST
+                                               << " --local=" << DEFAULT_LOCAL_IP
+                                               << " --username=root --password=user1234" << std::endl
               << "  " << leader_spaces.c_str() << " --database=table1 --echo=0" << std::endl
               << std::endl
-              << "  " << app_name.c_str() << " -s " << DEFAULT_SERVER_HOST << " -u root -p user1234 -d table1 -e 0" << std::endl;
+              << "  " << app_name.c_str() << " -s " << DEFAULT_SERVER_HOST
+                                          << " -l " << DEFAULT_LOCAL_IP
+                                          << " -u root -p user1234 -d table1 -e 0" << std::endl;
     std::cerr << std::endl;
 }
 
@@ -113,6 +135,8 @@ int main(int argc, char * argv[])
         ("help,h",          "usage info")
         ("host,s",          options::value<std::string>(&server_host)->default_value(DEFAULT_SERVER_HOST),
                             "server url: ([hostname]|[ip-address]):[port]")
+        ("local,l",         options::value<std::string>(&server_host)->default_value(DEFAULT_LOCAL_IP),
+                            "local url: ([hostname]|[ip-address]):[port]")
         ("username,u",      options::value<std::string>(&username)->default_value("root"),
                             "username = [root]")
         ("password,p",      options::value<std::string>(&password)->default_value("user1234"),
@@ -162,7 +186,7 @@ int main(int argc, char * argv[])
         exit(EXIT_FAILURE);
     }
 
-    clientConfig.host = server_host;
+    clientConfig.remote = server_host;
     clientConfig.address = server_address;
     clientConfig.port = server_port;
 
@@ -206,20 +230,9 @@ int main(int argc, char * argv[])
 
     clientConfig.database = database;
 
-    char packetBuf[4096];
-
-    NetPacket packet;
-    OutputStream stream(packetBuf);
-    stream.setStream(packetBuf);
-    packet.writeTo(stream);
-
-    PacketHeader & header = packet.getHeaderInfo();
-    ptrdiff_t length = stream.length();
-
-    InputStream istream(packetBuf);
-    int count = packet.readFrom(istream);
-
     printf("\n");
+
+    net_packet_test();
 
     bool exit = false;
 

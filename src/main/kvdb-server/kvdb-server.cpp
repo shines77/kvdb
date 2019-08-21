@@ -10,11 +10,10 @@
 #include <string>
 #include <utility>
 
-#include "server/common/boost_asio_msvc.h"
+#include "kvdb/common/boost_asio_msvc.h"
 #include <boost/asio.hpp>
 
 #include "server/common.h"
-#include "server/common/cmd_utils.h"
 #include "server/KvdbServer.h"
 
 #include "kvdb/all.h"

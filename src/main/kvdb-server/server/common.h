@@ -4,8 +4,8 @@
 #include <string>
 #include <atomic>
 
-#include "server/common/boost_asio_msvc.h"
-#include "server/common/aligned_atomic.h"
+#include "kvdb/common/boost_asio_msvc.h"
+#include "kvdb/common/aligned_atomic.h"
 
 extern uint32_t g_test_mode;
 extern uint32_t g_test_method;

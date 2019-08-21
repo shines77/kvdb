@@ -27,6 +27,9 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\stddef.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\stdint.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\stdsize.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\common\aligned_atomic.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\common\boost_asio_msvc.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\common\cmd_utils.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\hash\crc32c.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\hash\Dictionary.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\hash\DictionaryOld.h" />

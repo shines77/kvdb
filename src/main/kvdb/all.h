@@ -10,6 +10,10 @@
 #include <stdlib.h>
 
 #include "kvdb/basic/stddef.h"
+
+#include "kvdb/common/cmd_utils.h"
+#include "kvdb/common/aligned_atomic.h"
+
 #include "kvdb/hash/Dictionary.h"
 #include "kvdb/hash/DictionaryOld.h"
 
