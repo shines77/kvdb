@@ -1,5 +1,10 @@
 
+#ifndef KVDB_SERVER_H
+#define KVDB_SERVER_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
 
 #include <iostream>
 #include <streambuf>
@@ -204,3 +209,5 @@ private:
 
 } // namespace server
 } // namespace kvdb
+
+#endif // KVDB_SERVER_H

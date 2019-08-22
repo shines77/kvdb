@@ -8,6 +8,8 @@
 
 #include <kvdb/core/Application.h>
 
+#include <stdint.h>
+
 #include <string>
 #include <boost/program_options.hpp>
 
@@ -35,7 +37,7 @@ public:
         : kvdb::Application(argc, argv),
           options_desc("Command list"), need_echo(1) {
     }
-    ~KvdbClientApp() {}
+    virtual ~KvdbClientApp() {}
 
     virtual void initialize() override;
     virtual void finalize() override;
@@ -47,6 +49,7 @@ public:
     void init_options();
     void parse_command_line();
 
+    void net_packet_test();
     void run_kvdb_client(const std::string & address, uint16_t port);
     int  run_kvdb_shell(int argc, char * argv[]);
 };

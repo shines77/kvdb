@@ -1,5 +1,10 @@
 
+#ifndef KVDB_CLIENT_H
+#define KVDB_CLIENT_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
 
 #include <iostream>
 #include <streambuf>
@@ -269,3 +274,5 @@ private:
 
 } // namespace client
 } // namespace kvdb
+
+#endif // KVDB_CLIENT_H

@@ -25,7 +25,7 @@ public:
         this->create();
     }
 
-    ~Application() {
+    virtual ~Application() {
         this->destroy();
     }
 
@@ -34,6 +34,11 @@ public:
 
     int     arg_count() const { return argc_; }
     char ** arg_vars()  const { return argv_; }
+
+    void set_args(int argc, char * argv[]) {
+        argc_ = argc;
+        argv_ = argv_;
+    }
 
     virtual void welcome() = 0;
     virtual void print_usage() = 0;

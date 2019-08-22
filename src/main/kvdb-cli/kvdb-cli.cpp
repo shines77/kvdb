@@ -18,20 +18,11 @@
 
 #define STRING_COMPARE_MODE     STRING_COMPARE_SSE42
 
-#include "kvdb/common/boost_asio_msvc.h"
-#include <boost/asio.hpp>
+#include <kvdb/common/boost_asio_msvc.h>
 
-#include "client/common.h"
-#include "client/KvdbClient.h"
 #include "client/KvdbClientApp.h"
 
-#include "kvdb/all.h"
-
-using namespace kvdb;
 using namespace kvdb::client;
-
-std::string kvdb::g_server_address;
-std::string kvdb::g_server_port;
 
 int main(int argc, char * argv[])
 {

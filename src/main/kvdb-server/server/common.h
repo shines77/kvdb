@@ -1,4 +1,10 @@
+
+#ifndef KVDB_SERVER_COMMON_H
+#define KVDB_SERVER_COMMON_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
 
 #include <stdint.h>
 #include <string>
@@ -58,3 +64,5 @@ extern aligned_atomic<uint64_t> g_send_bytes;
 extern const std::string g_response_html;
 
 }
+
+#endif // KVDB_SERVER_COMMON_H

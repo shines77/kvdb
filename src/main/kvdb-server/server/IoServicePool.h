@@ -1,5 +1,10 @@
 
+#ifndef KVDB_IO_SERVICE_POOL_H
+#define KVDB_IO_SERVICE_POOL_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
 
 #include <atomic>
 #include <boost/noncopyable.hpp>
@@ -109,3 +114,5 @@ public:
 
 } // namespace server
 } // namespace kvdb
+
+#endif // KVDB_IO_SERVICE_POOL_H

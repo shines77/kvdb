@@ -1,4 +1,10 @@
+
+#ifndef KVDB_CLIENT_COMMON_H
+#define KVDB_CLIENT_COMMON_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
 
 #include <stdint.h>
 #include <string>
@@ -21,9 +27,4 @@
 
 #define CLIENT_PREFIX           APP_NAME"-"DEFAULT_SERVER_HOST"> "
 
-namespace kvdb {
-
-extern std::string g_server_address;
-extern std::string g_server_port;
-
-}
+#endif // KVDB_CLIENT_COMMON_H

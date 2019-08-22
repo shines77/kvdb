@@ -2,6 +2,10 @@
 #ifndef KVDB_RESPONSE_H
 #define KVDB_RESPONSE_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#pragma once
+#endif
+
 #include <string>
 #include <vector>
 #include <boost/asio.hpp>

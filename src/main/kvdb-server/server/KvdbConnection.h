@@ -1,5 +1,10 @@
 
+#ifndef KVDB_KVDB_CONNECTION_H
+#define KVDB_KVDB_CONNECTION_H
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
+#endif
 
 #include <iostream>
 #include <memory>
@@ -451,3 +456,5 @@ private:
 
 #undef MAX_UPDATE_CNT
 #undef MAX_UPDATE_BYTES
+
+#endif // KVDB_KVDB_CONNECTION_H

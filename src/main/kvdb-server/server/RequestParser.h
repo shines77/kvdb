@@ -2,6 +2,10 @@
 #ifndef KVDB_REQUEST_PARSER_H
 #define KVDB_REQUEST_PARSER_H
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#pragma once
+#endif
+
 #include <type_traits>
 
 #include <boost/logic/tribool.hpp>
@@ -77,7 +81,8 @@ private:
 };
 
 template <typename InputIterator>
-int RequestParser::parse(ConnectionContext & context, Request & req, InputIterator begin, InputIterator end)
+int RequestParser::parse(ConnectionContext & context, Request & req,
+                         InputIterator begin, InputIterator end)
 {
     InputStream stream(begin);
     uint32_t command = stream.readUInt32();

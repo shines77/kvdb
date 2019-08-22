@@ -29,23 +29,6 @@ void make_spaces(std::string & spaces, std::size_t size)
         spaces += " ";
 }
 
-static
-void net_packet_test()
-{
-    char packetBuf[4096];
-
-    NetPacket packet;
-    OutputStream ostream(packetBuf);
-    ostream.setStream(packetBuf);
-    packet.writeTo(ostream);
-
-    PacketHeader & header = packet.getHeaderInfo();
-    ptrdiff_t length = ostream.length();
-
-    InputStream istream(packetBuf);
-    int count = packet.readFrom(istream);
-}
-
 void KvdbClientApp::initialize()
 {
     // Initialize application data before main()
@@ -190,6 +173,22 @@ void KvdbClientApp::parse_command_line()
     }
 
     clientConfig.database = database;
+}
+
+void KvdbClientApp::net_packet_test()
+{
+    char packetBuf[4096];
+
+    NetPacket packet;
+    OutputStream ostream(packetBuf);
+    ostream.setStream(packetBuf);
+    packet.writeTo(ostream);
+
+    PacketHeader & header = packet.getHeaderInfo();
+    ptrdiff_t length = ostream.length();
+
+    InputStream istream(packetBuf);
+    int count = packet.readFrom(istream);
 }
 
 void KvdbClientApp::run_kvdb_client(const std::string & address, uint16_t port)
