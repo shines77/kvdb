@@ -1,6 +1,7 @@
 
 #include "server/ConnectionManager.h"
 
+#include <functional>
 #include <algorithm>
 #include <boost/bind.hpp>
 
@@ -22,7 +23,7 @@ void ConnectionManager::stop(connection_ptr conn)
 void ConnectionManager::stop_all()
 {
     std::for_each(connections_.begin(), connections_.end(),
-                  boost::bind(&KvdbConnection::stop, _1));
+                  std::bind(&Connection::stop, std::placeholders::_1));
     connections_.clear();
 }
 

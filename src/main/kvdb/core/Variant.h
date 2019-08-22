@@ -8,7 +8,7 @@
 
 #include <stdint.h>
 
-#include "kvdb/stream/DataType.h"
+#include "kvdb/core/DataType.h"
 
 namespace kvdb {
 

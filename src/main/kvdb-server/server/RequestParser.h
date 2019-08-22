@@ -7,10 +7,10 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
 
+#include <kvdb/core/CommandType.h>
 #include <kvdb/stream/InputStream.h>
 #include <kvdb/stream/ParseResult.h>
 #include <kvdb/stream/ParseStatus.h>
-#include <kvdb/server/CommandType.h>
 #include <kvdb/server/ServerStatus.h>
 
 #include <kvdb/jstd/StringRef.h>
@@ -125,7 +125,8 @@ int RequestParser::parse(ConnectionContext & context, Request & req, InputIterat
         }
     }
     else {
-        return ParseStatus::TooSmall;
+        return ParseStatus::Success;
+        //return ParseStatus::TooSmall;
     }
 }
 

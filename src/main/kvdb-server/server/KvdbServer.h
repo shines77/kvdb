@@ -23,6 +23,8 @@
 
 using namespace boost::asio;
 
+#define USE_KVDB_CONNECTION     0
+
 namespace kvdb {
 namespace server {
 
@@ -40,6 +42,9 @@ private:
     /// The connection manager which owns all live connections.
     ConnectionManager                   connection_manager_;
 
+    ///
+    RequestHandler                      request_handler_;
+
     std::shared_ptr<std::thread>        thread_;
 
     /// The signal_set is used to register for process termination notifications.
@@ -50,12 +55,11 @@ private:
 
 public:
     KvdbServer(const std::string & address, const std::string & port,
-        uint32_t buffer_size = 32768,
-        uint32_t packet_size = 64,
-        uint32_t pool_size = std::thread::hardware_concurrency())
+               const std::string & docRoot,
+               uint32_t pool_size = std::thread::hardware_concurrency())
         : io_service_pool_(pool_size), acceptor_(io_service_pool_.get_first_io_service()),
-          signals_(io_service_pool_.get_first_io_service()),
-          buffer_size_(buffer_size), packet_size_(packet_size)
+          request_handler_(docRoot),
+          signals_(io_service_pool_.get_first_io_service())
     {
         do_signal_set();
 
@@ -63,12 +67,11 @@ public:
     }
 
     KvdbServer(const std::string & address, uint16_t port,
-        uint32_t buffer_size = 32768,
-        uint32_t packet_size = 64,
-        uint32_t pool_size = std::thread::hardware_concurrency())
+               const std::string & docRoot,
+               uint32_t pool_size = std::thread::hardware_concurrency())
         : io_service_pool_(pool_size), acceptor_(io_service_pool_.get_first_io_service()),
-          signals_(io_service_pool_.get_first_io_service()),
-          buffer_size_(buffer_size), packet_size_(packet_size)
+          request_handler_(docRoot),
+          signals_(io_service_pool_.get_first_io_service())
     {
         do_signal_set();
 
@@ -152,8 +155,13 @@ public:
 private:
     void do_accept()
     {
+#if USE_KVDB_CONNECTION
         new_connection_.reset(new KvdbConnection(io_service_pool_.get_io_service(),
                                                  buffer_size_, packet_size_, g_need_echo));
+#else
+        new_connection_.reset(new Connection(io_service_pool_.get_io_service(),
+                                             connection_manager_, request_handler_));
+#endif
         acceptor_.async_accept(new_connection_->socket(), boost::bind(&KvdbServer::handle_accept,
                                this, boost::asio::placeholders::error, new_connection_));
     }

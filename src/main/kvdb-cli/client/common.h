@@ -7,54 +7,23 @@
 #include "kvdb/common/boost_asio_msvc.h"
 #include "kvdb/common/aligned_atomic.h"
 
-extern uint32_t g_test_mode;
-extern uint32_t g_test_method;
-extern uint32_t g_nodelay;
-extern uint32_t g_need_echo;
-extern uint32_t g_packet_size;
+#define _ToString(x)            #x
 
-extern std::string g_test_mode_str;
-extern std::string g_test_method_str;
-extern std::string g_test_mode_full_str;
-extern std::string g_nodelay_str;
-extern std::string g_rpc_topic;
+#define APP_NAME                "kvdb"
 
-extern std::string g_server_ip;
-extern std::string g_server_port;
+#define DEFAULT_SERVER_ADDRESS  "127.0.0.1"
+#define DEFAULT_SERVER_PORT     8077
+#define DEFAULT_SERVER_PORT_S   "8077"
+
+#define DEFAULT_LOCAL_IP        "127.0.0.1"
+
+#define DEFAULT_SERVER_HOST     DEFAULT_SERVER_ADDRESS":"DEFAULT_SERVER_PORT_S
+
+#define CLIENT_PREFIX           APP_NAME"-"DEFAULT_SERVER_HOST"> "
 
 namespace kvdb {
 
-enum session_mode_t {
-    mode_no_echo = 0,
-    mode_need_echo = 1
-};
-
-enum test_mode_t {
-    test_mode_unknown,
-    test_mode_echo_server,
-    test_mode_no_echo_server,
-    test_mode_http_server,
-    test_mode_rpc_call,
-    test_mode_sub_pub,
-    test_mode_default = -1
-};
-
-enum test_method_t {
-    test_method_unknown,
-    test_method_pingpong,
-    test_method_qps,
-    test_method_throughput,
-    test_method_latency,
-    test_method_async_qps,
-    test_method_default = -1
-};
-
-extern kvdb::aligned_atomic<uint64_t> g_query_count;
-extern kvdb::aligned_atomic<uint32_t> g_client_count;
-
-extern kvdb::aligned_atomic<uint64_t> g_recv_bytes;
-extern kvdb::aligned_atomic<uint64_t> g_send_bytes;
-
-extern const std::string g_response_html;
+extern std::string g_server_address;
+extern std::string g_server_port;
 
 }

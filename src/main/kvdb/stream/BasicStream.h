@@ -16,7 +16,7 @@
 #include <string>
 #include <type_traits>
 
-#include "kvdb/stream/DataType.h"
+#include "kvdb/core/DataType.h"
 #include "kvdb/jstd/StringRef.h"
 
 namespace kvdb {

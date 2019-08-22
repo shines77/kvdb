@@ -20,8 +20,6 @@
 
 #include "client/common.h"
 
-using namespace boost::asio;
-
 namespace kvdb {
 namespace client {
 
@@ -83,6 +81,7 @@ public:
 
     void start(const std::string & address, uint16_t port)
     {
+        std::cout << "start(address, port)" << std::endl;
         //
         // Start an asynchronous resolve to translate the server and service names
         // into a list of endpoints.
@@ -100,6 +99,15 @@ public:
         boost::asio::ip::tcp::resolver::query query(address, s_port);
         endpoint_iterator_ = resolver.resolve(query);
 
+        // Form the request. We specify the "Connection: close" header so that the
+        // server will close the socket after transmitting the response. This will
+        // allow us to treat all data up until the EOF as the content.
+        std::ostream request_stream(&request_);
+        request_stream << "GET " << port << " HTTP/1.1\r\n";
+        request_stream << "Host: " << address << "\r\n";
+        request_stream << "Accept: */*\r\n";
+        request_stream << "Connection: close\r\n\r\n";
+
         connect();
     }
 
@@ -110,9 +118,11 @@ public:
 
     void stop()
     {
+        std::cout << "stop()" << std::endl;
         this->disconnect();
 
         io_service_.stop();
+        this->join();
     }
 
     //
@@ -120,6 +130,7 @@ public:
     //
     void connect()
     {
+        std::cout << "connect()" << std::endl;
         //
         // Attempt a connection to each endpoint in the list until we
         // successfully establish a connection.
@@ -131,11 +142,13 @@ public:
 
     void disconnect()
     {
+        std::cout << "disconnect()" << std::endl;
         socket_.close();
     }
 
     void run()
     {
+        std::cout << "run()" << std::endl;
         thread_ = std::make_shared<std::thread>([this]() {
             io_service_.run();
         });
@@ -150,9 +163,8 @@ public:
 
 private:
     void handle_resolve(const boost::system::error_code & err,
-                        const ip::tcp::resolver::iterator & endpoint_iterator)
+                        const boost::asio::ip::tcp::resolver::iterator & endpoint_iterator)
     {
-        /*
         if (!err) {
             //
             // Attempt a connection to each endpoint in the list until we
@@ -163,14 +175,16 @@ private:
                             boost::asio::placeholders::error));
         }
         else {
-            std::cout << "Error: " << err.message() << "\n";
+            std::cout << "KvdbClient::handle_resolve() Error: " << err.message() << "\n";
         }
-        //*/
     }
 
     void handle_connect(const boost::system::error_code & err)
     {
         if (!err) {
+            std::cout << "KvdbClient::handle_connect()" << std::endl;
+            std::cout << "request_.size() = " << request_.size() << std::endl;
+            std::cout << std::endl;
             //
             // The connection was successful. Send the request.
             //
@@ -190,6 +204,9 @@ private:
 
     void handle_write_request(const boost::system::error_code & err)
     {
+        std::cout << "KvdbClient::handle_write_request()" << std::endl;
+        std::cout << std::endl;
+
         if (!err) {
             //
             // Receive the part data of response, if it's not completed, continue to read. 
@@ -209,12 +226,19 @@ private:
                           std::size_t bytes_transferred,
                           std::size_t bytes_wanted)
     {
+        std::cout << "KvdbClient::handle_read_some()" << std::endl;
+        std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
+        std::cout << "bytes_wanted = " << bytes_wanted << std::endl;
+        std::cout << std::endl;
+
         if (!err) {
             if (bytes_transferred < bytes_wanted) {
+                std::cout << "KvdbClient::handle_read_some(): Receive next partment." << std::endl;
                 //
                 // Receive the data of next partment.
                 //
-                socket_.async_read_some(boost::asio::buffer(&rev_buffer_[bytes_transferred], bytes_wanted - bytes_transferred),
+                socket_.async_read_some(boost::asio::buffer(&rev_buffer_[bytes_transferred],
+                    bytes_wanted - bytes_transferred),
                     boost::bind(&KvdbClient::handle_read_some, this,
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred,
@@ -228,6 +252,7 @@ private:
                 this->stop();
             }
             else {
+                std::cout << "KvdbClient::handle_read_some(): Read all wanted bytes." << std::endl;
                 //
                 // The connection was successful, send the request.
                 //

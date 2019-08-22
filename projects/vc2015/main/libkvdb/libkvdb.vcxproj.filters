@@ -32,6 +32,12 @@
     <Filter Include="src\common">
       <UniqueIdentifier>{e701dd03-a324-4238-a3a8-767548f8348e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\client">
+      <UniqueIdentifier>{ef71c4a7-442b-4e8b-8d04-5c200d42506b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\core">
+      <UniqueIdentifier>{753ff10e-2f00-4308-b588-28a1b6abadac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb\all.h">
@@ -112,12 +118,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\InputStream.h">
       <Filter>src\stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\DataType.h">
-      <Filter>src\stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\server\CommandType.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\server\ServerStatus.h">
       <Filter>src\server</Filter>
     </ClInclude>
@@ -145,9 +145,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\NetPacket.h">
       <Filter>src\stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\Variant.h">
-      <Filter>src\stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\OutputStream.h">
       <Filter>src\stream</Filter>
     </ClInclude>
@@ -162,6 +159,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\common\cmd_utils.h">
       <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\client\LoginState.h">
+      <Filter>src\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\Application.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\CommandType.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\DataType.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\Variant.h">
+      <Filter>src\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

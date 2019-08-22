@@ -441,7 +441,7 @@ private:
     }
 };
 
-typedef boost::shared_ptr<KvdbConnection> connection_ptr;
+//typedef boost::shared_ptr<KvdbConnection> connection_ptr;
 
 } // namespace server
 } // namespace kvdb

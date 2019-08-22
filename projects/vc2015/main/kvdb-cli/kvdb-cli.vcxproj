@@ -19,11 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClientApp.cpp" />
     <ClCompile Include="..\..\..\..\src\main\kvdb-cli\kvdb-cli.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\common.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClient.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClientApp.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClientConfig.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8EA65E91-D24D-4679-87F1-9B64BA73180C}</ProjectGuid>

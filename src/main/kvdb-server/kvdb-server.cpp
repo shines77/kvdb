@@ -55,9 +55,9 @@ void run_kvdb_server(const std::string & address, const std::string & port,
                      uint32_t packet_size, uint32_t thread_num,
                      bool confirm = false)
 {
-    static const uint32_t kSeesionBufferSize = 65536;
     try {
-        KvdbServer server(address, port, kSeesionBufferSize, packet_size, thread_num);
+        std::string doc_root = "";
+        KvdbServer server(address, port, doc_root, thread_num);
         server.run();
 
         std::cout << "Server has bind and listening ..." << std::endl;
@@ -67,12 +67,13 @@ void run_kvdb_server(const std::string & address, const std::string & port,
         }
         std::cout << std::endl;
 
+        /*
         uint64_t last_query_count = 0;
         while (true) {
             auto cur_succeed_count = (uint64_t)g_query_count;
             auto client_count = (uint32_t)g_client_count;
             auto qps = (cur_succeed_count - last_query_count);
-            std::cout << address.c_str() << ":" << port.c_str() << " - " << packet_size << " bytes : "
+            std::cout << address.c_str() << ":" << port.c_str() << " - "
                       << thread_num << " threads : "
                       << "[" << std::left << std::setw(4) << client_count << "] conns : "
                       << "nodelay:" << g_nodelay << ", "
@@ -82,12 +83,13 @@ void run_kvdb_server(const std::string & address, const std::string & port,
                       << "BW="
                       << std::right << std::setw(6)
                       << std::setiosflags(std::ios::fixed) << std::setprecision(3)
-                      << ((qps * packet_size) * 8 / (1024.0 * 1024.0))
+                      << (qps * 8 / (1024.0 * 1024.0))
                       << " Mb/s" << std::endl;
             std::cout << std::right;
             last_query_count = cur_succeed_count;
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
+        //*/
 
         server.join();
     }

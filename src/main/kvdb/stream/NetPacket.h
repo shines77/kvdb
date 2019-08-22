@@ -9,10 +9,10 @@
 #include <vector>
 #include <string>
 
-#include "kvdb/stream/Variant.h"
+#include "kvdb/core/CommandType.h"
+#include "kvdb/core/Variant.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
-#include "kvdb/server/CommandType.h"
 
 namespace kvdb {
 

@@ -13,12 +13,21 @@
     <ClCompile Include="..\..\..\..\src\main\kvdb-cli\kvdb-cli.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClientApp.cpp">
+      <Filter>src\client</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\common.h">
       <Filter>src\client</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClient.h">
+      <Filter>src\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClientConfig.h">
+      <Filter>src\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClientApp.h">
       <Filter>src\client</Filter>
     </ClInclude>
   </ItemGroup>

@@ -80,7 +80,7 @@ private:
     void handle_write(const boost::system::error_code & ec);
 };
 
-//typedef boost::shared_ptr<connection> connection_ptr;
+typedef boost::shared_ptr<Connection> connection_ptr;
 
 } // namespace server
 } // namespace kvdb
