@@ -20,15 +20,14 @@
 
 namespace kvdb {
 
-template <typename T, typename VauleType = T>
-class BasicInputStream : public BasicStream<T, VauleType> {
+template <typename T>
+class BasicInputStream : public BasicStream<T> {
 public:
-    typedef BasicStream<T, VauleType>           base_type;
-    typedef typename base_type::char_type       char_type;
-    typedef typename base_type::value_type      value_type;
+    typedef BasicStream<T>                  base_type;
+    typedef typename base_type::char_type   char_type;
 
-    typedef std::basic_string<char_type>        string_type;
-    typedef jstd::BasicStringRef<char_type>     stringref_type;
+    typedef std::basic_string<char_type>    string_type;
+    typedef jstd::BasicStringRef<char_type> stringref_type;
 
     BasicInputStream() : base_type(nullptr) {}
     BasicInputStream(const char_type * value) : base_type(value) {}
@@ -46,8 +45,8 @@ public:
         return value;
     }
 
-    value_type readChar() {
-        value_type value = getChar();
+    char_type readChar() {
+        char_type value = getChar();
         nextChar();
         return value;
     }
@@ -124,78 +123,49 @@ public:
         return value;
     }
 
-    void readString(string_type & value, size_t length) {
+    template <typename StringType>
+    void readString(StringType & value, size_t length) {
         value.assign((const char_type *)cur_, length);
     }
 
-    void readString(stringref_type & value, size_t length) {
-        value.assign((const char_type *)cur_, length);
-    }
-
-    int parseString(string_type & value) {
-        int result = ParseResult::OK;
+    template <typename StringType>
+    int parseString(StringType & value) {
+        int result = ReadResult::Ok;
         uint32_t length;
 
-        uint8_t data_type = readUInt8();
-        switch (data_type) {
+        uint8_t type = getType();
+        switch (type) {
         case DataType::String:
+            nextUInt8();
             length = readUInt32();
             readString(value, length);
             break;
 
         case DataType::String1B:
+            nextUInt8();
             length = readUInt8();
             readString(value, length);
 
         case DataType::String2B:
+            nextUInt8();
             length = readUInt16();
             readString(value, length);
             break;
 
         case DataType::String3B:
-            length = getUInt32() & 0x00FFFFFFU;
-            next(3);
+        {
+            uint32_t value32 = readUInt32();
+#if NOT_IS_LITTLE_ENDIAN
+            length = (value32 & 0xFFFFFF00UL) >> 8;
+#else
+            length = value32 & 0x00FFFFFFUL;
+#endif
             readString(value, length);
-            break;
-
-        default:
-            back();
-            result = ParseResult::Failed;
             break;
         }
 
-        return result;
-    }
-
-    int parseString(stringref_type & value) {
-        int result = ParseResult::OK;
-        uint32_t length;
-
-        uint8_t data_type = readUInt8();
-        switch (data_type) {
-        case DataType::String:
-            length = readUInt32();
-            readString(value, length);
-            break;
-
-        case DataType::String1B:
-            length = readUInt8();
-            readString(value, length);
-
-        case DataType::String2B:
-            length = readUInt16();
-            readString(value, length);
-            break;
-
-        case DataType::String3B:
-            length = getUInt32() & 0x00FFFFFFU;
-            next(3);
-            readString(value, length);
-            break;
-
         default:
-            back();
-            result = ParseResult::Failed;
+            result = ReadResult::Failed;
             break;
         }
 

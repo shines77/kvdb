@@ -21,18 +21,31 @@
 
 namespace kvdb {
 
-template <typename T, typename VauleType = T>
+struct ReadResult {
+    enum Type {
+        Failed = -1,
+        Ok = 0,
+        Last
+    };
+};
+
+struct WriteResult {
+    enum Type {
+        Failed = -1,
+        Ok = 0,
+        Last
+    };
+};
+
+template <typename T>
 class BasicStream {
 public:
     typedef typename std::remove_pointer<
                 typename std::remove_cv<T>::type
             >::type     char_type;
-    typedef typename std::remove_pointer<
-                typename std::remove_cv<VauleType>::type
-            >::type     value_type;
 
-    typedef std::basic_string<char_type>        string_type;
-    typedef jstd::BasicStringRef<char_type>     stringref_type;
+    typedef std::basic_string<char_type>    string_type;
+    typedef jstd::BasicStringRef<char_type> stringref_type;
 
 protected:
     char_type * cur_;
@@ -64,10 +77,6 @@ public:
         return cur_;
     }
 
-    value_type * currentPtr() const {
-        return (value_type *)cur_;
-    }
-
     ptrdiff_t length() const   { return (cur_ - head_); }
     ptrdiff_t position() const { return this->length(); }
 
@@ -91,11 +100,11 @@ public:
     }
 
     void backChar() {
-        cur_ = (char_type *)((char *)cur_ - sizeof(value_type));
+        cur_ = (char_type *)((char *)cur_ - sizeof(char_type));
     }
 
     void backChar(int skip) {
-        cur_ = (char_type *)((char *)cur_ - skip * sizeof(value_type));
+        cur_ = (char_type *)((char *)cur_ - skip * sizeof(char_type));
     }
 
     void next() {
@@ -106,16 +115,20 @@ public:
         cur_ = (char_type *)((char *)cur_ + skip);
     }
 
+    void nextType() {
+        next();
+    }
+
     void nextByte() {
         next();
     }
 
     void nextChar() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(value_type));
+        cur_ = (char_type *)((char *)cur_ + sizeof(char_type));
     }
 
     void nextChar(int skip) {
-        cur_ = (char_type *)((char *)cur_ + skip * sizeof(value_type));
+        cur_ = (char_type *)((char *)cur_ + skip * sizeof(char_type));
     }
 
     void nextBool() {
@@ -174,12 +187,16 @@ public:
         return getUInt8();
     }
 
+    uint8_t getType() const {
+        return getUInt8();
+    }
+
     uint8_t getByte() const {
         return getUInt8();
     }
 
-    value_type getChar() const {
-        return *(value_type *)cur_;
+    char_type getChar() const {
+        return *(char_type *)cur_;
     }
 
     bool getBool() const {
@@ -234,8 +251,8 @@ public:
         setUInt8(value);
     }
 
-    void setChar(value_type value) const {
-        *(value_type *)cur_ = value;
+    void setChar(char_type value) const {
+        *(char_type *)cur_ = value;
     }
 
     void setBool(bool value) {

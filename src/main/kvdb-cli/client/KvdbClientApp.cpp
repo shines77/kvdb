@@ -130,13 +130,13 @@ void KvdbClientApp::parse_command_line()
         exit(EXIT_FAILURE);
     }
 
-    clientConfig.remote = server_host;
-    clientConfig.address = server_address;
-    clientConfig.port = server_port;
+    client_config.remote = server_host;
+    client_config.address = server_address;
+    client_config.port = server_port;
 
     std::stringstream prefix_s; 
     prefix_s << APP_NAME << "-" << server_address << ":" << server_port << "> ";
-    clientConfig.prefix = prefix_s.str();
+    client_config.prefix = prefix_s.str();
 
     // Option: username
     if (args_map.count("username") > 0) {
@@ -148,7 +148,7 @@ void KvdbClientApp::parse_command_line()
         exit(EXIT_FAILURE);
     }
 
-    clientConfig.username = username;
+    client_config.username = username;
 
     // Option: password
     if (args_map.count("password") > 0) {
@@ -160,7 +160,7 @@ void KvdbClientApp::parse_command_line()
         exit(EXIT_FAILURE);
     }
 
-    clientConfig.password = password;
+    client_config.password = password;
 
     // Option: database
     if (args_map.count("database") > 0) {
@@ -172,7 +172,7 @@ void KvdbClientApp::parse_command_line()
         exit(EXIT_FAILURE);
     }
 
-    clientConfig.database = database;
+    client_config.database = database;
 }
 
 void KvdbClientApp::net_packet_test()
@@ -241,7 +241,7 @@ int KvdbClientApp::run_kvdb_shell(int argc, char * argv[])
     bool exit = false;
 
     while (!exit) {
-        printf("%s", clientConfig.prefix.c_str());
+        printf("%s", client_config.prefix.c_str());
         unsigned char commands[1024];
         do {
 #if defined(_WIN32)
@@ -329,7 +329,7 @@ int KvdbClientApp::main(int argc, char * argv[])
 
     net_packet_test();
 
-    run_kvdb_client(clientConfig.address, clientConfig.port);
+    run_kvdb_client(client_config.address, client_config.port);
 
     int result = run_kvdb_shell(argc, argv);
     return result;

@@ -20,15 +20,14 @@
 
 namespace kvdb {
 
-template <typename T, typename VauleType = T>
-class BasicOutputStream : public BasicStream<T, VauleType> {
+template <typename T>
+class BasicOutputStream : public BasicStream<T> {
 public:
-    typedef BasicStream<T, VauleType>           base_type;
-    typedef typename base_type::char_type       char_type;
-    typedef typename base_type::value_type      value_type;
+    typedef BasicStream<T>                  base_type;
+    typedef typename base_type::char_type   char_type;
 
-    typedef std::basic_string<char_type>        string_type;
-    typedef jstd::BasicStringRef<char_type>     stringref_type;
+    typedef std::basic_string<char_type>    string_type;
+    typedef jstd::BasicStringRef<char_type> stringref_type;
 
     BasicOutputStream() : base_type() {}
     BasicOutputStream(const char_type * value) : base_type(value) {}
@@ -49,7 +48,7 @@ public:
         nextByte();
     }
 
-    void writeChar(value_type value) {
+    void writeChar(char_type value) {
         setChar(value);
         nextChar();
     }

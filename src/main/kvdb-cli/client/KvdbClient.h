@@ -170,6 +170,9 @@ private:
     void handle_resolve(const boost::system::error_code & err,
                         const boost::asio::ip::tcp::resolver::iterator & endpoint_iterator)
     {
+        std::cout << "KvdbClient::handle_resolve()" << std::endl;
+        std::cout << std::endl;
+
         if (!err) {
             //
             // Attempt a connection to each endpoint in the list until we
@@ -186,6 +189,9 @@ private:
 
     void handle_connect(const boost::system::error_code & err)
     {
+        std::cout << "KvdbClient::handle_connect()" << std::endl;
+        std::cout << std::endl;
+
         if (!err) {
             std::cout << "KvdbClient::handle_connect()" << std::endl;
             std::cout << "request_.size() = " << request_.size() << std::endl;

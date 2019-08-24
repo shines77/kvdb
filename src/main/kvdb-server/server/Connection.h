@@ -40,11 +40,11 @@ private:
     /// The manager for this connection.
     ConnectionManager & connection_manager_;
 
-    /// The handler used to process the incoming request.
-    RequestHandler & request_handler_;
-
     /// The incoming request.
     Request request_;
+
+    /// The handler used to process the incoming request.
+    RequestHandler & request_handler_;
 
     /// The parser for the incoming request.
     RequestParser request_parser_;
@@ -64,6 +64,8 @@ public:
 
     /// Get the socket associated with the connection.
     boost::asio::ip::tcp::socket & socket();
+
+    void shutdown_both();
 
     /// Start the first asynchronous operation for the connection.
     void start();

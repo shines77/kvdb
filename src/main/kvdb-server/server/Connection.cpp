@@ -33,6 +33,13 @@ boost::asio::ip::tcp::socket & Connection::socket()
     return socket_;
 }
 
+void Connection::shutdown_both()
+{
+    // Initiate graceful connection closure.
+    boost::system::error_code ignored_ec;
+    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+}
+
 void Connection::start()
 {
     socket_.async_read_some(boost::asio::buffer(buffer_),
@@ -43,17 +50,32 @@ void Connection::start()
 
 void Connection::stop()
 {
-    socket_.close();
+    if (socket_.is_open()) {
+        shutdown_both();
+
+        socket_.close();
+    }
 }
 
-void Connection::handle_read(const boost::system::error_code & ec,
+void Connection::handle_read(const boost::system::error_code & err,
                              std::size_t bytes_transferred)
 {
+    //
+    // See: https://www.cnblogs.com/pengyusong/p/6433516.html
+    //
+    // boost::asio::error::operation_aborted = 955,
+    // boost::asio::error::connection_was_aborted = 10053,
+    //   A established connection was aborted by the software in your host machine.
+    // boost::asio::error::connection_has_closed = 10054,
+    //   Connection closed by peer.
+    //
+
     std::cout << "Connection::handle_read()" << std::endl;
+    std::cout << "error_code = " << err.value() << std::endl;
     std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
     std::cout << std::endl;
 
-    if (!ec) {
+    if (!err) {
         int result = request_parser_.parse(context_, request_, buffer_.data(),
                                            buffer_.data() + bytes_transferred);
         if (result == ParseStatus::Success) {
@@ -78,17 +100,18 @@ void Connection::handle_read(const boost::system::error_code & ec,
             //
         }
     }
-    else if (ec != boost::asio::error::operation_aborted) {
+    else if (err != boost::asio::error::operation_aborted) {
         connection_manager_.stop(shared_from_this());
     }
 }
 
-void Connection::handle_write(const boost::system::error_code & ec)
+void Connection::handle_write(const boost::system::error_code & err)
 {
     std::cout << "Connection::handle_write()" << std::endl;
+    std::cout << "error_code = " << err.value() << std::endl;
     std::cout << std::endl;
 
-    if (!ec) {
+    if (!err) {
         // Initiate graceful connection closure.
         //boost::system::error_code ignored_ec;
         //socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
@@ -98,7 +121,7 @@ void Connection::handle_write(const boost::system::error_code & ec)
                         boost::asio::placeholders::error,
                         boost::asio::placeholders::bytes_transferred));
     }
-    else if (ec != boost::asio::error::operation_aborted) {
+    else if (err != boost::asio::error::operation_aborted) {
         connection_manager_.stop(shared_from_this());
     }
 }
