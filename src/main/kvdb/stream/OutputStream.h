@@ -39,7 +39,7 @@ public:
         writeUInt8(type);
     }
 
-    void writeType(uint32_t type) {
+    void writeType32(uint32_t type) {
         writeUInt8((uint8_t)type);
     }
 

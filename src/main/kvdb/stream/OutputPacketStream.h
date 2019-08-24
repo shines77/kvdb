@@ -17,6 +17,7 @@
 #include <type_traits>
 
 #include "kvdb/stream/OutputStream.h"
+#include "kvdb/core/Variant.h"
 
 namespace kvdb {
 
@@ -24,18 +25,28 @@ template <typename T>
 class BasicOutputPacketStream {
 public:
     typedef BasicOutputStream<T>            stream_type;
-    typedef typename base_type::char_type   char_type;
+    typedef typename stream_type::char_type char_type;
 
     typedef std::basic_string<char_type>    string_type;
     typedef jstd::BasicStringRef<char_type> stringref_type;
 
     stream_type stream;
 
-    BasicOutputPacketStream() : base_type() {}
-    BasicOutputPacketStream(const char_type * value) : base_type(value) {}
+    BasicOutputPacketStream() : stream() {}
+    BasicOutputPacketStream(const char_type * value) : stream(value) {}
     template <size_t N>
-    BasicOutputPacketStream(const char_type(&data)[N]) : base_type(data) {}
+    BasicOutputPacketStream(const char_type(&data)[N]) : stream(data) {}
     ~BasicOutputPacketStream() {}
+
+    char_type * head() const {
+        return stream.head();
+    }
+
+    char_type * current() const {
+        return stream.current();;
+    }
+
+    ptrdiff_t length() const   { return stream.length(); }
 
     void writeType(uint8_t type) {
         stream.writeUInt8(type);

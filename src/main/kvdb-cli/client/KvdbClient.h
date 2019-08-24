@@ -24,6 +24,8 @@
 #include <boost/asio/signal_set.hpp>
 
 #include "client/common.h"
+#include "client/KvdbClientApp.h"
+#include "kvdb/core/Messages.h"
 
 namespace kvdb {
 namespace client {
@@ -199,7 +201,17 @@ private:
             //
             // The connection was successful. Send the request.
             //
-            boost::asio::async_write(socket_, request_,
+            KvdbClientConfig & config = KvdbClientApp::client_config;
+            LoginRequest request;
+            request.username = config.username;
+            request.password = config.password;
+            request.database = config.database;
+
+            char req_buf[4096];
+            OutputPacketStream ostream(req_buf);
+            request.writeTo(ostream);
+
+            boost::asio::async_write(socket_, boost::asio::buffer(ostream.head(), ostream.length()),
                 boost::bind(&KvdbClient::handle_write_request, this,
                             boost::asio::placeholders::error));
         }

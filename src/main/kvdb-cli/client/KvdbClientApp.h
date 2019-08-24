@@ -30,7 +30,7 @@ public:
     std::string username, password, database;
     int32_t need_echo;
 
-    KvdbClientConfig client_config;
+    static KvdbClientConfig client_config;
 
 public:
     KvdbClientApp(int argc = 0, char * argv[] = nullptr)

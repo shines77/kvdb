@@ -1,6 +1,6 @@
 
-#ifndef KVDB_STREAM_DATATYPE_H
-#define KVDB_STREAM_DATATYPE_H
+#ifndef KVDB_CORE_DATATYPE_H
+#define KVDB_CORE_DATATYPE_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -50,4 +50,4 @@ struct DataType {
 
 } // namespace kvdb
 
-#endif // KVDB_STREAM_DATATYPE_H
+#endif // KVDB_CORE_DATATYPE_H

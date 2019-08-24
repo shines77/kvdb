@@ -21,6 +21,8 @@ namespace options = boost::program_options;
 namespace kvdb {
 namespace client {
 
+KvdbClientConfig KvdbClientApp::client_config;
+
 static
 void make_spaces(std::string & spaces, std::size_t size)
 {

@@ -17,17 +17,18 @@
 #include <type_traits>
 
 #include "kvdb/stream/InputStream.h"
+#include "kvdb/core/Variant.h"
 
 namespace kvdb {
 
 template <typename T>
 class BasicInputPacketStream {
 public:
-    typedef BasicInputStream<T>                 stream_type;
-    typedef typename stream_type::char_type     char_type;
+    typedef BasicInputStream<T>             stream_type;
+    typedef typename stream_type::char_type char_type;
 
-    typedef std::basic_string<char_type>        string_type;
-    typedef jstd::BasicStringRef<char_type>     stringref_type;
+    typedef std::basic_string<char_type>    string_type;
+    typedef jstd::BasicStringRef<char_type> stringref_type;
 
     stream_type stream;
 
@@ -36,6 +37,16 @@ public:
     template <size_t N>
     BasicInputPacketStream(const char_type(&data)[N]) : stream(data) {}
     ~BasicInputPacketStream() {}
+
+    char_type * head() const {
+        return stream.head();
+    }
+
+    char_type * current() const {
+        return stream.current();;
+    }
+
+    ptrdiff_t length() const   { return stream.length(); }
 
     uint8_t readType() {
         return stream.readUInt8();
@@ -47,12 +58,12 @@ public:
         return (type == DataType::Int8 || type == DataType::UInt8);
     }
 
-    bool readChar(value_type & correct) {
+    bool readChar(char_type & correct) {
         uint8_t type = stream.readType();
-        bool correct = ((typeid(value_type) == typeid(int8_t)   && type == DataType::Int8)
-                || (typeid(value_type) == typeid(uint8_t)  && type == DataType::UInt8)
-                || (typeid(value_type) == typeid(int16_t)  && type == DataType::Int16)
-                || (typeid(value_type) == typeid(uint16_t) && type == DataType::UInt16));
+        bool correct = ((typeid(char_type) == typeid(int8_t)   && type == DataType::Int8)
+                || (typeid(char_type) == typeid(uint8_t)  && type == DataType::UInt8)
+                || (typeid(char_type) == typeid(int16_t)  && type == DataType::Int16)
+                || (typeid(char_type) == typeid(uint16_t) && type == DataType::UInt16));
         value = stream.readChar();
         return correct;
     }
@@ -178,6 +189,7 @@ public:
 
     template <typename StringType>
     int readString(StringType & value) {
+        size_t length;
         int result = ReadResult::Ok;
         uint8_t type = stream.getType();
         switch (type) {
