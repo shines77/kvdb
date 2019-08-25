@@ -16,8 +16,9 @@
 #include <string>
 #include <type_traits>
 
-#include "kvdb/stream/InputStream.h"
 #include "kvdb/core/Variant.h"
+#include "kvdb/stream/InputStream.h"
+#include "kvdb/stream/Packet.h"
 
 namespace kvdb {
 
@@ -43,7 +44,7 @@ public:
     }
 
     char_type * current() const {
-        return stream.current();;
+        return stream.current();
     }
 
     ptrdiff_t length() const { return stream.length(); }
@@ -59,23 +60,12 @@ public:
         stream.skipToHeader();
     }
 
-    void writeHeader(uint32_t msgType, uint32_t varCount) {
-        char_type * saveCur = stream.current();
-        uint32_t msgLength = getMsgLength();
-        reset();
-        stream.writeUInt32(msgType);
-        stream.writeUInt32(msgLength);
-        stream.writeUInt32(varCount);
-        stream.setCurrent(saveCur);
-    }
-
-    void writeHeader(uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
-        char_type * saveCur = stream.current();
-        reset();
-        stream.writeUInt32(msgType);
-        stream.writeUInt32(msgLength);
-        stream.writeUInt32(varCount);
-        stream.setCurrent(saveCur);
+    int readHeader(PacketHeader & header) {
+        header.signId = stream.readUInt32();
+        header.msgType = stream.readUInt32();
+        header.msgLength = stream.readUInt32();
+        header.varCount = stream.readUInt32();
+        return ReadResult::Ok;
     }
 
     uint8_t readType() {
@@ -91,9 +81,9 @@ public:
     bool readChar(char_type & correct) {
         uint8_t type = stream.readType();
         bool correct = ((typeid(char_type) == typeid(int8_t)   && type == DataType::Int8)
-                || (typeid(char_type) == typeid(uint8_t)  && type == DataType::UInt8)
-                || (typeid(char_type) == typeid(int16_t)  && type == DataType::Int16)
-                || (typeid(char_type) == typeid(uint16_t) && type == DataType::UInt16));
+                     || (typeid(char_type) == typeid(uint8_t)  && type == DataType::UInt8)
+                     || (typeid(char_type) == typeid(int16_t)  && type == DataType::Int16)
+                     || (typeid(char_type) == typeid(uint16_t) && type == DataType::UInt16));
         value = stream.readChar();
         return correct;
     }

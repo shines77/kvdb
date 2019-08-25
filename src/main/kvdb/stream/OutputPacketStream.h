@@ -43,7 +43,7 @@ public:
     }
 
     char_type * current() const {
-        return stream.current();;
+        return stream.current();
     }
 
     ptrdiff_t length() const { return stream.length(); }
@@ -59,19 +59,31 @@ public:
         stream.skipToHeader();
     }
 
-    void writeHeader(uint32_t msgType, uint32_t varCount) {
+    void writeHeader(const PacketHeader & header) {
+        char_type * saveCur = stream.current();
+        reset();
+        stream.writeUInt32(header.signId);
+        stream.writeUInt32(header.msgType);
+        stream.writeUInt32(header.msgLength);
+        stream.writeUInt32(header.varCount);
+        stream.setCurrent(saveCur);
+    }
+
+    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t varCount) {
         char_type * saveCur = stream.current();
         uint32_t msgLength = getMsgLength();
         reset();
+        stream.writeUInt32(signId);
         stream.writeUInt32(msgType);
         stream.writeUInt32(msgLength);
         stream.writeUInt32(varCount);
         stream.setCurrent(saveCur);
     }
 
-    void writeHeader(uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
+    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
         char_type * saveCur = stream.current();
         reset();
+        stream.writeUInt32(signId);
         stream.writeUInt32(msgType);
         stream.writeUInt32(msgLength);
         stream.writeUInt32(varCount);

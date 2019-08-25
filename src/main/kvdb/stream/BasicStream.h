@@ -94,16 +94,18 @@ public:
     void setHead(char_type * head) { this->head_ = head; }
     void setCurrent(char_type * cur) { this->cur_ = cur; }
 
-    void writeHeader(uint32_t msgType, uint32_t varCount) {
+    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t varCount) {
         uint32_t msgLength = getMsgLength();
         reset();
+        writeUInt32(signId);
         writeUInt32(msgType);
         writeUInt32(msgLength);
         writeUInt32(varCount);
     }
 
-    void writeHeader(uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
+    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
         reset();
+        writeUInt32(signId);
         writeUInt32(msgType);
         writeUInt32(msgLength);
         writeUInt32(varCount);

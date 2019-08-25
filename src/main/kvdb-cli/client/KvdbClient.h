@@ -25,6 +25,11 @@
 
 #include "client/common.h"
 #include "client/KvdbClientApp.h"
+
+#include "kvdb/stream/InputStream.h"
+#include "kvdb/stream/OutputStream.h"
+#include "kvdb/stream/InputPacketStream.h"
+#include "kvdb/stream/OutputPacketStream.h"
 #include "kvdb/core/Messages.h"
 
 namespace kvdb {
@@ -208,7 +213,7 @@ private:
             OutputPacketStream ostream(req_buf);
             ostream.skipToHeader();
             request.writeTo(ostream);
-            ostream.writeHeader(MessageType::Login, 3);
+            ostream.writeHeader(kDefaultSignId, MessageType::Login, 3);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
             std::cout << "request_.size() = " << request_.size() << std::endl;
@@ -235,14 +240,31 @@ private:
         std::cout << std::endl;
 
         if (!err) {
-            //
-            // Receive the part data of response, if it's not completed, continue to read. 
-            //
-            socket_.async_read_some(boost::asio::buffer(rev_buffer_),
-                boost::bind(&KvdbClient::handle_read_some, this,
-                            boost::asio::placeholders::error,
-                            boost::asio::placeholders::bytes_transferred,
-                            rev_bufsize_));
+            static const size_t kHeaderSize = sizeof(PacketHeader);
+            boost::asio::streambuf headBuffer;
+            //boost::asio::read(socket_, boost::asio::buffer(rev_buffer_, sizeof(PacketHeader)), err);
+            size_t readBytes = boost::asio::read(socket_, headBuffer.prepare(kHeaderSize));
+            if (readBytes == kHeaderSize) {
+                PacketHeader header;
+                InputPacketStream istream((const char *)(*(void **)&headBuffer.data()));
+                istream.readHeader(header);
+
+                if (header.msgLength > 0) {
+                    //
+                    // Receive the part data of response, if it's not completed, continue to read. 
+                    //
+                    boost::asio::streambuf msgBuffer;
+                    msgBuffer.prepare(header.msgLength);
+                    socket_.async_read_some(msgBuffer.prepare(header.msgLength),
+                        boost::bind(&KvdbClient::handle_read_some, this,
+                                    boost::asio::placeholders::error,
+                                    boost::asio::placeholders::bytes_transferred,
+                                    header.msgLength));
+                }
+            }
+            else {
+                // Read packet header error.
+            }
         }
         else {
             std::cout << "KvdbClient::handle_write_request() Error: " << err.message() << "\n";

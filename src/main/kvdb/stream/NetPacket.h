@@ -6,40 +6,18 @@
 #pragma once
 #endif
 
+#include "kvdb/basic/stdint.h"
+
 #include <vector>
 #include <string>
 
-#include "kvdb/core/MessageType.h"
 #include "kvdb/core/Variant.h"
+#include "kvdb/core/MessageType.h"
+#include "kvdb/stream/Packet.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
 
 namespace kvdb {
-
-struct PacketHeader {
-    uint32_t msgType;
-    uint32_t msgLength;
-    uint32_t varCount;
-
-    PacketHeader() : msgType(MessageType::Unknown), msgLength(0), varCount(0) {}
-    ~PacketHeader() {}
-};
-
-#pragma warning (push)
-#pragma warning (disable: 4200)
-
-struct PacketData {
-    PacketHeader header;
-    char         data[0];
-};
-
-#pragma warning (pop)
-
-struct PacketBody
-{
-    PacketHeader  header;
-    const char *  data;
-};
 
 class NetPacket {
 protected:
@@ -53,12 +31,18 @@ public:
     NetPacket() : is_little_endian_(false) { init(); }
     virtual ~NetPacket() {}
 
+    uint32_t getSignId() const { return header.signId; }
     uint32_t getMsgType() const { return header.msgType; }
     uint32_t getMsgLength() const { return header.msgLength; }
+
+    void setSignId(uint32_t signId) {
+        header.signId = signId;
+    }
 
     void setMsgType(uint32_t msgType) {
         header.msgType = msgType;
     }
+
     void setMsgLength(uint32_t msgLength) {
         header.msgLength = msgLength;
     }
@@ -88,57 +72,62 @@ public:
     }
 
     size_t calcRequireSize(size_t & count) {
-        size_t totalSize = sizeof(PacketHeader);
+        size_t msgLength = 0;
         size_t valid_count = values.size();
         // Calculation the body sizes.
         for (size_t i = 0; i < values.size(); ++i) {
             Variant & value = values[i];
             uint32_t type = value.getType();
             // Write the data type.
-            totalSize++;
+            msgLength++;
             // Write the data.
             switch (type) {
             case DataType::EndOf:
                 break;
             case DataType::Bool:
-                totalSize += sizeof(bool);
+                msgLength += sizeof(bool);
                 break;
             case DataType::Int8:
             case DataType::UInt8:
-                totalSize += sizeof(uint8_t);
+                msgLength += sizeof(uint8_t);
                 break;
             case DataType::Int16:
             case DataType::UInt16:
-                totalSize += sizeof(uint16_t);
+                msgLength += sizeof(uint16_t);
                 break;
             case DataType::Int32:
             case DataType::UInt32:
-                totalSize += sizeof(uint32_t);
+                msgLength += sizeof(uint32_t);
                 break;
             case DataType::Int64:
             case DataType::UInt64:
-                totalSize += sizeof(uint64_t);
+                msgLength += sizeof(uint64_t);
                 break;
             case DataType::Pointer:
-                totalSize += sizeof(void *);
+                msgLength += sizeof(void *);
                 break;
             case DataType::Float:
-                totalSize += sizeof(float);
+                msgLength += sizeof(float);
                 break;
             case DataType::Double:
-                totalSize += sizeof(double);
+                msgLength += sizeof(double);
                 break;
             default:
-                totalSize--;
+                msgLength--;
                 valid_count--;
                 break;
             }
         }
+        //
         // Write the ending mark.
-        totalSize += 1 + sizeof(uint8_t);
+        //
+        // |  DataType  |    0    |
+        // |  uint8_t   | uint8_t |
+        //
+        msgLength += 1 + sizeof(uint8_t);
 
         count = valid_count;
-        return totalSize;
+        return msgLength;
     }
 
     int writeTo(OutputStream & stream) {
@@ -150,6 +139,7 @@ public:
         // Write the header info.
         header.msgLength = (uint32_t)totalSize;
         header.varCount = (uint32_t)valid_count;
+        stream.writeUInt32(header.signId);
         stream.writeUInt32(header.msgLength);
         stream.writeUInt32(header.msgType);
         stream.writeUInt32(header.varCount);
@@ -231,6 +221,7 @@ public:
         values.clear();
 
         // Read the header info.
+        header.signId = stream.readUInt32();
         header.msgLength = stream.readUInt32();
         header.msgType = stream.readUInt32();
         header.varCount = stream.readUInt32();

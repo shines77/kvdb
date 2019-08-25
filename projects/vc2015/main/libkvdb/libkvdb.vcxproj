@@ -59,6 +59,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\NetPacket.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\OutputPacketStream.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\OutputStream.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\Packet.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseResult.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseStatus.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_forward.h" />

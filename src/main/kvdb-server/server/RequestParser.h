@@ -86,12 +86,14 @@ int RequestParser::parse(ConnectionContext & context, Request & req,
 {
     InputStream stream(begin);
 
+    uint32_t signId = stream.readUInt32();
     uint32_t msgType = stream.readUInt32();
     uint32_t msgLength = stream.readUInt32();
     uint32_t varCount = stream.readUInt32();
 
     size_t length = (size_t)(end - begin);
     if (length >= ((size_t)msgLength)) {
+        req.header.signId = signId;
         req.header.msgType = msgType;
         req.header.msgLength = msgLength;
         req.header.varCount = varCount;
@@ -127,7 +129,7 @@ int RequestParser::parse(ConnectionContext & context, Request & req,
             return ParseStatus::Success;
         }
         else {
-            return ParseStatus::Failed;
+            return ParseStatus::Error;
         }
     }
     else {
