@@ -1,6 +1,6 @@
 
-#ifndef KVDB_SERVER_COMMANDTYPE_H
-#define KVDB_SERVER_COMMANDTYPE_H
+#ifndef KVDB_CORE_MESSAGETYPE_H
+#define KVDB_CORE_MESSAGETYPE_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -8,7 +8,7 @@
 
 namespace kvdb {
 
-struct CommandType {
+struct MessageType {
     enum Type {
         Unknown,
         Login,
@@ -22,4 +22,4 @@ struct CommandType {
 
 } // namespace kvdb
 
-#endif // KVDB_SERVER_COMMANDTYPE_H
+#endif // KVDB_CORE_MESSAGETYPE_H

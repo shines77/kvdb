@@ -186,7 +186,6 @@ void KvdbClientApp::net_packet_test()
     ostream.setStream(packetBuf);
     packet.writeTo(ostream);
 
-    PacketHeader & header = packet.getHeaderInfo();
     ptrdiff_t length = ostream.length();
 
     InputStream istream(packetBuf);

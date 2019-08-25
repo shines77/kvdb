@@ -10,6 +10,7 @@
 
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
+#include "kvdb/stream/NetPacket.h"
 
 namespace kvdb {
 
@@ -23,6 +24,22 @@ struct LoginRequest {
         : username(_username), password(_password), database(_database) {
     }
     ~LoginRequest() {}
+
+    void skipToHeader(InputStream & os) {
+        os.next(sizeof(PacketHeader));
+    }
+
+    void skipToHeader(InputPacketStream & os) {
+        os.stream.next(sizeof(PacketHeader));
+    }
+
+    void skipToHeader(OutputStream & os) {
+        os.next(sizeof(PacketHeader));
+    }
+
+    void skipToHeader(OutputPacketStream & os) {
+        os.stream.next(sizeof(PacketHeader));
+    }
 
     void writeTo(OutputPacketStream & os) {
         os.writeString(username);

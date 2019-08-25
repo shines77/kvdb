@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 
-#include "kvdb/core/CommandType.h"
+#include "kvdb/core/MessageType.h"
 #include "kvdb/core/Variant.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
@@ -17,11 +17,11 @@
 namespace kvdb {
 
 struct PacketHeader {
-    uint32_t command;
-    uint32_t count;
-    uint32_t total_size;
+    uint32_t msgType;
+    uint32_t msgLength;
+    uint32_t varCount;
 
-    PacketHeader() : command(CommandType::Unknown), count(0), total_size(0) {}
+    PacketHeader() : msgType(MessageType::Unknown), msgLength(0), varCount(0) {}
     ~PacketHeader() {}
 };
 
@@ -53,14 +53,15 @@ public:
     NetPacket() : is_little_endian_(false) { init(); }
     virtual ~NetPacket() {}
 
-    uint32_t getCommand() const { return header.command; }
+    uint32_t getMsgType() const { return header.msgType; }
+    uint32_t getMsgLength() const { return header.msgLength; }
 
-    void setCommand(uint32_t command) {
-        header.command = command;
+    void setMsgType(uint32_t msgType) {
+        header.msgType = msgType;
     }
-
-    PacketHeader & getHeaderInfo() { return header; }
-    const PacketHeader & getHeaderInfo() const { return header; }
+    void setMsgLength(uint32_t msgLength) {
+        header.msgLength = msgLength;
+    }
 
     void init() {
         Variant value;
@@ -86,7 +87,7 @@ public:
         values.push_back(value);
     }
 
-    size_t calcRequireSize(OutputStream & stream, size_t & count) {
+    size_t calcRequireSize(size_t & count) {
         size_t totalSize = sizeof(PacketHeader);
         size_t valid_count = values.size();
         // Calculation the body sizes.
@@ -144,14 +145,14 @@ public:
         size_t count = values.size();
 
         size_t valid_count;
-        size_t totalSize = calcRequireSize(stream, valid_count);
+        size_t totalSize = calcRequireSize(valid_count);
 
         // Write the header info.
-        header.count = (uint32_t)valid_count;
-        header.total_size = (uint32_t)totalSize;
-        stream.writeUInt32(header.command);
-        stream.writeUInt32(header.count);
-        stream.writeUInt32(header.total_size);
+        header.msgLength = (uint32_t)totalSize;
+        header.varCount = (uint32_t)valid_count;
+        stream.writeUInt32(header.msgLength);
+        stream.writeUInt32(header.msgType);
+        stream.writeUInt32(header.varCount);
 
         // Write the body info.
         for (size_t i = 0; i < values.size(); ++i) {
@@ -230,11 +231,11 @@ public:
         values.clear();
 
         // Read the header info.
-        header.command = stream.readUInt32();
-        header.count = stream.readUInt32();
-        header.total_size = stream.readUInt32();
+        header.msgLength = stream.readUInt32();
+        header.msgType = stream.readUInt32();
+        header.varCount = stream.readUInt32();
 
-        count = valid_count = header.count;
+        count = valid_count = header.varCount;
 
         // Read the body info.
         for (size_t i = 0; i < count; ++i) {

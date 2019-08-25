@@ -11,7 +11,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include <kvdb/core/CommandType.h>
+#include <kvdb/core/MessageType.h>
 #include <kvdb/stream/InputStream.h>
 #include <kvdb/stream/ParseResult.h>
 #include <kvdb/stream/ParseStatus.h>
@@ -58,11 +58,11 @@ public:
     template <typename InputIterator>
     int parse(ConnectionContext & context, Request & req, InputIterator begin, InputIterator end);
 
-    int handleLoginCommand(ConnectionContext & context, InputStream & stream);
-    int handleHandshakeCommand(InputStream & stream);
-    int handleQueryCommand(InputStream & stream);
+    int handleLoginMessage(ConnectionContext & context, InputStream & stream);
+    int handleHandshakeMessage(InputStream & stream);
+    int handleQueryMessage(InputStream & stream);
 
-    int parseFirstQueryCommand(jstd::StringRef & cmd, const jstd::StringRef & qurey);
+    int parseFirstQueryMessage(jstd::StringRef & cmd, const jstd::StringRef & qurey);
 
     int handleRequestData(const char * data);
 
@@ -85,34 +85,35 @@ int RequestParser::parse(ConnectionContext & context, Request & req,
                          InputIterator begin, InputIterator end)
 {
     InputStream stream(begin);
-    uint32_t command = stream.readUInt32();
-    uint32_t count = stream.readUInt32();
-    uint32_t total_size = stream.readUInt32();
+
+    uint32_t msgType = stream.readUInt32();
+    uint32_t msgLength = stream.readUInt32();
+    uint32_t varCount = stream.readUInt32();
 
     size_t length = (size_t)(end - begin);
-    if (length >= ((size_t)total_size)) {
-        req.header.command = command;
-        req.header.count = count;
-        req.header.total_size = total_size;
+    if (length >= ((size_t)msgLength)) {
+        req.header.msgType = msgType;
+        req.header.msgLength = msgLength;
+        req.header.varCount = varCount;
 
         const char * first = stream.current();
         int result = 0;
-        switch (command) {
-        case CommandType::Login:
+        switch (msgType) {
+        case MessageType::Login:
             {
-                result = handleLoginCommand(context, stream);
+                result = handleLoginMessage(context, stream);
             }
             break;
 
-        case CommandType::HandShake:
+        case MessageType::HandShake:
             {
-                //result = handle_handshake_command(stream);
+                result = handleHandshakeMessage(stream);
             }
             break;
 
-        case CommandType::Query:
+        case MessageType::Query:
             {
-                //result = handle_query_command(stream);
+                result = handleQueryMessage(stream);
             }
             break;
 
@@ -122,7 +123,7 @@ int RequestParser::parse(ConnectionContext & context, Request & req,
         }
 
         const char * last = stream.current();
-        if ((last - first) == (size_t)total_size) {
+        if ((last - first) == (size_t)msgLength) {
             return ParseStatus::Success;
         }
         else {

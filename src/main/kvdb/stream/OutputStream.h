@@ -112,6 +112,12 @@ public:
         setDouble(value);
         nextDouble();
     }
+
+    template <typename StringType>
+    void writeString(const StringType & value) {
+        setString(value);
+        nextChar((int)value.size());
+    }
 };
 
 typedef BasicOutputStream<char>      OutputStream;

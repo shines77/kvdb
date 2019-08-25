@@ -80,11 +80,33 @@ public:
     ptrdiff_t length() const   { return (cur_ - head_); }
     ptrdiff_t position() const { return this->length(); }
 
+    uint32_t getMsgLength() const {
+        return (uint32_t)(this->length() - sizeof(PacketHeader));
+    }
+
     bool isOverflow()  const { return false; }
     bool isUnderflow() const { return (cur_ < head_); }
 
     void reset() {
         cur_ = head_;
+    }
+
+    void setHead(char_type * head) { this->head_ = head; }
+    void setCurrent(char_type * cur) { this->cur_ = cur; }
+
+    void writeHeader(uint32_t msgType, uint32_t varCount) {
+        uint32_t msgLength = getMsgLength();
+        reset();
+        writeUInt32(msgType);
+        writeUInt32(msgLength);
+        writeUInt32(varCount);
+    }
+
+    void writeHeader(uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
+        reset();
+        writeUInt32(msgType);
+        writeUInt32(msgLength);
+        writeUInt32(varCount);
     }
 
     void back() {
@@ -97,6 +119,10 @@ public:
 
     void backByte() {
         back();
+    }
+
+    void backByte(int skip) {
+        back(skip);
     }
 
     void backChar() {
@@ -121,6 +147,10 @@ public:
 
     void nextByte() {
         next();
+    }
+
+    void nextByte(int skip) {
+        next(skip);
     }
 
     void nextChar() {
@@ -177,6 +207,14 @@ public:
 
     void nextDouble() {
         cur_ = (char_type *)((char *)cur_ + sizeof(double));
+    }
+
+    void skip(int offset) {
+        next(offset);
+    }
+
+    void skipToHeader() {
+        next(sizeof(PacketHeader));
     }
 
     char get() const {
@@ -247,6 +285,11 @@ public:
         return *(double *)cur_;
     }
 
+    template <typename StringType>
+    void getString(StringType & value, size_t length) {
+        value.assign((const char_type *)cur_, length);
+    }
+
     void setByte(uint8_t value) const {
         setUInt8(value);
     }
@@ -301,6 +344,11 @@ public:
 
     void setDouble(double value) {
         *(double *)cur_ = value;
+    }
+
+    template <typename StringType>
+    void setString(const StringType & value) {
+        ::memcpy((void *)cur_, (const void *)value.c_str(), value.size() * sizeof(char_type));
     }
 };
 

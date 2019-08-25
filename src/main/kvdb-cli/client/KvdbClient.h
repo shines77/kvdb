@@ -195,9 +195,6 @@ private:
         std::cout << std::endl;
 
         if (!err) {
-            std::cout << "KvdbClient::handle_connect()" << std::endl;
-            std::cout << "request_.size() = " << request_.size() << std::endl;
-            std::cout << std::endl;
             //
             // The connection was successful. Send the request.
             //
@@ -209,7 +206,14 @@ private:
 
             char req_buf[4096];
             OutputPacketStream ostream(req_buf);
+            ostream.skipToHeader();
             request.writeTo(ostream);
+            ostream.writeHeader(MessageType::Login, 3);
+
+            std::cout << "KvdbClient::handle_connect()" << std::endl;
+            std::cout << "request_.size() = " << request_.size() << std::endl;
+            std::cout << "ostream.length() = " << ostream.length() << std::endl;
+            std::cout << std::endl;
 
             boost::asio::async_write(socket_, boost::asio::buffer(ostream.head(), ostream.length()),
                 boost::bind(&KvdbClient::handle_write_request, this,

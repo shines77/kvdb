@@ -125,7 +125,8 @@ public:
 
     template <typename StringType>
     void readString(StringType & value, size_t length) {
-        value.assign((const char_type *)cur_, length);
+        getString(value, length);
+        nextChar((int)length);
     }
 
     template <typename StringType>
@@ -145,6 +146,7 @@ public:
             nextUInt8();
             length = readUInt8();
             readString(value, length);
+            break;
 
         case DataType::String2B:
             nextUInt8();

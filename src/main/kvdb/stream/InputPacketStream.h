@@ -46,7 +46,37 @@ public:
         return stream.current();;
     }
 
-    ptrdiff_t length() const   { return stream.length(); }
+    ptrdiff_t length() const { return stream.length(); }
+    uint32_t getMsgLength() const {
+        return (uint32_t)(stream.length() - sizeof(PacketHeader));
+    }
+
+    void reset() {
+        stream.reset();
+    }
+
+    void skipToHeader() {
+        stream.skipToHeader();
+    }
+
+    void writeHeader(uint32_t msgType, uint32_t varCount) {
+        char_type * saveCur = stream.current();
+        uint32_t msgLength = getMsgLength();
+        reset();
+        stream.writeUInt32(msgType);
+        stream.writeUInt32(msgLength);
+        stream.writeUInt32(varCount);
+        stream.setCurrent(saveCur);
+    }
+
+    void writeHeader(uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
+        char_type * saveCur = stream.current();
+        reset();
+        stream.writeUInt32(msgType);
+        stream.writeUInt32(msgLength);
+        stream.writeUInt32(varCount);
+        stream.setCurrent(saveCur);
+    }
 
     uint8_t readType() {
         return stream.readUInt8();

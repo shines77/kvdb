@@ -46,7 +46,37 @@ public:
         return stream.current();;
     }
 
-    ptrdiff_t length() const   { return stream.length(); }
+    ptrdiff_t length() const { return stream.length(); }
+    uint32_t getMsgLength() const {
+        return (uint32_t)(stream.length() - sizeof(PacketHeader));
+    }
+
+    void reset() {
+        stream.reset();
+    }
+
+    void skipToHeader() {
+        stream.skipToHeader();
+    }
+
+    void writeHeader(uint32_t msgType, uint32_t varCount) {
+        char_type * saveCur = stream.current();
+        uint32_t msgLength = getMsgLength();
+        reset();
+        stream.writeUInt32(msgType);
+        stream.writeUInt32(msgLength);
+        stream.writeUInt32(varCount);
+        stream.setCurrent(saveCur);
+    }
+
+    void writeHeader(uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
+        char_type * saveCur = stream.current();
+        reset();
+        stream.writeUInt32(msgType);
+        stream.writeUInt32(msgLength);
+        stream.writeUInt32(varCount);
+        stream.setCurrent(saveCur);
+    }
 
     void writeType(uint8_t type) {
         stream.writeUInt8(type);
@@ -191,10 +221,12 @@ public:
         if (length < 256) {
             stream.writeType(DataType::String1B);
             stream.writeUInt8((uint8_t)length);
+            stream.writeString(value);
         }
         else if (length < 65536) {
             stream.writeType(DataType::String2B);
             stream.writeUInt16((uint16_t)length);
+            stream.writeString(value);
         }
         else if (length < 16777216) {
 #if IS_BIG_ENDIAN
@@ -204,10 +236,12 @@ public:
             uint32_t value32 = (DataType::String3B << 24) | (length & 0x00FFFFFFUL);
             stream.writeUInt32(value32);
 #endif
+            stream.writeString(value);
         }
         else {
             stream.writeType(DataType::String);
             stream.writeUInt32((uint32_t)length);
+            stream.writeString(value);
         }
     }
 };

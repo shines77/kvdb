@@ -169,9 +169,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Application.h">
       <Filter>src\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\core\CommandType.h">
-      <Filter>src\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\DataType.h">
       <Filter>src\core</Filter>
     </ClInclude>
@@ -186,6 +183,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\OutputPacketStream.h">
       <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageType.h">
+      <Filter>src\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

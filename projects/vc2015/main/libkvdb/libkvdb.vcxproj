@@ -32,7 +32,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\common\boost_asio_msvc.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\common\cmd_utils.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Application.h" />
-    <ClInclude Include="..\..\..\..\src\main\kvdb\core\CommandType.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageType.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\DataType.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Messages.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Variant.h" />
