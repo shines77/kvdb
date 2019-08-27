@@ -26,11 +26,11 @@
 #include "client/common.h"
 #include "client/KvdbClientApp.h"
 
+#include "kvdb/core/Messages.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
-#include "kvdb/core/Messages.h"
 
 namespace kvdb {
 namespace client {
@@ -208,13 +208,14 @@ private:
             request.password = config.password;
             request.database = config.database;
 
-            uint32_t msgLength = request.prepare();
+            PrepareOutputPacketStream preOs;
+            uint32_t msgLength = request.prepare(preOs);
             size_t requestSize = msgLength + kMsgHeaderSize;
             request_.resize(requestSize);
             request_size_ = requestSize;
 
             OutputPacketStream ostream(request_.data());
-            ostream.writeHeader(kDefaultSignId, Message::Login, msgLength, 3);
+            ostream.writeHeader(kDefaultSignId, Message::LoginRequest, msgLength, 3);
             request.writeTo(ostream);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
@@ -259,9 +260,14 @@ private:
                                     boost::asio::placeholders::bytes_transferred,
                                     header.msgLength));
                 }
+                else {
+                    // The signId is dismatch
+                    std::cout << "KvdbClient::handle_write_request() Error: The signId is dismatch.\n" << std::endl;
+                }
             }
             else {
                 // Read packet header error.
+                std::cout << "KvdbClient::handle_write_request() Error: Read packet header error.\n" << std::endl;
             }
         }
         else {
@@ -274,6 +280,7 @@ private:
                           std::size_t bytes_wanted)
     {
         std::cout << "KvdbClient::handle_read_some()" << std::endl;
+        std::cout << "error_code = " << err.value() << std::endl;
         std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
         std::cout << "bytes_wanted = " << bytes_wanted << std::endl;
         std::cout << std::endl;
@@ -285,7 +292,8 @@ private:
                 // Receive the data of next partment.
                 //
                 // response_buf_.consume(bytes_transferred);
-                // boost::asio::buffer(response_.data(), bytes_wanted - bytes_transferred),
+                // boost::asio::buffer(response_buf_.data(), bytes_wanted - bytes_transferred),
+                //
                 socket_.async_read_some(boost::asio::buffer(&response_[bytes_transferred],
                     bytes_wanted - bytes_transferred),
                     boost::bind(&KvdbClient::handle_read_some, this,
@@ -306,6 +314,7 @@ private:
                 // The connection was successful, send the request.
                 //
                 // response_buf_.commit(request_size_);
+                //
 
                 KvdbClientConfig & config = KvdbClientApp::client_config;
                 LoginRequest request;
@@ -313,13 +322,14 @@ private:
                 request.password = config.password;
                 request.database = config.database;
 
-                uint32_t msgLength = request.prepare();
+                PrepareOutputPacketStream preOS;
+                uint32_t msgLength = request.prepare(preOS);
                 size_t requestSize = msgLength + kMsgHeaderSize;
                 request_.reserve(requestSize);
                 request_size_ = requestSize;
 
                 OutputPacketStream ostream(request_.data());
-                ostream.writeHeader(kDefaultSignId, Message::HandShake, msgLength, 3);
+                ostream.writeHeader(kDefaultSignId, Message::HandShakeRequest, msgLength, 3);
                 request.writeTo(ostream);  
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;

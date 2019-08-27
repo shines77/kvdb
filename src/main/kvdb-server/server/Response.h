@@ -11,13 +11,15 @@
 #include <boost/asio.hpp>
 
 #include "server/HeaderField.h"
+#include "kvdb/stream/NetPacket.h"
 
 namespace kvdb {
 namespace server {
 
-/// A reply to be sent to a client.
-struct Response
+/// A response to be sent to a client.
+class Response : public NetPacket
 {
+public:
     /// The status of the reply.
     enum StatusType
     {
@@ -39,19 +41,17 @@ struct Response
         service_unavailable = 503
     } status;
 
-    /// The headers to be included in the reply.
-    std::vector<HeaderField> fields;
+private:
+    const char * data_;
 
-    /// The content to be sent in the reply.
-    std::string content;
+public:
+    Response() : NetPacket(), data_(nullptr) {}
+    virtual ~Response() {}
 
-    /// Convert the reply into a vector of buffers. The buffers do not own the
-    /// underlying memory blocks, therefore the reply object must remain valid and
-    /// not be changed until the write operation has completed.
-    std::vector<boost::asio::const_buffer> to_buffers();
+    char * data() { return (char *)(this->data_); }
+    const char * data() const { return this->data_; }
 
-    /// Get a stock reply.
-    static Response stock_response(StatusType status);
+    void setData(const char * data) { this->data_ = data; }
 };
 
 } // namespace server

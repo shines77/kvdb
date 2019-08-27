@@ -39,13 +39,10 @@ public:
     BasicInputPacketStream(const char_type(&data)[N]) : stream(data) {}
     ~BasicInputPacketStream() {}
 
-    char_type * head() const {
-        return stream.head();
-    }
+    char_type * head() const { return stream.head(); }
+    char_type * current() const { return stream.current(); }
 
-    char_type * current() const {
-        return stream.current();
-    }
+    char_type * data() const { return stream.data(); }
 
     ptrdiff_t length() const { return stream.length(); }
     uint32_t getMsgLength() const {

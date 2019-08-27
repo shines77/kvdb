@@ -40,17 +40,25 @@ private:
     /// The manager for this connection.
     ConnectionManager & connection_manager_;
 
-    /// The incoming request.
-    Request request_;
-
     /// The handler used to process the incoming request.
     RequestHandler & request_handler_;
 
     /// The parser for the incoming request.
     RequestParser request_parser_;
 
+    /// The incoming request.
+    Request request_;
+
     /// The reply to be sent back to the client.
     Response response_;
+
+    PacketHeader req_header_;
+
+    /// Buffer for incoming or outgoing data.
+    std::vector<char>               request_buf_;
+    std::vector<char>               response_buf_;
+    std::size_t                     request_size_;
+    std::size_t                     response_size_;
 
     /// Buffer for incoming data.
     boost::array<char, 8192> buffer_;
@@ -77,8 +85,9 @@ private:
     void start_read_request();
 
     /// Handle completion of a read operation.
-    void handle_read(const boost::system::error_code & ec,
-                     std::size_t bytes_transferred);
+    void handle_read_some(const boost::system::error_code & ec,
+                          std::size_t bytes_transferred,
+                          std::size_t bytes_wanted);
 
     /// Handle completion of a write operation.
     void handle_write(const boost::system::error_code & ec);

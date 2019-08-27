@@ -12,11 +12,22 @@ class Message {
 public:
     enum Type {
         Unknown,
-        Login,
-        HandShake,
-        Connect,
-        Query,
-        Logout,
+
+        LoginRequest,
+        LoginResponse,
+
+        HandShakeRequest,
+        HandShakeResponse,
+
+        ConnectRequest,
+        ConnectResponse,
+
+        QueryRequest,
+        QueryResponse,
+
+        LogoutRequest,
+        LogoutResponse,
+
         Last
     };
 

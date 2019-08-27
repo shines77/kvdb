@@ -130,90 +130,6 @@ public:
         return msgLength;
     }
 
-    int writeTo(OutputStream & stream) {
-        size_t count = values.size();
-
-        size_t valid_count;
-        size_t totalSize = calcRequireSize(valid_count);
-
-        // Write the header info.
-        header.msgLength = (uint32_t)totalSize;
-        header.varCount = (uint32_t)valid_count;
-        stream.writeUInt32(header.signId);
-        stream.writeUInt32(header.msgLength);
-        stream.writeUInt32(header.msgType);
-        stream.writeUInt32(header.varCount);
-
-        // Write the body info.
-        for (size_t i = 0; i < values.size(); ++i) {
-            Variant & var = values[i];
-            uint32_t type = var.getType();
-            // Write the data type.
-            
-            // Write the datas.
-            switch (type) {
-            case DataType::EndOf:
-                break;
-            case DataType::Bool:
-                stream.writeType(type);
-                stream.writeBool(var.getValue().b);
-                break;
-            case DataType::Int8:
-                stream.writeType(type);
-                stream.writeInt8(var.getValue().i8);
-                break;
-            case DataType::UInt8:
-                stream.writeType(type);
-                stream.writeUInt8(var.getValue().u8);
-                break;
-            case DataType::Int16:
-                stream.writeType(type);
-                stream.writeInt16(var.getValue().i16);
-                break;
-            case DataType::UInt16:
-                stream.writeType(type);
-                stream.writeUInt16(var.getValue().u16);
-                break;
-            case DataType::Int32:
-                stream.writeType(type);
-                stream.writeInt32(var.getValue().i32);
-                break;
-            case DataType::UInt32:
-                stream.writeType(type);
-                stream.writeUInt32(var.getValue().u32);
-                break;
-            case DataType::Int64:
-                stream.writeType(type);
-                stream.writeInt64(var.getValue().i64);
-                break;
-            case DataType::UInt64:
-                stream.writeType(type);
-                stream.writeUInt64(var.getValue().u64);
-                break;
-            case DataType::Pointer:
-                stream.writeType(type);
-                stream.writePointer(var.getValue().ptr);
-                break;
-            case DataType::Float:
-                stream.writeType(type);
-                stream.writeFloat(var.getValue().f);
-                break;
-            case DataType::Double:
-                stream.writeType(type);
-                stream.writeDouble(var.getValue().d);
-                break;
-            default:
-                count--;
-                break;
-            }
-        }
-
-        // Write the ending mark.
-        stream.writeUInt8((uint8_t)DataType::EndOf);
-        stream.writeUInt8(0);
-        return (int)count;
-    }
-
     int readFrom(InputStream & stream) {
         size_t valid_count = 0;
         size_t count;
@@ -305,6 +221,90 @@ public:
         }
 
         return (int)valid_count;
+    }
+
+    int writeTo(OutputStream & stream) {
+        size_t count = values.size();
+
+        size_t valid_count;
+        size_t totalSize = calcRequireSize(valid_count);
+
+        // Write the header info.
+        header.msgLength = (uint32_t)totalSize;
+        header.varCount = (uint32_t)valid_count;
+        stream.writeUInt32(header.signId);
+        stream.writeUInt32(header.msgLength);
+        stream.writeUInt32(header.msgType);
+        stream.writeUInt32(header.varCount);
+
+        // Write the body info.
+        for (size_t i = 0; i < values.size(); ++i) {
+            Variant & var = values[i];
+            uint32_t type = var.getType();
+            // Write the data type.
+            
+            // Write the datas.
+            switch (type) {
+            case DataType::EndOf:
+                break;
+            case DataType::Bool:
+                stream.writeType(type);
+                stream.writeBool(var.getValue().b);
+                break;
+            case DataType::Int8:
+                stream.writeType(type);
+                stream.writeInt8(var.getValue().i8);
+                break;
+            case DataType::UInt8:
+                stream.writeType(type);
+                stream.writeUInt8(var.getValue().u8);
+                break;
+            case DataType::Int16:
+                stream.writeType(type);
+                stream.writeInt16(var.getValue().i16);
+                break;
+            case DataType::UInt16:
+                stream.writeType(type);
+                stream.writeUInt16(var.getValue().u16);
+                break;
+            case DataType::Int32:
+                stream.writeType(type);
+                stream.writeInt32(var.getValue().i32);
+                break;
+            case DataType::UInt32:
+                stream.writeType(type);
+                stream.writeUInt32(var.getValue().u32);
+                break;
+            case DataType::Int64:
+                stream.writeType(type);
+                stream.writeInt64(var.getValue().i64);
+                break;
+            case DataType::UInt64:
+                stream.writeType(type);
+                stream.writeUInt64(var.getValue().u64);
+                break;
+            case DataType::Pointer:
+                stream.writeType(type);
+                stream.writePointer(var.getValue().ptr);
+                break;
+            case DataType::Float:
+                stream.writeType(type);
+                stream.writeFloat(var.getValue().f);
+                break;
+            case DataType::Double:
+                stream.writeType(type);
+                stream.writeDouble(var.getValue().d);
+                break;
+            default:
+                count--;
+                break;
+            }
+        }
+
+        // Write the ending mark.
+        stream.writeUInt8((uint8_t)DataType::EndOf);
+        stream.writeUInt8(0);
+        return (int)count;
     }
 };
 

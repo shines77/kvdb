@@ -6,6 +6,17 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 
+#include <kvdb/core/Message.h>
+#include <kvdb/core/Messages.h>
+#include <kvdb/jstd/StringRef.h>
+#include <kvdb/server/ServerStatus.h>
+#include <kvdb/stream/ParseResult.h>
+#include <kvdb/stream/ParseStatus.h>
+#include <kvdb/stream/InputStream.h>
+#include <kvdb/stream/InputPacketStream.h>
+#include <kvdb/stream/OutputStream.h>
+#include <kvdb/stream/OutputPacketStream.h>
+
 #include "server/Request.h"
 #include "server/Response.h"
 
@@ -13,92 +24,159 @@ namespace kvdb {
 namespace server {
 
 RequestHandler::RequestHandler(const std::string & doc_root)
-    : doc_root_(doc_root)
 {
 }
 
-void RequestHandler::handle_request(const Request & req, Response & res)
+RequestHandler::~RequestHandler()
 {
-    // Decode url to path.
-    std::string request_path;
-    if (req.data != nullptr) {
-        if (!url_decode(req.data, request_path)) {
-            res = Response::stock_response(Response::bad_request);
-            return;
-        }
-    }
-
-    // Request path must be absolute and not contain "..".
-    if (request_path.empty() || request_path[0] != '/'
-        || request_path.find("..") != std::string::npos) {
-        res = Response::stock_response(Response::bad_request);
-        return;
-    }
-
-    // If path ends in slash (i.e. is a directory) then add "index.html".
-    if (request_path[request_path.size() - 1] == '/') {
-        request_path += "index.html";
-    }
-
-    // Determine the file extension.
-    std::size_t last_slash_pos = request_path.find_last_of("/");
-    std::size_t last_dot_pos = request_path.find_last_of(".");
-    std::string extension;
-    if (last_dot_pos != std::string::npos && last_dot_pos > last_slash_pos) {
-        extension = request_path.substr(last_dot_pos + 1);
-    }
-
-    // Open the file to send back.
-    std::string full_path = doc_root_ + request_path;
-    std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
-    if (!is) {
-        res = Response::stock_response(Response::not_found);
-        return;
-    }
-
-    // Fill out the reply to be sent to the client.
-    res.status = Response::ok;
-    char buf[512];
-    while (is.read(buf, sizeof(buf)).gcount() > 0) {
-        res.content.append(buf, is.gcount());
-    }
-
-    res.fields.resize(2);
-    res.fields[0].name = "Content-Length";
-    res.fields[0].value = boost::lexical_cast<std::string>(res.content.size());
-    res.fields[1].name = "Content-Type";
-    res.fields[1].value = "html/text";
 }
 
-bool RequestHandler::url_decode(const std::string & in, std::string & out)
+int RequestHandler::handleRequest(ConnectionContext & context,
+                                  const Request & request,
+                                  Response & response)
 {
-    out.clear();
-    out.reserve(in.size());
-    for (std::size_t i = 0; i < in.size(); ++i) {
-        if (in[i] == '%') {
-            if (i + 3 <= in.size()) {
-                int value = 0;
-                std::istringstream is(in.substr(i + 1, 2));
-                if (is >> std::hex >> value) {
-                    out += static_cast<char>(value);
-                    i += 2;
-                }
-                else {
-                    return false;
-                }
-            }
-            else {
-                return false;
-            }
+    InputPacketStream stream(request.data());
+    PacketHeader header = request.header;
+
+    if (header.msgLength > 0) {
+        const char * first = stream.current();
+        int result = 0;
+        switch (header.msgType) {
+        case Message::LoginRequest:
+            result = handleLoginRequest(context, stream, response);
+            break;
+
+        case Message::HandShakeRequest:
+            result = handleHandshakeRequest(context, stream, response);
+            break;
+
+        case Message::QueryRequest:
+            result = handleQueryRequest(context, stream, response);
+            break;
+
+        default:
+            // Unknown type message
+            break;
         }
-        else if (in[i] == '+') {
-            out += ' ';
+
+        const char * last = stream.current();
+        if ((last - first) == (ptrdiff_t)header.msgLength) {
+            return ParseStatus::Success;
         }
         else {
-            out += in[i];
+            return ParseStatus::Error;
         }
     }
-    return true;
+    else {
+        return ParseStatus::TooSmall;
+    }
+}
+
+int RequestHandler::handleLoginRequest(ConnectionContext & context,
+                                       InputPacketStream & stream,
+                                       Response & response)
+{
+    std::string username, password, database;
+    int result = stream.readString(username);
+    if (result == ParseResult::OK) {
+        int result = stream.readString(password);
+        if (result == ParseResult::OK) {
+            int result = stream.readString(database);
+            if (result == ParseResult::OK) {
+                OutputStream os;
+                response.setSignId(kDefaultSignId);
+                response.setMsgType(Message::LoginResponse);
+                response.writeTo(os);
+
+                LoginResponse loginResponse;
+                OutputPacketStream os;
+                loginResponse.writeTo(os);
+                return ParseStatus::Success;
+            }
+        }
+    }
+    else {
+        //
+    }
+    return ParseStatus::Failed;
+}
+
+int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
+                                           InputPacketStream & stream,
+                                           Response & response)
+{
+    return ParseStatus::Success;
+}
+
+int RequestHandler::parseFirstQueryCommand(jstd::StringRef & cmd, const jstd::StringRef & qurey)
+{
+    size_t first = 0, last;
+    size_t i;
+    for (i = 0; i < qurey.size(); ++i) {
+        if (qurey[i] != ' ') {
+            break;
+        }
+        first++;
+    }
+
+    last = first;
+    for ( ; i < qurey.size(); ++i) {
+        if (qurey[i] != ' ') {
+            last++;
+        }
+        else {
+            break;
+        }
+    }
+
+    cmd.set_data(qurey.data(), first, last);
+    return (int)cmd.size();
+}
+
+int RequestHandler::handleQueryRequest(ConnectionContext & context,
+                                       InputPacketStream & stream,
+                                       Response & response)
+{
+    jstd::StringRef qurey;
+    int result = stream.readString(qurey);
+    if (result == ParseResult::OK) {
+        jstd::StringRef cmd;
+        int result = parseFirstQueryCommand(cmd, qurey);
+        return (result > 0) ? ParseStatus::Success : ParseStatus::Error;
+    }
+    else {
+        //
+    }
+    return ParseStatus::Failed;
+}
+
+int RequestHandler::handleRequestData(const char * data)
+{
+    InputStream stream(data);
+    bool isEndOf = false;
+    while (!isEndOf) {
+        uint8_t type = stream.getType();
+        switch (type) {
+        case DataType::EndOf:
+            {
+                stream.next();
+                uint8_t endOfMark = stream.getUInt8();
+                if (endOfMark == '\0') {
+                    isEndOf = true;
+                }
+                stream.next();
+            }
+            break;
+
+        case DataType::Bool:
+            break;
+
+        default:
+            // Unknown errors
+            break;
+        }
+    }
+    return 0;
 }
 
 } // namespace server

@@ -76,23 +76,6 @@ const char crlf[] = { '\r', '\n' };
 
 } // namespace misc_strings
 
-std::vector<boost::asio::const_buffer> Response::to_buffers()
-{
-    std::vector<boost::asio::const_buffer> buffers;
-    buffers.push_back(status_strings::to_buffer(status));
-    for (std::size_t i = 0; i < fields.size(); ++i)
-    {
-        HeaderField & field = fields[i];
-        buffers.push_back(boost::asio::buffer(field.name));
-        buffers.push_back(boost::asio::buffer(misc_strings::name_value_separator));
-        buffers.push_back(boost::asio::buffer(field.value));
-        buffers.push_back(boost::asio::buffer(misc_strings::crlf));
-    }
-    buffers.push_back(boost::asio::buffer(misc_strings::crlf));
-    buffers.push_back(boost::asio::buffer(content));
-    return buffers;
-}
-
 namespace stock_replies {
 
 const char ok[] = "";
@@ -229,19 +212,6 @@ std::string to_string(Response::StatusType status)
 }
 
 } // namespace stock_replies
-
-Response Response::stock_response(Response::StatusType status)
-{
-    Response res;
-    res.status = status;
-    res.content = stock_replies::to_string(status);
-    res.fields.resize(2);
-    res.fields[0].name = "Content-Length";
-    res.fields[0].value = boost::lexical_cast<std::string>(res.content.size());
-    res.fields[1].name = "Content-Type";
-    res.fields[1].value = "text/html";
-    return res;
-}
 
 } // namespace server
 } // namespace kvdb

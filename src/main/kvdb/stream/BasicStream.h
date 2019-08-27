@@ -60,25 +60,22 @@ public:
     ~BasicStream() {}
 
     void setStream(const char_type * ptr) {
-        cur_ = (char_type *)ptr;
-        head_ = (char_type *)ptr;
+        this->cur_ = (char_type *)ptr;
+        this->head_ = (char_type *)ptr;
     }
 
     template <size_t N>
     void setStream(const char_type(&data)[N]) {
-        cur_ = (char_type *)data;
-        head_ = (char_type *)data;
+        this->cur_ = (char_type *)data;
+        this->head_ = (char_type *)data;
     }
 
-    char_type * head() const {
-        return head_;
-    }
+    char_type * head() const { return this->head_; }
+    char_type * current() const { return this->cur_; }
 
-    char_type * current() const {
-        return cur_;
-    }
+    char_type * data() const { return this->head(); }
 
-    ptrdiff_t length() const   { return (cur_ - head_); }
+    ptrdiff_t length() const   { return (this->cur_ - this->head_); }
     ptrdiff_t position() const { return this->length(); }
 
     uint32_t getMsgLength() const {
@@ -86,10 +83,10 @@ public:
     }
 
     bool isOverflow()  const { return false; }
-    bool isUnderflow() const { return (cur_ < head_); }
+    bool isUnderflow() const { return (this->cur_ < this->head_); }
 
     void reset() {
-        cur_ = head_;
+        this->cur_ = this->head_;
     }
 
     void setHead(char_type * head) { this->head_ = head; }

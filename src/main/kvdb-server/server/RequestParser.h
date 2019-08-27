@@ -84,58 +84,7 @@ template <typename InputIterator>
 int RequestParser::parse(ConnectionContext & context, Request & req,
                          InputIterator begin, InputIterator end)
 {
-    InputStream stream(begin);
-
-    uint32_t signId = stream.readUInt32();
-    uint32_t msgType = stream.readUInt32();
-    uint32_t msgLength = stream.readUInt32();
-    uint32_t varCount = stream.readUInt32();
-
-    size_t length = (size_t)(end - begin);
-    if (length >= ((size_t)msgLength)) {
-        req.header.signId = signId;
-        req.header.msgType = msgType;
-        req.header.msgLength = msgLength;
-        req.header.varCount = varCount;
-
-        const char * first = stream.current();
-        int result = 0;
-        switch (msgType) {
-        case Message::Login:
-            {
-                result = handleLoginMessage(context, stream);
-            }
-            break;
-
-        case Message::HandShake:
-            {
-                result = handleHandshakeMessage(stream);
-            }
-            break;
-
-        case Message::Query:
-            {
-                result = handleQueryMessage(stream);
-            }
-            break;
-
-        default:
-            // Unknown command
-            break;
-        }
-
-        const char * last = stream.current();
-        if ((last - first) == (size_t)msgLength) {
-            return ParseStatus::Success;
-        }
-        else {
-            return ParseStatus::Error;
-        }
-    }
-    else {
-        return ParseStatus::Success;
-        //return ParseStatus::TooSmall;
-    }
+    //
 }
 
 } // namespace server

@@ -20,12 +20,17 @@ namespace server {
 /// A request received from a client.
 class Request : public NetPacket
 {
-public:
-    char * data;
+private:
+    const char * data_;
 
 public:
-    Request() : NetPacket(), data(nullptr) {}
+    Request() : NetPacket(), data_(nullptr) {}
     virtual ~Request() {}
+
+    char * data() { return (char *)(this->data_); }
+    const char * data() const { return this->data_; }
+
+    void setData(const char * data) { this->data_ = data; }
 };
 
 } // namespace server

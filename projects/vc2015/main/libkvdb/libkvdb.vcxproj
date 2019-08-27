@@ -35,6 +35,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Message.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\DataType.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Messages.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\StatusCode.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Variant.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\hash\crc32c.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\hash\Dictionary.h" />

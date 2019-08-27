@@ -8,6 +8,7 @@
 
 #include <string>
 
+#include "kvdb/core/StatusCode.h"
 #include "kvdb/stream/Packet.h"
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
@@ -28,26 +29,57 @@ struct LoginRequest {
     }
     ~LoginRequest() {}
 
-    uint32_t prepare() {
-        PrepareOutputPacketStream os;
+    template <typename PrepareOutputStreamTy>
+    uint32_t prepare(PrepareOutputStreamTy & os) {
+        os.reset();
         os.writeString(username);
         os.writeString(password);
         os.writeString(database);
         return os.requireSize();
     }
 
-    void writeTo(OutputPacketStream & os) {
-        os.writeString(username);
-        os.writeString(password);
-        os.writeString(database);
-    }
-
-    int readFrom(InputPacketStream & is) {
+    template <typename InputStreamTy>
+    int readFrom(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
         readStatus |= is.readString(username);
         readStatus |= is.readString(password);
         readStatus |= is.readString(database);
         return readStatus;
+    }
+
+    template <typename OutputStreamTy>
+    void writeTo(OutputStreamTy & os) {
+        os.writeString(username);
+        os.writeString(password);
+        os.writeString(database);
+    }
+};
+
+struct LoginResponse {
+    int statusCode;
+
+    LoginResponse(int _statusCode = StatusCode::Unknown)
+        : statusCode(_statusCode) {
+    }
+    ~LoginResponse() {}
+
+    template <typename PrepareOutputStreamTy>
+    uint32_t prepare(PrepareOutputStreamTy & os) {
+        os.reset();
+        os.writeInt32(statusCode);
+        return os.requireSize();
+    }
+
+    template <typename InputStreamTy>
+    int readFrom(InputStreamTy & is) {
+        int readStatus = ReadResult::Ok;
+        readStatus |= is.readInt32(statusCode);
+        return readStatus;
+    }
+
+    template <typename OutputStreamTy>
+    void writeTo(OutputStreamTy & os) {
+        os.writeInt32(statusCode);
     }
 };
 

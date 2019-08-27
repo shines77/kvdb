@@ -11,6 +11,13 @@
 #include "server/RequestParser.h"
 #include "server/RequestHandler.h"
 
+#include "kvdb/core/Messages.h"
+#include "kvdb/stream/Packet.h"
+#include "kvdb/stream/InputStream.h"
+#include "kvdb/stream/OutputStream.h"
+#include "kvdb/stream/InputPacketStream.h"
+#include "kvdb/stream/OutputPacketStream.h"
+
 namespace kvdb {
 namespace server {
 
@@ -56,14 +63,40 @@ void Connection::stop()
 
 void Connection::start_read_request()
 {
-    socket_.async_read_some(boost::asio::buffer(buffer_),
-        boost::bind(&Connection::handle_read, shared_from_this(),
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred));
+    char header_buf[kMsgHeaderSize];
+    size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
+    if (readBytes == kMsgHeaderSize) {
+        PacketHeader header;
+        InputPacketStream istream(header_buf);
+        istream.readHeader(header);
+        uint32_t requestSize = header.msgLength;
+        if (header.signId == kDefaultSignId && requestSize > 0) {
+            //
+            // Receive the part data of response, if it's not completed, continue to read. 
+            //
+            request_.header = header;
+            request_buf_.reserve(requestSize);
+            request_size_ = requestSize;
+            socket_.async_read_some(boost::asio::buffer(request_buf_.data(), requestSize),
+                boost::bind(&Connection::handle_read_some, shared_from_this(),
+                            boost::asio::placeholders::error,
+                            boost::asio::placeholders::bytes_transferred,
+                            requestSize));
+        }
+        else {
+            // The signId is dismatch
+            std::cout << "Connection::start_read_request() Error: The signId is dismatch.\n" << std::endl;
+        }
+    }
+    else {
+        // Read packet header error.
+        std::cout << "Connection::start_read_request() Error: Read packet header error.\n" << std::endl;
+    }
 }
 
-void Connection::handle_read(const boost::system::error_code & err,
-                             std::size_t bytes_transferred)
+void Connection::handle_read_some(const boost::system::error_code & err,
+                                  std::size_t bytes_transferred,
+                                  std::size_t bytes_wanted)
 {
     //
     // See: https://www.cnblogs.com/pengyusong/p/6433516.html
@@ -75,34 +108,50 @@ void Connection::handle_read(const boost::system::error_code & err,
     //   Connection closed by peer.
     //
 
-    std::cout << "Connection::handle_read()" << std::endl;
+    std::cout << "Connection::handle_read_some()" << std::endl;
     std::cout << "error_code = " << err.value() << std::endl;
     std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
+    std::cout << "bytes_wanted = " << bytes_wanted << std::endl;
     std::cout << std::endl;
 
     if (!err) {
-        int result = request_parser_.parse(context_, request_, buffer_.data(),
-                                           buffer_.data() + bytes_transferred);
-        if (result == ParseStatus::Success) {
-            request_handler_.handle_request(request_, response_);
-            boost::asio::async_write(socket_, response_.to_buffers(),
-                boost::bind(&Connection::handle_write, shared_from_this(),
-                            boost::asio::placeholders::error));
+        if (bytes_transferred < bytes_wanted) {
+            std::cout << "KvdbClient::handle_read_some(): Receive next partment." << std::endl;
+            //
+            // Receive the data of next partment.
+            //
+            // request_buf_.consume(bytes_transferred);
+            // boost::asio::buffer(request_buf_.data(), bytes_wanted - bytes_transferred),
+            //
+            socket_.async_read_some(boost::asio::buffer(&request_buf_[bytes_transferred],
+                bytes_wanted - bytes_transferred),
+                boost::bind(&Connection::handle_read_some, this,
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::bytes_transferred,
+                    bytes_wanted - bytes_transferred)
+            );
         }
-        else if (result == ParseStatus::Failed) {
-            response_ = Response::stock_response(Response::bad_request);
-            boost::asio::async_write(socket_, response_.to_buffers(),
-                boost::bind(&Connection::handle_write, shared_from_this(),
-                            boost::asio::placeholders::error));
-        }
-        else if (result == ParseStatus::TooSmall) {
-            socket_.async_read_some(boost::asio::buffer(buffer_),
-                boost::bind(&Connection::handle_read, shared_from_this(),
-                            boost::asio::placeholders::error,
-                            boost::asio::placeholders::bytes_transferred));
+        else if (bytes_transferred == 0) {
+            //
+            // Error: no data read.
+            //
+            this->stop();
         }
         else {
-            //
+            request_.setData(&request_buf_[0]);
+            int result = request_handler_.handleRequest(context_, request_, response_);
+            if (result == ParseStatus::Success) {
+                //
+            }
+            else if (result == ParseStatus::Failed) {
+                //
+            }
+            else if (result == ParseStatus::TooSmall) {
+                //
+            }
+            else {
+                //
+            }
         }
     }
     else if (err != boost::asio::error::operation_aborted) {
@@ -121,10 +170,7 @@ void Connection::handle_write(const boost::system::error_code & err)
         //boost::system::error_code ignored_ec;
         //socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 
-        socket_.async_read_some(boost::asio::buffer(buffer_),
-            boost::bind(&Connection::handle_read, shared_from_this(),
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred));
+        start_read_request();
     }
     else if (err != boost::asio::error::operation_aborted) {
         connection_manager_.stop(shared_from_this());

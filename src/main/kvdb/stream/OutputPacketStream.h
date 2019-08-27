@@ -38,13 +38,10 @@ public:
     BasicOutputPacketStream(const char_type(&data)[N]) : stream(data) {}
     ~BasicOutputPacketStream() {}
 
-    char_type * head() const {
-        return stream.head();
-    }
+    char_type * head() const { return stream.head(); }
+    char_type * current() const { return stream.current(); }
 
-    char_type * current() const {
-        return stream.current();
-    }
+    char_type * data() const { return stream.data(); }
 
     ptrdiff_t length() const { return stream.length(); }
     uint32_t getMsgLength() const {
@@ -182,6 +179,37 @@ public:
         stream.writeDouble(value);
     }
 
+    template <typename StringType>
+    void writeString(const StringType & value) {
+        int result = WriteResult::Ok;
+        size_t length = value.size();
+        if (length < 256) {
+            stream.writeType(DataType::String1B);
+            stream.writeUInt8((uint8_t)length);
+            stream.writeString(value);
+        }
+        else if (length < 65536) {
+            stream.writeType(DataType::String2B);
+            stream.writeUInt16((uint16_t)length);
+            stream.writeString(value);
+        }
+        else if (length < 16777216) {
+#if IS_BIG_ENDIAN
+            uint32_t value32 = (DataType::String3B & 0x000000FFUL) | (length & 0xFFFFFF00UL);
+            stream.writeUInt32(value32);
+#else
+            uint32_t value32 = (DataType::String3B << 24) | (length & 0x00FFFFFFUL);
+            stream.writeUInt32(value32);
+#endif
+            stream.writeString(value);
+        }
+        else {
+            stream.writeType(DataType::String);
+            stream.writeUInt32((uint32_t)length);
+            stream.writeString(value);
+        }
+    }
+
     int writeValue(Variant & variant) {
         int result = WriteResult::Ok;
         uint8_t type = variant.getType();
@@ -238,37 +266,6 @@ public:
             result = WriteResult::Failed;
         }
         return result;
-    }
-
-    template <typename StringType>
-    void writeString(const StringType & value) {
-        int result = WriteResult::Ok;
-        size_t length = value.size();
-        if (length < 256) {
-            stream.writeType(DataType::String1B);
-            stream.writeUInt8((uint8_t)length);
-            stream.writeString(value);
-        }
-        else if (length < 65536) {
-            stream.writeType(DataType::String2B);
-            stream.writeUInt16((uint16_t)length);
-            stream.writeString(value);
-        }
-        else if (length < 16777216) {
-#if IS_BIG_ENDIAN
-            uint32_t value32 = (DataType::String3B & 0x000000FFUL) | (length & 0xFFFFFF00UL);
-            stream.writeUInt32(value32);
-#else
-            uint32_t value32 = (DataType::String3B << 24) | (length & 0x00FFFFFFUL);
-            stream.writeUInt32(value32);
-#endif
-            stream.writeString(value);
-        }
-        else {
-            stream.writeType(DataType::String);
-            stream.writeUInt32((uint32_t)length);
-            stream.writeString(value);
-        }
     }
 };
 
