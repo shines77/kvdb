@@ -208,20 +208,20 @@ private:
             request.password = config.password;
             request.database = config.database;
 
-            size_t msgLength = request.prepare();
-            size_t requireSize = msgLength + kMsgHeaderSize;
-            request_.resize(requireSize);
-            request_size_ = requireSize;
+            uint32_t msgLength = request.prepare();
+            size_t requestSize = msgLength + kMsgHeaderSize;
+            request_.resize(requestSize);
+            request_size_ = requestSize;
 
             OutputPacketStream ostream(request_.data());
             ostream.writeHeader(kDefaultSignId, Message::Login, msgLength, 3);
             request.writeTo(ostream);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
-            std::cout << "request_.size() = " << request_.size() << std::endl;
+            std::cout << "request_.size() = " << ostream.length() << std::endl;
             std::cout << std::endl;
 
-            boost::asio::async_write(socket_, boost::asio::buffer(request_.data(), request_.size()),
+            boost::asio::async_write(socket_, boost::asio::buffer(ostream.head(), ostream.length()),
                 boost::bind(&KvdbClient::handle_write_request, this,
                             boost::asio::placeholders::error));
         }
@@ -313,20 +313,20 @@ private:
                 request.password = config.password;
                 request.database = config.database;
 
-                size_t msgLength = request.prepare();
-                size_t requireSize = msgLength + kMsgHeaderSize;
-                request_.resize(requireSize);
-                request_size_ = requireSize;
+                uint32_t msgLength = request.prepare();
+                size_t requestSize = msgLength + kMsgHeaderSize;
+                request_.reserve(requestSize);
+                request_size_ = requestSize;
 
                 OutputPacketStream ostream(request_.data());
                 ostream.writeHeader(kDefaultSignId, Message::HandShake, msgLength, 3);
                 request.writeTo(ostream);  
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
-                std::cout << "request_.size() = " << request_.size() << std::endl;
+                std::cout << "request_.size() = " << ostream.length() << std::endl;
                 std::cout << std::endl;
 
-                boost::asio::async_write(socket_, boost::asio::buffer(request_.data(), request_.size()),
+                boost::asio::async_write(socket_, boost::asio::buffer(ostream.head(), ostream.length()),
                     boost::bind(&KvdbClient::handle_write_request, this,
                                 boost::asio::placeholders::error));
             }

@@ -96,6 +96,20 @@ public:
     void setCurrent(char_type * cur) { this->cur_ = cur; }
 
     void writeHeader(const PacketHeader & header) {
+        stream.writeUInt32(header.signId);
+        stream.writeUInt32(header.msgType);
+        stream.writeUInt32(header.msgLength);
+        stream.writeUInt32(header.varCount);
+    }
+
+    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
+        stream.writeUInt32(signId);
+        stream.writeUInt32(msgType);
+        stream.writeUInt32(msgLength);
+        stream.writeUInt32(varCount);
+    }
+
+    void writeHeaderAndRestore(const PacketHeader & header) {
         char_type * saveCur = this->current();
         reset();
         this->writeUInt32(header.signId);
@@ -105,7 +119,7 @@ public:
         this->setCurrent(saveCur);
     }
 
-    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t varCount) {
+    void writeHeaderAndRestore(uint32_t signId, uint32_t msgType, uint32_t varCount) {
         char_type * saveCur = this->current();
         uint32_t msgLength = getMsgLength();
         reset();
@@ -116,7 +130,7 @@ public:
         setCurrent(saveCur);
     }
 
-    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
+    void writeHeaderAndRestore(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
         char_type * saveCur = this->current();
         reset();
         writeUInt32(signId);

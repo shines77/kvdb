@@ -28,7 +28,7 @@ struct LoginRequest {
     }
     ~LoginRequest() {}
 
-    size_t prepare() {
+    uint32_t prepare() {
         PrepareOutputPacketStream os;
         os.writeString(username);
         os.writeString(password);

@@ -59,8 +59,8 @@ public:
         stream.skipToHeader();
     }
 
-    size_t requireSize() {
-        return (size_t)(stream.length() + sizeof(PacketHeader));
+    uint32_t requireSize() {
+        return (uint32_t)stream.length();
     }
 
     void writeType(uint8_t type) {
