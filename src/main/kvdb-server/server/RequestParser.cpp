@@ -84,13 +84,13 @@ int RequestParser::handleRequestData(const char * data)
     InputStream stream(data);
     bool isEndOf = false;
     while (!isEndOf) {
-        uint8_t data_type = stream.getUInt8();
-        switch (data_type) {
+        uint8_t type = stream.getType();
+        switch (type) {
         case DataType::EndOf:
             {
                 stream.next();
-                uint8_t end_of = stream.getUInt8();
-                if (end_of == '\0') {
+                uint8_t endOfMark = stream.getUInt8();
+                if (endOfMark == '\0') {
                     isEndOf = true;
                 }
                 stream.next();

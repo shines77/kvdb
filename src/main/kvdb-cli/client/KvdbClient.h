@@ -56,19 +56,16 @@ private:
 
     std::shared_ptr<std::thread>    thread_;
 
-    boost::asio::streambuf          request_;
-    boost::asio::streambuf          response_;
-
-    static const std::size_t kRevBufSize = 8192;
-
-    /// Buffer for incoming data.
-    boost::array<char, kRevBufSize> rev_buffer_;
-    std::size_t                     rev_bufsize_;
+    /// Buffer for incoming or outgoing data.
+    std::vector<char>               request_;
+    std::vector<char>               response_;
+    std::size_t                     request_size_;
+    std::size_t                     response_size_;
 
 public:
     KvdbClient(boost::asio::io_service & io_service, const std::string & address, uint16_t port)
         : io_service_(io_service), socket_(io_service), signals_(io_service),
-          address_(address), port_(port), rev_bufsize_(kRevBufSize) {
+          address_(address), port_(port), request_size_(0), response_size_(0) {
         do_signal_set();
     }
 
@@ -114,11 +111,13 @@ public:
         // Form the request. We specify the "Connection: close" header so that the
         // server will close the socket after transmitting the response. This will
         // allow us to treat all data up until the EOF as the content.
-        std::ostream request_stream(&request_);
+        /*
+        std::ostream request_stream(&request_buf_);
         request_stream << "GET " << port << " HTTP/1.1\r\n";
         request_stream << "Host: " << address << "\r\n";
-        request_stream << "Accept: */*\r\n";
+        request_stream << "Accept: * / *\r\n";
         request_stream << "Connection: close\r\n\r\n";
+        //*/
 
         connect();
     }
@@ -209,18 +208,20 @@ private:
             request.password = config.password;
             request.database = config.database;
 
-            char req_buf[4096];
-            OutputPacketStream ostream(req_buf);
-            ostream.skipToHeader();
+            size_t msgLength = request.prepare();
+            size_t requireSize = msgLength + kMsgHeaderSize;
+            request_.resize(requireSize);
+            request_size_ = requireSize;
+
+            OutputPacketStream ostream(request_.data());
+            ostream.writeHeader(kDefaultSignId, Message::Login, msgLength, 3);
             request.writeTo(ostream);
-            ostream.writeHeader(kDefaultSignId, MessageType::Login, 3);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
             std::cout << "request_.size() = " << request_.size() << std::endl;
-            std::cout << "ostream.length() = " << ostream.length() << std::endl;
             std::cout << std::endl;
 
-            boost::asio::async_write(socket_, boost::asio::buffer(ostream.head(), ostream.length()),
+            boost::asio::async_write(socket_, boost::asio::buffer(request_.data(), request_.size()),
                 boost::bind(&KvdbClient::handle_write_request, this,
                             boost::asio::placeholders::error));
         }
@@ -240,22 +241,19 @@ private:
         std::cout << std::endl;
 
         if (!err) {
-            static const size_t kHeaderSize = sizeof(PacketHeader);
-            boost::asio::streambuf headBuffer;
-            //boost::asio::read(socket_, boost::asio::buffer(rev_buffer_, sizeof(PacketHeader)), err);
-            size_t readBytes = boost::asio::read(socket_, headBuffer.prepare(kHeaderSize));
-            if (readBytes == kHeaderSize) {
+            char header_buf[kMsgHeaderSize];
+            size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
+            if (readBytes == kMsgHeaderSize) {
                 PacketHeader header;
-                InputPacketStream istream((const char *)(*(void **)&headBuffer.data()));
+                InputPacketStream istream(header_buf);
                 istream.readHeader(header);
-
-                if (header.msgLength > 0) {
+                if (header.signId == kDefaultSignId && header.msgLength > 0) {
                     //
                     // Receive the part data of response, if it's not completed, continue to read. 
                     //
-                    boost::asio::streambuf msgBuffer;
-                    msgBuffer.prepare(header.msgLength);
-                    socket_.async_read_some(msgBuffer.prepare(header.msgLength),
+                    response_.reserve(header.msgLength);
+                    response_size_ = header.msgLength;
+                    socket_.async_read_some(boost::asio::buffer(response_.data(), header.msgLength),
                         boost::bind(&KvdbClient::handle_read_some, this,
                                     boost::asio::placeholders::error,
                                     boost::asio::placeholders::bytes_transferred,
@@ -286,7 +284,9 @@ private:
                 //
                 // Receive the data of next partment.
                 //
-                socket_.async_read_some(boost::asio::buffer(&rev_buffer_[bytes_transferred],
+                // response_buf_.consume(bytes_transferred);
+                // boost::asio::buffer(response_.data(), bytes_wanted - bytes_transferred),
+                socket_.async_read_some(boost::asio::buffer(&response_[bytes_transferred],
                     bytes_wanted - bytes_transferred),
                     boost::bind(&KvdbClient::handle_read_some, this,
                         boost::asio::placeholders::error,
@@ -294,7 +294,7 @@ private:
                         bytes_wanted - bytes_transferred)
                 );
             }
-            else if (bytes_transferred <= 0) {
+            else if (bytes_transferred == 0) {
                 //
                 // Error: no data read.
                 //
@@ -305,7 +305,28 @@ private:
                 //
                 // The connection was successful, send the request.
                 //
-                boost::asio::async_write(socket_, request_,
+                // response_buf_.commit(request_size_);
+
+                KvdbClientConfig & config = KvdbClientApp::client_config;
+                LoginRequest request;
+                request.username = config.username;
+                request.password = config.password;
+                request.database = config.database;
+
+                size_t msgLength = request.prepare();
+                size_t requireSize = msgLength + kMsgHeaderSize;
+                request_.resize(requireSize);
+                request_size_ = requireSize;
+
+                OutputPacketStream ostream(request_.data());
+                ostream.writeHeader(kDefaultSignId, Message::HandShake, msgLength, 3);
+                request.writeTo(ostream);  
+
+                std::cout << "KvdbClient::handle_read_some()" << std::endl;
+                std::cout << "request_.size() = " << request_.size() << std::endl;
+                std::cout << std::endl;
+
+                boost::asio::async_write(socket_, boost::asio::buffer(request_.data(), request_.size()),
                     boost::bind(&KvdbClient::handle_write_request, this,
                                 boost::asio::placeholders::error));
             }

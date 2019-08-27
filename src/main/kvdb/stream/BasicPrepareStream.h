@@ -1,6 +1,6 @@
 
-#ifndef KVDB_STREAM_BASICSTREAM_H
-#define KVDB_STREAM_BASICSTREAM_H
+#ifndef KVDB_STREAM_BASIC_PREPARESTREAM_H
+#define KVDB_STREAM_BASIC_PREPARESTREAM_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -18,28 +18,11 @@
 
 #include "kvdb/core/DataType.h"
 #include "kvdb/jstd/StringRef.h"
-#include "kvdb/stream/Packet.h"
 
 namespace kvdb {
 
-struct ReadResult {
-    enum Type {
-        Failed = -1,
-        Ok = 0,
-        Last
-    };
-};
-
-struct WriteResult {
-    enum Type {
-        Failed = -1,
-        Ok = 0,
-        Last
-    };
-};
-
 template <typename T>
-class BasicStream {
+class BasicPrepareStream {
 public:
     typedef typename std::remove_pointer<
                 typename std::remove_cv<T>::type
@@ -53,11 +36,13 @@ protected:
     char_type * head_;
 
 public:
-    BasicStream() : cur_(nullptr), head_(nullptr) {}
-    BasicStream(const char_type * ptr) : cur_(const_cast<char_type *>(ptr)), head_(const_cast<char_type *>(ptr)) {}
+    BasicPrepareStream() : cur_(nullptr), head_(nullptr) {}
+    BasicPrepareStream(const char_type * ptr)
+        : cur_(const_cast<char_type *>(ptr)),
+          head_(const_cast<char_type *>(ptr)) {}
     template <size_t N>
-    BasicStream(const char_type(&data)[N]) : cur_(data), head_(data) {}
-    ~BasicStream() {}
+    BasicPrepareStream(const char_type(&data)[N]) : cur_(data), head_(data) {}
+    ~BasicPrepareStream() {}
 
     void setStream(const char_type * ptr) {
         cur_ = (char_type *)ptr;
@@ -90,41 +75,11 @@ public:
 
     void reset() {
         cur_ = head_;
+ 
     }
 
     void setHead(char_type * head) { this->head_ = head; }
     void setCurrent(char_type * cur) { this->cur_ = cur; }
-
-    void writeHeader(const PacketHeader & header) {
-        char_type * saveCur = this->current();
-        reset();
-        this->writeUInt32(header.signId);
-        this->writeUInt32(header.msgType);
-        this->writeUInt32(header.msgLength);
-        this->writeUInt32(header.varCount);
-        this->setCurrent(saveCur);
-    }
-
-    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t varCount) {
-        char_type * saveCur = this->current();
-        uint32_t msgLength = getMsgLength();
-        reset();
-        writeUInt32(signId);
-        writeUInt32(msgType);
-        writeUInt32(msgLength);
-        writeUInt32(varCount);
-        setCurrent(saveCur);
-    }
-
-    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
-        char_type * saveCur = this->current();
-        reset();
-        writeUInt32(signId);
-        writeUInt32(msgType);
-        writeUInt32(msgLength);
-        writeUInt32(varCount);
-        setCurrent(saveCur);
-    }
 
     void back() {
         cur_ = (char_type *)((char *)cur_ - sizeof(char));
@@ -251,127 +206,111 @@ public:
     }
 
     char_type getChar() const {
-        return *(char_type *)cur_;
+        return '0';
     }
 
     bool getBool() const {
-        return *(bool *)cur_;
+        return false;
     }
 
     int8_t getInt8() const {
-        return *(int8_t *)cur_;
+        return 0;
     }
 
     int16_t getInt16() const {
-        return *(int16_t *)cur_;
+        return 0;
     }
 
     int32_t getInt32() const {
-        return *(int32_t *)cur_;
+        return 0;
     }
 
     int64_t getInt64() const {
-        return *(int64_t *)cur_;
+        return 0;
     }
 
     uint8_t getUInt8() const {
-        return *(uint8_t *)cur_;
+        return 0;
     }
 
     uint16_t getUInt16() const {
-        return *(uint16_t *)cur_;
+        return 0;
     }
 
     uint32_t getUInt32() const {
-        return *(uint32_t *)cur_;
+        return 0;
     }
 
     uint64_t getUInt64() const {
-        return *(uint64_t *)cur_;
+        return 0;
     }
 
     void * getPointer() const {
-        return *(void **)cur_;
+        return nullptr;
     }
 
     float getFloat() const {
-        return *(float *)cur_;
+        return 0.0f;
     }
 
     double getDouble() const {
-        return *(double *)cur_;
+        return 0.0;
     }
 
     template <typename StringType>
     void getString(StringType & value, size_t length) {
-        value.assign((const char_type *)cur_, length);
     }
 
     void setByte(uint8_t value) const {
-        setUInt8(value);
     }
 
     void setChar(char_type value) const {
-        *(char_type *)cur_ = value;
     }
 
     void setBool(bool value) {
-        *(bool *)cur_ = value;
     }
 
     void setInt8(int8_t value) {
-        *(int8_t *)cur_ = value;
     }
 
     void setInt16(int16_t value) {
-        *(int16_t *)cur_ = value;
     }
 
     void setInt32(int32_t value) {
-        *(int32_t *)cur_ = value;
     }
 
     void setInt64(int64_t value) {
-        *(int64_t *)cur_ = value;
     }
 
     void setUInt8(uint8_t value) {
-        *(uint8_t *)cur_ = value;
     }
 
     void setUInt16(uint16_t value) {
-        *(uint16_t *)cur_ = value;
     }
 
     void setUInt32(uint32_t value) {
-        *(uint32_t *)cur_ = value;
     }
 
     void setUInt64(uint64_t value) {
-        *(uint64_t *)cur_ = value;
     }
 
     void setPointer(void * value) {
-        *(void **)cur_ = value;
     }
 
     void setFloat(float value) {
-        *(float *)cur_ = value;
     }
 
     void setDouble(double value) {
-        *(double *)cur_ = value;
     }
 
     template <typename StringType>
     void setString(const StringType & value) {
-        ::memcpy((void *)cur_, (const void *)value.c_str(), value.size() * sizeof(char_type));
     }
 };
 
-typedef BasicStream<char>      Stream;
-typedef BasicStream<wchar_t>   StreamW;
+typedef BasicPrepareStream<char>    PrepareStream;
+typedef BasicPrepareStream<wchar_t> PrepareStreamW;
 
 } // namespace kvdb
 
-#endif // KVDB_STREAM_BASICSTREAM_H
+#endif // KVDB_STREAM_BASIC_PREPARESTREAM_H

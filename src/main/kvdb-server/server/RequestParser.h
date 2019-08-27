@@ -11,7 +11,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include <kvdb/core/MessageType.h>
+#include <kvdb/core/Message.h>
 #include <kvdb/stream/InputStream.h>
 #include <kvdb/stream/ParseResult.h>
 #include <kvdb/stream/ParseStatus.h>
@@ -101,19 +101,19 @@ int RequestParser::parse(ConnectionContext & context, Request & req,
         const char * first = stream.current();
         int result = 0;
         switch (msgType) {
-        case MessageType::Login:
+        case Message::Login:
             {
                 result = handleLoginMessage(context, stream);
             }
             break;
 
-        case MessageType::HandShake:
+        case Message::HandShake:
             {
                 result = handleHandshakeMessage(stream);
             }
             break;
 
-        case MessageType::Query:
+        case Message::Query:
             {
                 result = handleQueryMessage(stream);
             }

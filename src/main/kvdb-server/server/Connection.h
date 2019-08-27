@@ -65,15 +65,17 @@ public:
     /// Get the socket associated with the connection.
     boost::asio::ip::tcp::socket & socket();
 
-    void shutdown_both();
-
     /// Start the first asynchronous operation for the connection.
     void start();
 
     /// Stop all asynchronous operations associated with the connection.
     void stop();
 
+    void shutdown_both();
+
 private:
+    void start_read_request();
+
     /// Handle completion of a read operation.
     void handle_read(const boost::system::error_code & ec,
                      std::size_t bytes_transferred);

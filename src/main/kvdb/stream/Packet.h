@@ -7,7 +7,7 @@
 #endif
 
 #include "kvdb/basic/stdint.h"
-#include "kvdb/core/MessageType.h"
+#include "kvdb/core/Message.h"
 
 namespace kvdb {
 
@@ -19,7 +19,7 @@ struct PacketHeader {
     uint32_t msgLength;
     uint32_t varCount;
 
-    PacketHeader() : signId(0), msgType(MessageType::Unknown), msgLength(0), varCount(0) {}
+    PacketHeader() : signId(0), msgType(Message::Unknown), msgLength(0), varCount(0) {}
     ~PacketHeader() {}
 };
 
@@ -38,6 +38,8 @@ struct PacketBody
     PacketHeader  header;
     const char *  data;
 };
+
+static const size_t kMsgHeaderSize = sizeof(PacketHeader);
 
 } // namespace kvdb
 

@@ -184,10 +184,22 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\OutputPacketStream.h">
       <Filter>src\stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageType.h">
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\Packet.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\Message.h">
       <Filter>src\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\Packet.h">
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\BasicPrepareStream.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\PrepareInputStream.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\PrepareOutputStream.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\PrepareOutputPacketStream.h">
       <Filter>src\stream</Filter>
     </ClInclude>
   </ItemGroup>

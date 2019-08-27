@@ -12,6 +12,9 @@
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
 
+//#include "kvdb/stream/PrepareInputPacketStream.h"
+#include "kvdb/stream/PrepareOutputPacketStream.h"
+
 namespace kvdb {
 
 struct LoginRequest {
@@ -25,6 +28,14 @@ struct LoginRequest {
     }
     ~LoginRequest() {}
 
+    size_t prepare() {
+        PrepareOutputPacketStream os;
+        os.writeString(username);
+        os.writeString(password);
+        os.writeString(database);
+        return os.requireSize();
+    }
+
     void writeTo(OutputPacketStream & os) {
         os.writeString(username);
         os.writeString(password);
@@ -32,11 +43,11 @@ struct LoginRequest {
     }
 
     int readFrom(InputPacketStream & is) {
-        int readOk = ReadResult::Ok;
-        readOk |= is.readString(username);
-        readOk |= is.readString(password);
-        readOk |= is.readString(database);
-        return readOk;
+        int readStatus = ReadResult::Ok;
+        readStatus |= is.readString(username);
+        readStatus |= is.readString(password);
+        readStatus |= is.readString(database);
+        return readStatus;
     }
 };
 

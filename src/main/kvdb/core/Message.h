@@ -1,6 +1,6 @@
 
-#ifndef KVDB_CORE_MESSAGETYPE_H
-#define KVDB_CORE_MESSAGETYPE_H
+#ifndef KVDB_CORE_MESSAGE_H
+#define KVDB_CORE_MESSAGE_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -8,7 +8,8 @@
 
 namespace kvdb {
 
-struct MessageType {
+class Message {
+public:
     enum Type {
         Unknown,
         Login,
@@ -18,8 +19,15 @@ struct MessageType {
         Logout,
         Last
     };
+
+private:
+    //
+
+public:
+    Message() {}
+    ~Message() {}
 };
 
 } // namespace kvdb
 
-#endif // KVDB_CORE_MESSAGETYPE_H
+#endif // KVDB_CORE_MESSAGE_H

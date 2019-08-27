@@ -32,7 +32,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\common\boost_asio_msvc.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\common\cmd_utils.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Application.h" />
-    <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageType.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\Message.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\DataType.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Messages.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Variant.h" />
@@ -53,6 +53,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\jstd\strlen.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\server\ServerStatus.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\store\Slice.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\BasicPrepareStream.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\BasicStream.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\InputPacketStream.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\InputStream.h" />
@@ -62,6 +63,9 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\Packet.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseResult.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseStatus.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\PrepareInputStream.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\PrepareOutputStream.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\PrepareOutputPacketStream.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_forward.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_reverse.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\popcnt.h" />

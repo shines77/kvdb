@@ -42,10 +42,7 @@ void Connection::shutdown_both()
 
 void Connection::start()
 {
-    socket_.async_read_some(boost::asio::buffer(buffer_),
-        boost::bind(&Connection::handle_read, shared_from_this(),
-                    boost::asio::placeholders::error,
-                    boost::asio::placeholders::bytes_transferred));
+    start_read_request();
 }
 
 void Connection::stop()
@@ -55,6 +52,14 @@ void Connection::stop()
 
         socket_.close();
     }
+}
+
+void Connection::start_read_request()
+{
+    socket_.async_read_some(boost::asio::buffer(buffer_),
+        boost::bind(&Connection::handle_read, shared_from_this(),
+                    boost::asio::placeholders::error,
+                    boost::asio::placeholders::bytes_transferred));
 }
 
 void Connection::handle_read(const boost::system::error_code & err,
