@@ -8,11 +8,12 @@
 #include <boost/logic/tribool.hpp>
 
 #include "server/ConnectionManager.h"
-#include "server/RequestParser.h"
 #include "server/RequestHandler.h"
 
+#include "kvdb/core/Request.h"
+#include "kvdb/core/Response.h"
 #include "kvdb/core/Messages.h"
-#include "kvdb/core/Packet.h"
+#include "kvdb/stream/ParseStatus.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
 #include "kvdb/stream/InputPacketStream.h"
@@ -139,7 +140,7 @@ void Connection::handle_read_some(const boost::system::error_code & err,
         }
         else {
             request_.setData(&request_buf_[0]);
-            int result = request_handler_.handleRequest(context_, request_, response_);
+            int result = request_handler_.handleRequest(context_, request_);
             if (result == ParseStatus::Success) {
                 //
             }

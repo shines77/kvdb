@@ -16,14 +16,15 @@ public:
     //
 
 protected:
-    const char * data_;
+    //
 
 public:
-    Response(const char * data = nullptr) : data_(data) {}
-    ~Response() {}
+    Response(uint32_t type = Message::Unknown, const char * data = nullptr)
+        : Message(type, data) {
+        //
+    }
 
-    char * data() { return (char *)this->data_; }
-    const char * data() const { return this->data_; }
+    virtual ~Response() {}
 };
 
 } // namespace kvdb

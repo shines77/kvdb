@@ -57,6 +57,9 @@ public:
         QueryRequest,
         QueryResponse,
 
+        DisconnectRequest,
+        DisconnectResponse,
+
         LogoutRequest,
         LogoutResponse,
 
@@ -66,11 +69,20 @@ public:
     MessageHeader header;
 
 protected:
-    //
+    const char * data_;
 
 public:
-    Message() {}
-    ~Message() {}
+    Message(uint32_t type = Message::Unknown, const char * data = nullptr) : data_(data) {
+        this->header.sign = kDefaultSignId;
+        this->header.type = type;
+    }
+
+    virtual ~Message() {}
+
+    char * data() { return (char *)this->data_; }
+    const char * data() const { return this->data_; }
+
+    void setData(const char * data) { this->data_ = data; }
 };
 
 } // namespace kvdb

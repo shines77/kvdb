@@ -24,11 +24,12 @@ struct LoginRequest : public Request {
     std::string password;
     std::string database;
 
-    LoginRequest() {}
+    LoginRequest(const char * data = nullptr) : Request(Message::LogoutRequest, data) {}
     LoginRequest(std::string _username, std::string _password, std::string _database)
-        : username(_username), password(_password), database(_database) {
+        : Request(Message::LogoutRequest, nullptr),
+          username(_username), password(_password), database(_database) {
     }
-    ~LoginRequest() {}
+    virtual ~LoginRequest() {}
 
     template <typename PrepareOutputStreamTy>
     uint32_t prepare(PrepareOutputStreamTy & os) {
@@ -59,10 +60,12 @@ struct LoginRequest : public Request {
 struct LoginResponse : public Response {
     int statusCode;
 
-    LoginResponse(int _statusCode = StatusCode::Unknown)
-        : statusCode(_statusCode) {
+    LoginResponse(const char * data = nullptr) : Response(Message::LogoutRequest, data) {}
+    LoginResponse(int _statusCode)
+        : Response(Message::LogoutResponse, nullptr),
+          statusCode(_statusCode) {
     }
-    ~LoginResponse() {}
+    virtual ~LoginResponse() {}
 
     template <typename PrepareOutputStreamTy>
     uint32_t prepare(PrepareOutputStreamTy & os) {

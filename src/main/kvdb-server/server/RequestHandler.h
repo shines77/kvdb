@@ -9,14 +9,16 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 
-#include <kvdb/core/Message.h>
 #include <kvdb/jstd/StringRef.h>
+#include <kvdb/core/Message.h>
+#include <kvdb/core/Request.h>
+#include <kvdb/core/Response.h>
 #include <kvdb/stream/InputStream.h>
 #include <kvdb/stream/InputPacketStream.h>
 
-#include "server/Request.h"
-#include "server/Response.h"
 #include "server/ConnectionContext.h"
+
+using namespace kvdb;
 
 namespace kvdb {
 namespace server {

@@ -12,11 +12,11 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
+#include <kvdb/core/Request.h>
+#include <kvdb/core/Response.h>
+
 #include "server/ConnectionContext.h"
-#include "server/Response.h"
-#include "server/Request.h"
 #include "server/RequestHandler.h"
-#include "server/RequestParser.h"
 
 //
 // Since boost.asio 1.66, it has changed from asio::io_service to asio::io_context.
@@ -42,9 +42,6 @@ private:
 
     /// The handler used to process the incoming request.
     RequestHandler & request_handler_;
-
-    /// The parser for the incoming request.
-    RequestParser request_parser_;
 
     /// The incoming request.
     Request request_;
