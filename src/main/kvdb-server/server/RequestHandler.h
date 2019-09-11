@@ -32,7 +32,7 @@ public:
     ~RequestHandler();
 
     /// Handle a request and produce a response.
-    int handleRequest(ConnectionContext & context, const Request & request);
+    int handleRequest(ConnectionContext & context, const IRequest & request);
 
 private:
     int handleLoginRequest(ConnectionContext & context, InputPacketStream & stream);

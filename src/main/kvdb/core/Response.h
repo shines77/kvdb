@@ -11,7 +11,24 @@
 
 namespace kvdb {
 
-class Response : public Message {
+class IResponse : public Message {
+public:
+    //
+
+protected:
+    //
+
+public:
+    IResponse(uint32_t type = Message::Unknown, const char * data = nullptr)
+        : Message(type, data) {
+        //
+    }
+
+    virtual ~IResponse() {}
+};
+
+template <typename T>
+class Response : public BasicMessage<T> {
 public:
     //
 
@@ -20,7 +37,7 @@ protected:
 
 public:
     Response(uint32_t type = Message::Unknown, const char * data = nullptr)
-        : Message(type, data) {
+        : BasicMessage(type, data) {
         //
     }
 

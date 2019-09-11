@@ -19,29 +19,25 @@
 
 namespace kvdb {
 
-struct LoginRequest : public Request {
+struct LoginRequest : public Request<LoginRequest> {
+    static const uint32_t kArgs = 3;
     std::string username;
     std::string password;
     std::string database;
 
-    LoginRequest(const char * data = nullptr) : Request(Message::LogoutRequest, data) {}
+    LoginRequest(const char * data = nullptr)
+        : Request(Message::LogoutRequest, data) {
+        setArgs(kArgs);
+    }
     LoginRequest(std::string _username, std::string _password, std::string _database)
         : Request(Message::LogoutRequest, nullptr),
           username(_username), password(_password), database(_database) {
+        setArgs(kArgs);
     }
     virtual ~LoginRequest() {}
 
-    template <typename PrepareOutputStreamTy>
-    uint32_t prepare(PrepareOutputStreamTy & os) {
-        os.reset();
-        os.writeString(username);
-        os.writeString(password);
-        os.writeString(database);
-        return os.requireSize();
-    }
-
     template <typename InputStreamTy>
-    int readFrom(InputStreamTy & is) {
+    int readBody(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
         readStatus |= is.readString(username);
         readStatus |= is.readString(password);
@@ -50,39 +46,38 @@ struct LoginRequest : public Request {
     }
 
     template <typename OutputStreamTy>
-    void writeTo(OutputStreamTy & os) {
+    void writeBody(OutputStreamTy & os) {
         os.writeString(username);
         os.writeString(password);
         os.writeString(database);
     }
 };
 
-struct LoginResponse : public Response {
+struct LoginResponse : public Response<LoginResponse> {
+    static const uint32_t kArgs = 1;
     int statusCode;
 
-    LoginResponse(const char * data = nullptr) : Response(Message::LogoutRequest, data) {}
+    LoginResponse(const char * data = nullptr)
+        : Response(Message::LogoutRequest, data),
+          statusCode(StatusCode::Unknown) {
+        setArgs(kArgs);
+    }
     LoginResponse(int _statusCode)
         : Response(Message::LogoutResponse, nullptr),
           statusCode(_statusCode) {
+        setArgs(kArgs);
     }
     virtual ~LoginResponse() {}
 
-    template <typename PrepareOutputStreamTy>
-    uint32_t prepare(PrepareOutputStreamTy & os) {
-        os.reset();
-        os.writeInt32(statusCode);
-        return os.requireSize();
-    }
-
     template <typename InputStreamTy>
-    int readFrom(InputStreamTy & is) {
+    int readBody(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
         readStatus |= is.readInt32(statusCode);
         return readStatus;
     }
 
     template <typename OutputStreamTy>
-    void writeTo(OutputStreamTy & os) {
+    void writeBody(OutputStreamTy & os) {
         os.writeInt32(statusCode);
     }
 };

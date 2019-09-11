@@ -23,17 +23,19 @@ namespace kvdb {
 template <typename T>
 class BasicPrepareInputStream : public BasicPrepareStream<T> {
 public:
-    typedef BasicPrepareStream<T>           base_type;
-    typedef typename base_type::char_type   char_type;
+    typedef BasicPrepareStream<T>               base_type;
+    typedef typename base_type::char_type       char_type;
 
-    typedef std::basic_string<char_type>    string_type;
-    typedef jstd::BasicStringRef<char_type> stringref_type;
+    typedef typename base_type::string_type     string_type;
+    typedef typename base_type::stringref_type  stringref_type;
 
     BasicPrepareInputStream() : base_type(nullptr) {}
     BasicPrepareInputStream(const char_type * value) : base_type(value) {}
     template <size_t N>
     BasicPrepareInputStream(const char_type(&data)[N]) : base_type(data) {}
     ~BasicPrepareInputStream() {}
+
+    bool isMemoryStream() const { return true; }
 
     uint8_t readType() {
         return readUInt8();

@@ -208,9 +208,8 @@ private:
             request.password = config.password;
             request.database = config.database;
 
-            PrepareOutputPacketStream preOs;
-            uint32_t msgLength = request.prepare(preOs);
-            size_t requestSize = msgLength + kMsgHeaderSize;
+            uint32_t requestSize = request.prepare();
+            uint32_t msgLength = requestSize - kMsgHeaderSize;
             request_.resize(requestSize);
             request_size_ = requestSize;
 
@@ -323,8 +322,8 @@ private:
                 request.database = config.database;
 
                 PrepareOutputPacketStream preOS;
-                uint32_t msgLength = request.prepare(preOS);
-                size_t requestSize = msgLength + kMsgHeaderSize;
+                uint32_t requestSize = request.prepare();
+                uint32_t msgLength = requestSize - kMsgHeaderSize;
                 request_.reserve(requestSize);
                 request_size_ = requestSize;
 

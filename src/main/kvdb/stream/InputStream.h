@@ -23,11 +23,11 @@ namespace kvdb {
 template <typename T>
 class BasicInputStream : public BasicStream<T> {
 public:
-    typedef BasicStream<T>                  base_type;
-    typedef typename base_type::char_type   char_type;
+    typedef BasicStream<T>                      base_type;
+    typedef typename base_type::char_type       char_type;
 
-    typedef std::basic_string<char_type>    string_type;
-    typedef jstd::BasicStringRef<char_type> stringref_type;
+    typedef typename base_type::string_type     string_type;
+    typedef typename base_type::stringref_type  stringref_type;
 
     BasicInputStream() : base_type(nullptr) {}
     BasicInputStream(const char_type * value) : base_type(value) {}

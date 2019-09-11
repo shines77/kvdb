@@ -54,7 +54,9 @@ protected:
 
 public:
     BasicStream() : cur_(nullptr), head_(nullptr) {}
-    BasicStream(const char_type * ptr) : cur_(const_cast<char_type *>(ptr)), head_(const_cast<char_type *>(ptr)) {}
+    BasicStream(const char_type * ptr)
+        : cur_(const_cast<char_type *>(ptr)),
+          head_(const_cast<char_type *>(ptr)) {}
     template <size_t N>
     BasicStream(const char_type(&data)[N]) : cur_(data), head_(data) {}
     ~BasicStream() {}
@@ -85,6 +87,8 @@ public:
     bool isOverflow()  const { return false; }
     bool isUnderflow() const { return (this->cur_ < this->head_); }
 
+    bool isMemoryStream() const { return true; }
+
     void reset() {
         this->cur_ = this->head_;
     }
@@ -92,57 +96,12 @@ public:
     void setHead(char_type * head) { this->head_ = head; }
     void setCurrent(char_type * cur) { this->cur_ = cur; }
 
-    void writeHeader(const MessageHeader & header) {
-        stream.writeUInt32(header.sign);
-        stream.writeUInt32(header.type);
-        stream.writeUInt32(header.length);
-        stream.writeUInt32(header.args);
-    }
-
-    void writeHeader(uint32_t sign, uint32_t type, uint32_t length, uint32_t args) {
-        stream.writeUInt32(sign);
-        stream.writeUInt32(type);
-        stream.writeUInt32(length);
-        stream.writeUInt32(args);
-    }
-
-    void writeHeaderAndRestore(const MessageHeader & header) {
-        char_type * savePos = this->current();
-        reset();
-        this->writeUInt32(header.sign);
-        this->writeUInt32(header.type);
-        this->writeUInt32(header.length);
-        this->writeUInt32(header.args);
-        this->setCurrent(savePos);
-    }
-
-    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t args) {
-        char_type * savePos = this->current();
-        uint32_t length = getMsgLength();
-        reset();
-        writeUInt32(sign);
-        writeUInt32(type);
-        writeUInt32(length);
-        writeUInt32(args);
-        setCurrent(savePos);
-    }
-
-    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t length, uint32_t args) {
-        char_type * savePos = this->current();
-        reset();
-        writeUInt32(sign);
-        writeUInt32(type);
-        writeUInt32(length);
-        writeUInt32(args);
-        setCurrent(savePos);
-    }
-
     void back() {
-        cur_ = (char_type *)((char *)cur_ - sizeof(char));
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(char));
     }
 
     void back(int skip) {
-        cur_ = (char_type *)((char *)cur_ - skip * sizeof(char));
+        this->cur_ = (char_type *)((char *)this->cur_ - skip * sizeof(char));
     }
 
     void backByte() {
@@ -154,19 +113,19 @@ public:
     }
 
     void backChar() {
-        cur_ = (char_type *)((char *)cur_ - sizeof(char_type));
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(char_type));
     }
 
     void backChar(int skip) {
-        cur_ = (char_type *)((char *)cur_ - skip * sizeof(char_type));
+        this->cur_ = (char_type *)((char *)this->cur_ - skip * sizeof(char_type));
     }
 
     void next() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(char));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(char));
     }
 
     void next(int skip) {
-        cur_ = (char_type *)((char *)cur_ + skip);
+        this->cur_ = (char_type *)((char *)this->cur_ + skip);
     }
 
     void nextType() {
@@ -182,59 +141,59 @@ public:
     }
 
     void nextChar() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(char_type));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(char_type));
     }
 
     void nextChar(int skip) {
-        cur_ = (char_type *)((char *)cur_ + skip * sizeof(char_type));
+        this->cur_ = (char_type *)((char *)this->cur_ + skip * sizeof(char_type));
     }
 
     void nextBool() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(bool));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(bool));
     }
 
     void nextInt8() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(int8_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int8_t));
     }
 
     void nextInt16() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(int16_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int16_t));
     }
 
     void nextInt32() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(int32_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int32_t));
     }
 
     void nextInt64() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(int64_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int64_t));
     }
 
     void nextUInt8() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(uint8_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint8_t));
     }
 
     void nextUInt16() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(uint16_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint16_t));
     }
 
     void nextUInt32() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(uint32_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint32_t));
     }
 
     void nextUInt64() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(uint64_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint64_t));
     }
 
     void nextPointer() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(void *));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(void *));
     }
 
     void nextFloat() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(float));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(float));
     }
 
     void nextDouble() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(double));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(double));
     }
 
     void skip(int offset) {
@@ -262,55 +221,55 @@ public:
     }
 
     char_type getChar() const {
-        return *(char_type *)cur_;
+        return *(char_type *)this->cur_;
     }
 
     bool getBool() const {
-        return *(bool *)cur_;
+        return *(bool *)this->cur_;
     }
 
     int8_t getInt8() const {
-        return *(int8_t *)cur_;
+        return *(int8_t *)this->cur_;
     }
 
     int16_t getInt16() const {
-        return *(int16_t *)cur_;
+        return *(int16_t *)this->cur_;
     }
 
     int32_t getInt32() const {
-        return *(int32_t *)cur_;
+        return *(int32_t *)this->cur_;
     }
 
     int64_t getInt64() const {
-        return *(int64_t *)cur_;
+        return *(int64_t *)this->cur_;
     }
 
     uint8_t getUInt8() const {
-        return *(uint8_t *)cur_;
+        return *(uint8_t *)this->cur_;
     }
 
     uint16_t getUInt16() const {
-        return *(uint16_t *)cur_;
+        return *(uint16_t *)this->cur_;
     }
 
     uint32_t getUInt32() const {
-        return *(uint32_t *)cur_;
+        return *(uint32_t *)this->cur_;
     }
 
     uint64_t getUInt64() const {
-        return *(uint64_t *)cur_;
+        return *(uint64_t *)this->cur_;
     }
 
     void * getPointer() const {
-        return *(void **)cur_;
+        return *(void **)this->cur_;
     }
 
     float getFloat() const {
-        return *(float *)cur_;
+        return *(float *)this->cur_;
     }
 
     double getDouble() const {
-        return *(double *)cur_;
+        return *(double *)this->cur_;
     }
 
     template <typename StringType>
@@ -323,55 +282,55 @@ public:
     }
 
     void setChar(char_type value) const {
-        *(char_type *)cur_ = value;
+        *(char_type *)this->cur_ = value;
     }
 
     void setBool(bool value) {
-        *(bool *)cur_ = value;
+        *(bool *)this->cur_ = value;
     }
 
     void setInt8(int8_t value) {
-        *(int8_t *)cur_ = value;
+        *(int8_t *)this->cur_ = value;
     }
 
     void setInt16(int16_t value) {
-        *(int16_t *)cur_ = value;
+        *(int16_t *)this->cur_ = value;
     }
 
     void setInt32(int32_t value) {
-        *(int32_t *)cur_ = value;
+        *(int32_t *)this->cur_ = value;
     }
 
     void setInt64(int64_t value) {
-        *(int64_t *)cur_ = value;
+        *(int64_t *)this->cur_ = value;
     }
 
     void setUInt8(uint8_t value) {
-        *(uint8_t *)cur_ = value;
+        *(uint8_t *)this->cur_ = value;
     }
 
     void setUInt16(uint16_t value) {
-        *(uint16_t *)cur_ = value;
+        *(uint16_t *)this->cur_ = value;
     }
 
     void setUInt32(uint32_t value) {
-        *(uint32_t *)cur_ = value;
+        *(uint32_t *)this->cur_ = value;
     }
 
     void setUInt64(uint64_t value) {
-        *(uint64_t *)cur_ = value;
+        *(uint64_t *)this->cur_ = value;
     }
 
     void setPointer(void * value) {
-        *(void **)cur_ = value;
+        *(void **)this->cur_ = value;
     }
 
     void setFloat(float value) {
-        *(float *)cur_ = value;
+        *(float *)this->cur_ = value;
     }
 
     void setDouble(double value) {
-        *(double *)cur_ = value;
+        *(double *)this->cur_ = value;
     }
 
     template <typename StringType>

@@ -44,12 +44,10 @@ private:
     RequestHandler & request_handler_;
 
     /// The incoming request.
-    Request request_;
+    IRequest request_;
 
     /// The reply to be sent back to the client.
-    Response response_;
-
-    PacketHeader req_header_;
+    IResponse response_;
 
     /// Buffer for incoming or outgoing data.
     std::vector<char>               request_buf_;

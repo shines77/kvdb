@@ -11,7 +11,24 @@
 
 namespace kvdb {
 
-class Request : public Message {
+class IRequest : public Message {
+public:
+    //
+
+protected:
+    //
+
+public:
+    IRequest(uint32_t type = Message::Unknown, const char * data = nullptr)
+        : Message(type, data) {
+        //
+    }
+
+    virtual ~IRequest() {}
+};
+
+template <typename T>
+class Request : public BasicMessage<T> {
 public:
     //
 
@@ -20,7 +37,7 @@ protected:
 
 public:
     Request(uint32_t type = Message::Unknown, const char * data = nullptr)
-        : Message(type, data) {
+        : BasicMessage(type, data) {
         //
     }
 

@@ -17,6 +17,7 @@
 #include <type_traits>
 
 #include "kvdb/core/DataType.h"
+#include "kvdb/core/Message.h"
 #include "kvdb/jstd/StringRef.h"
 
 namespace kvdb {
@@ -45,48 +46,46 @@ public:
     ~BasicPrepareStream() {}
 
     void setStream(const char_type * ptr) {
-        cur_ = (char_type *)ptr;
-        head_ = (char_type *)ptr;
+        this->cur_ = (char_type *)ptr;
+        this->head_ = (char_type *)ptr;
     }
 
     template <size_t N>
     void setStream(const char_type(&data)[N]) {
-        cur_ = (char_type *)data;
-        head_ = (char_type *)data;
+        this->cur_ = (char_type *)data;
+        this->head_ = (char_type *)data;
     }
 
-    char_type * head() const {
-        return head_;
-    }
+    char_type * head() const { return this->head_; }
+    char_type * current() const { return this->cur_; }
 
-    char_type * current() const {
-        return cur_;
-    }
+    char_type * data() const { return this->head(); }
 
-    ptrdiff_t length() const   { return (cur_ - head_); }
+    ptrdiff_t length() const   { return (this->cur_ - this->head_); }
     ptrdiff_t position() const { return this->length(); }
 
     uint32_t getMsgLength() const {
-        return (uint32_t)(this->length() - sizeof(PacketHeader));
+        return (uint32_t)(this->length() - sizeof(MessageHeader));
     }
 
     bool isOverflow()  const { return false; }
-    bool isUnderflow() const { return (cur_ < head_); }
+    bool isUnderflow() const { return (this->cur_ < this->head_); }
+
+    bool isMemoryStream() const { return true; }
 
     void reset() {
-        cur_ = head_;
- 
+        this->cur_ = this->head_;
     }
 
     void setHead(char_type * head) { this->head_ = head; }
     void setCurrent(char_type * cur) { this->cur_ = cur; }
 
     void back() {
-        cur_ = (char_type *)((char *)cur_ - sizeof(char));
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(char));
     }
 
     void back(int skip) {
-        cur_ = (char_type *)((char *)cur_ - skip * sizeof(char));
+        this->cur_ = (char_type *)((char *)this->cur_ - skip * sizeof(char));
     }
 
     void backByte() {
@@ -98,19 +97,19 @@ public:
     }
 
     void backChar() {
-        cur_ = (char_type *)((char *)cur_ - sizeof(char_type));
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(char_type));
     }
 
     void backChar(int skip) {
-        cur_ = (char_type *)((char *)cur_ - skip * sizeof(char_type));
+        this->cur_ = (char_type *)((char *)this->cur_ - skip * sizeof(char_type));
     }
 
     void next() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(char));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(char));
     }
 
     void next(int skip) {
-        cur_ = (char_type *)((char *)cur_ + skip);
+        this->cur_ = (char_type *)((char *)this->cur_ + skip);
     }
 
     void nextType() {
@@ -126,59 +125,59 @@ public:
     }
 
     void nextChar() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(char_type));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(char_type));
     }
 
     void nextChar(int skip) {
-        cur_ = (char_type *)((char *)cur_ + skip * sizeof(char_type));
+        this->cur_ = (char_type *)((char *)this->cur_ + skip * sizeof(char_type));
     }
 
     void nextBool() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(bool));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(bool));
     }
 
     void nextInt8() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(int8_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int8_t));
     }
 
     void nextInt16() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(int16_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int16_t));
     }
 
     void nextInt32() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(int32_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int32_t));
     }
 
     void nextInt64() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(int64_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int64_t));
     }
 
     void nextUInt8() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(uint8_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint8_t));
     }
 
     void nextUInt16() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(uint16_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint16_t));
     }
 
     void nextUInt32() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(uint32_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint32_t));
     }
 
     void nextUInt64() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(uint64_t));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint64_t));
     }
 
     void nextPointer() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(void *));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(void *));
     }
 
     void nextFloat() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(float));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(float));
     }
 
     void nextDouble() {
-        cur_ = (char_type *)((char *)cur_ + sizeof(double));
+        this->cur_ = (char_type *)((char *)this->cur_ + sizeof(double));
     }
 
     void skip(int offset) {
@@ -186,7 +185,7 @@ public:
     }
 
     void skipToHeader() {
-        next(sizeof(PacketHeader));
+        next(sizeof(MessageHeader));
     }
 
     char get() const {

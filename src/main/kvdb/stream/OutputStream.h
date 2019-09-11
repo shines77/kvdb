@@ -16,6 +16,7 @@
 #include <string>
 #include <type_traits>
 
+#include "kvdb/core/Message.h"
 #include "kvdb/stream/BasicStream.h"
 
 namespace kvdb {
@@ -23,17 +24,62 @@ namespace kvdb {
 template <typename T>
 class BasicOutputStream : public BasicStream<T> {
 public:
-    typedef BasicStream<T>                  base_type;
-    typedef typename base_type::char_type   char_type;
+    typedef BasicStream<T>                      base_type;
+    typedef typename base_type::char_type       char_type;
 
-    typedef std::basic_string<char_type>    string_type;
-    typedef jstd::BasicStringRef<char_type> stringref_type;
+    typedef typename base_type::string_type     string_type;
+    typedef typename base_type::stringref_type  stringref_type;
 
     BasicOutputStream() : base_type() {}
     BasicOutputStream(const char_type * value) : base_type(value) {}
     template <size_t N>
     BasicOutputStream(const char_type(&data)[N]) : base_type(data) {}
     ~BasicOutputStream() {}
+
+    void writeHeader(const MessageHeader & header) {
+        this->writeUInt32(header.sign);
+        this->writeUInt32(header.type);
+        this->writeUInt32(header.args);
+        this->writeUInt32(header.length);
+    }
+
+    void writeHeader(uint32_t sign, uint32_t type, uint32_t args, uint32_t length) {
+        this->writeUInt32(sign);
+        this->writeUInt32(type);
+        this->writeUInt32(args);
+        this->writeUInt32(length);
+    }
+
+    void writeHeaderAndRestore(const MessageHeader & header) {
+        char_type * savePos = this->current();
+        this->reset();
+        this->writeUInt32(header.sign);
+        this->writeUInt32(header.type);
+        this->writeUInt32(header.args);
+        this->writeUInt32(header.length);
+        this->setCurrent(savePos);
+    }
+
+    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t args) {
+        char_type * savePos = this->current();
+        uint32_t length = this->getMsgLength();
+        this->reset();
+        this->writeUInt32(sign);
+        this->writeUInt32(type);
+        this->writeUInt32(args);
+        this->writeUInt32(length);
+        this->setCurrent(savePos);
+    }
+
+    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t args, uint32_t length) {
+        char_type * savePos = this->current();
+        this->reset();
+        this->writeUInt32(sign);
+        this->writeUInt32(type);
+        this->writeUInt32(args);
+        this->writeUInt32(length);
+        this->setCurrent(savePos);
+    }
 
     void writeType(uint8_t type) {
         writeUInt8(type);

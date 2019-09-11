@@ -34,7 +34,7 @@ RequestHandler::~RequestHandler()
 }
 
 int RequestHandler::handleRequest(ConnectionContext & context,
-                                  const Request & request)
+                                  const IRequest & request)
 {
     InputPacketStream stream(request.data());
     MessageHeader header = request.header;
@@ -83,13 +83,14 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
         if (result == ParseResult::OK) {
             int result = stream.readString(database);
             if (result == ParseResult::OK) {
-                LoginResponse response;
-                PrepareOutputPacketStream preOS;
-                uint32_t msgLength = response.prepare(preOS);
                 OutputPacketStream os;
-                os.writeHeader(kDefaultSignId, Message::LoginResponse, msgLength, 3);
-                response.writeTo(os);
+                LoginResponse response;
+                response.setSign(kDefaultSignId);
+                response.setMessageType(Message::LoginResponse);
+                response.setBodyLength(0);
+                response.setArgs(3);
 
+                response.writeTo(os);
                 return ParseStatus::Success;
             }
         }

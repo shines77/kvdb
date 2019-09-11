@@ -22,161 +22,98 @@
 namespace kvdb {
 
 template <typename T>
-class BasicOutputPacketStream {
+class BasicOutputPacketStream : public BasicOutputStream<T> {
 public:
-    typedef BasicOutputStream<T>            stream_type;
-    typedef typename stream_type::char_type char_type;
+    typedef BasicOutputStream<T>                base_type;
+    typedef typename base_type::char_type       char_type;
 
-    typedef std::basic_string<char_type>    string_type;
-    typedef jstd::BasicStringRef<char_type> stringref_type;
+    typedef typename base_type::string_type     string_type;
+    typedef typename base_type::stringref_type  stringref_type;
 
-    stream_type stream;
-
-    BasicOutputPacketStream() : stream() {}
-    BasicOutputPacketStream(const char_type * value) : stream(value) {}
+    BasicOutputPacketStream() : base_type() {}
+    BasicOutputPacketStream(const char_type * value) : base_type(value) {}
     template <size_t N>
-    BasicOutputPacketStream(const char_type(&data)[N]) : stream(data) {}
+    BasicOutputPacketStream(const char_type(&data)[N]) : base_type(data) {}
     ~BasicOutputPacketStream() {}
 
-    char_type * head() const { return stream.head(); }
-    char_type * current() const { return stream.current(); }
-
-    char_type * data() const { return stream.data(); }
-
-    ptrdiff_t length() const { return stream.length(); }
-    uint32_t getMsgLength() const {
-        return (uint32_t)(stream.length() - sizeof(PacketHeader));
-    }
-
-    void reset() {
-        stream.reset();
-    }
-
-    void skipToHeader() {
-        stream.skipToHeader();
-    }
-
-    void writeHeader(const PacketHeader & header) {
-        stream.writeUInt32(header.sign);
-        stream.writeUInt32(header.type);
-        stream.writeUInt32(header.length);
-        stream.writeUInt32(header.args);
-    }
-
-    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
-        stream.writeUInt32(signId);
-        stream.writeUInt32(msgType);
-        stream.writeUInt32(msgLength);
-        stream.writeUInt32(varCount);
-    }
-
-    void writeHeaderAndRestore(const PacketHeader & header) {
-        char_type * saveCur = stream.current();
-        reset();
-        stream.writeUInt32(header.sign);
-        stream.writeUInt32(header.type);
-        stream.writeUInt32(header.length);
-        stream.writeUInt32(header.args);
-        stream.setCurrent(saveCur);
-    }
-
-    void writeHeaderAndRestore(uint32_t signId, uint32_t msgType, uint32_t varCount) {
-        char_type * saveCur = stream.current();
-        uint32_t msgLength = getMsgLength();
-        reset();
-        stream.writeUInt32(signId);
-        stream.writeUInt32(msgType);
-        stream.writeUInt32(msgLength);
-        stream.writeUInt32(varCount);
-        stream.setCurrent(saveCur);
-    }
-
-    void writeHeaderAndRestore(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
-        char_type * saveCur = stream.current();
-        reset();
-        stream.writeUInt32(signId);
-        stream.writeUInt32(msgType);
-        stream.writeUInt32(msgLength);
-        stream.writeUInt32(varCount);
-        stream.setCurrent(saveCur);
-    }
+    bool isMemoryStream() const { return true; }
 
     void writeType(uint8_t type) {
-        stream.writeUInt8(type);
+        base_type::writeUInt8(type);
     }
 
     void writeType(uint32_t type) {
-        stream.writeUInt8((uint8_t)type);
+        base_type::writeUInt8((uint8_t)type);
     }
 
     void writeByte(uint8_t value) {
-        stream.writeType(DataType::UInt8);
-        stream.writeByte(value);
+        base_type::writeType(DataType::UInt8);
+        base_type::writeByte(value);
     }
 
     void writeChar(char_type value) {
-        stream.writeType(DataType::UInt8);
-        stream.writeByte(value);
+        base_type::writeType(DataType::UInt8);
+        base_type::writeByte(value);
     }
 
     void writeBool(bool value) {
-        stream.writeType(DataType::Bool);
-        stream.writeBool(value);
+        base_type::writeType(DataType::Bool);
+        base_type::writeBool(value);
     }
 
     void writeInt8(int8_t value) {
-        stream.writeType(DataType::Int8);
-        stream.writeInt8(value);
+        base_type::writeType(DataType::Int8);
+        base_type::writeInt8(value);
     }
 
     void writeInt16(int16_t value) {
-        stream.writeType(DataType::Int16);
-        stream.writeInt16(value);
+        base_type::writeType(DataType::Int16);
+        base_type::writeInt16(value);
     }
 
     void writeInt32(int32_t value) {
-        stream.writeType(DataType::Int32);
-        stream.writeInt32(value);
+        base_type::writeType(DataType::Int32);
+        base_type::writeInt32(value);
     }
 
     void writeInt64(int64_t value) {
-        stream.writeType(DataType::Int64);
-        stream.writeInt64(value);
+        base_type::writeType(DataType::Int64);
+        base_type::writeInt64(value);
     }
 
     void writeUInt8(uint8_t value) {
-        stream.writeType(DataType::UInt8);
-        stream.writeUInt8(value);
+        base_type::writeType(DataType::UInt8);
+        base_type::writeUInt8(value);
     }
 
     void writeUInt16(uint16_t value) {
-        stream.writeType(DataType::UInt16);
-        stream.writeUInt16(value);
+        base_type::writeType(DataType::UInt16);
+        base_type::writeUInt16(value);
     }
 
     void writeUInt32(uint32_t value) {
-        stream.writeType(DataType::UInt32);
-        stream.writeUInt32(value);
+        base_type::writeType(DataType::UInt32);
+        base_type::writeUInt32(value);
     }
 
     void writeUInt64(uint64_t value) {
-        stream.writeType(DataType::UInt64);
-        stream.writeUInt64(value);
+        base_type::writeType(DataType::UInt64);
+        base_type::writeUInt64(value);
     }
 
     void writePointer(void * value) {
-        stream.writeType(DataType::Pointer);
-        stream.writePointer(value);
+        base_type::writeType(DataType::Pointer);
+        base_type::writePointer(value);
     }
 
     void writeFloat(float value) {
-        stream.writeType(DataType::Float);
-        stream.writeFloat(value);
+        base_type::writeType(DataType::Float);
+        base_type::writeFloat(value);
     }
 
     void writeDouble(double value) {
-        stream.writeType(DataType::Double);
-        stream.writeDouble(value);
+        base_type::writeType(DataType::Double);
+        base_type::writeDouble(value);
     }
 
     template <typename StringType>
@@ -184,29 +121,29 @@ public:
         int result = WriteResult::Ok;
         size_t length = value.size();
         if (length < 256) {
-            stream.writeType(DataType::String1B);
-            stream.writeUInt8((uint8_t)length);
-            stream.writeString(value);
+            base_type::writeType(DataType::String1B);
+            base_type::writeUInt8((uint8_t)length);
+            base_type::writeString(value);
         }
         else if (length < 65536) {
-            stream.writeType(DataType::String2B);
-            stream.writeUInt16((uint16_t)length);
-            stream.writeString(value);
+            base_type::writeType(DataType::String2B);
+            base_type::writeUInt16((uint16_t)length);
+            base_type::writeString(value);
         }
         else if (length < 16777216) {
 #if IS_BIG_ENDIAN
             uint32_t value32 = (DataType::String3B & 0x000000FFUL) | (length & 0xFFFFFF00UL);
-            stream.writeUInt32(value32);
+            base_type::writeUInt32(value32);
 #else
             uint32_t value32 = (DataType::String3B << 24) | (length & 0x00FFFFFFUL);
-            stream.writeUInt32(value32);
+            base_type::writeUInt32(value32);
 #endif
-            stream.writeString(value);
+            base_type::writeString(value);
         }
         else {
-            stream.writeType(DataType::String);
-            stream.writeUInt32((uint32_t)length);
-            stream.writeString(value);
+            base_type::writeType(DataType::String);
+            base_type::writeUInt32((uint32_t)length);
+            base_type::writeString(value);
         }
     }
 
@@ -215,52 +152,52 @@ public:
         uint8_t type = variant.getType();
         switch (type) {
         case DataType::Bool:
-            stream.writeType(Type);
-            stream.writeBool(variant.value.b);
+            base_type::writeType(Type);
+            base_type::writeBool(variant.value.b);
             break;
         case DataType::Int8:
-            stream.writeType(Type);
-            stream.writeInt8(variant.value.i8);
+            base_type::writeType(Type);
+            base_type::writeInt8(variant.value.i8);
             break;
         case DataType::Int16:
-            stream.writeType(Type);
-            stream.writeInt16(variant.value.i16);
+            base_type::writeType(Type);
+            base_type::writeInt16(variant.value.i16);
             break;
         case DataType::Int32:
-            stream.writeType(Type);
-            stream.writeInt32(variant.value.i32);
+            base_type::writeType(Type);
+            base_type::writeInt32(variant.value.i32);
             break;
         case DataType::Int64:
-            stream.writeType(Type);
-            stream.writeInt64(variant.value.i64);
+            base_type::writeType(Type);
+            base_type::writeInt64(variant.value.i64);
             break;
         case DataType::UInt8:
-            stream.writeType(Type);
-            stream.writeUInt8(variant.value.u8);
+            base_type::writeType(Type);
+            base_type::writeUInt8(variant.value.u8);
             break;
         case DataType::UInt16:
-            stream.writeType(Type);
-            stream.writeUInt16(variant.value.u16);
+            base_type::writeType(Type);
+            base_type::writeUInt16(variant.value.u16);
             break;
         case DataType::UInt32:
-            stream.writeType(Type);
-            stream.writeUInt32(variant.value.u32);
+            base_type::writeType(Type);
+            base_type::writeUInt32(variant.value.u32);
             break;
         case DataType::UInt64:
-            stream.writeType(Type);
-            stream.writeUInt64(variant.value.u64);
+            base_type::writeType(Type);
+            base_type::writeUInt64(variant.value.u64);
             break;
         case DataType::Pointer:
-            stream.writeType(Type);
-            stream.writePointer(variant.value.ptr);
+            base_type::writeType(Type);
+            base_type::writePointer(variant.value.ptr);
             break;
         case DataType::Float:
-            stream.writeType(Type);
-            stream.writeFloat(variant.value.f);
+            base_type::writeType(Type);
+            base_type::writeFloat(variant.value.f);
             break;
         case DataType::Double:
-            stream.writeType(Type);
-            stream.writeDouble(variant.value.d);
+            base_type::writeType(Type);
+            base_type::writeDouble(variant.value.d);
             break;
         default:
             result = WriteResult::Failed;
