@@ -30,14 +30,14 @@ public:
     ~RequestHandler();
 
     /// Handle a request and produce a response.
-    int handleRequest(ConnectionContext & context, const Request & request, Response & response);
+    int handleRequest(ConnectionContext & context, const Request & request);
 
 private:
-    int handleLoginRequest(ConnectionContext & context, InputPacketStream & stream, Response & response);
-    int handleHandshakeRequest(ConnectionContext & context, InputPacketStream & stream, Response & response);
-    int handleQueryRequest(ConnectionContext & context, InputPacketStream & stream, Response & response);
+    int handleLoginRequest(ConnectionContext & context, InputPacketStream & stream);
+    int handleHandshakeRequest(ConnectionContext & context, InputPacketStream & stream);
+    int handleQueryRequest(ConnectionContext & context, InputPacketStream & stream);
 
-    int parseFirstQueryCommand(jstd::StringRef & cmd, const jstd::StringRef & qurey);
+    int parseQueryRequestFirstCmd(jstd::StringRef & cmd, const jstd::StringRef & qurey);
 
     int handleRequestData(const char * data);
 };

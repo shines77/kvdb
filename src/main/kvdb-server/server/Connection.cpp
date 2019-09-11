@@ -12,7 +12,7 @@
 #include "server/RequestHandler.h"
 
 #include "kvdb/core/Messages.h"
-#include "kvdb/stream/Packet.h"
+#include "kvdb/core/Packet.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
 #include "kvdb/stream/InputPacketStream.h"

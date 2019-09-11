@@ -8,8 +8,9 @@
 
 #include <string>
 
+#include "kvdb/core/Request.h"
+#include "kvdb/core/Response.h"
 #include "kvdb/core/StatusCode.h"
-#include "kvdb/stream/Packet.h"
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
 
@@ -18,7 +19,7 @@
 
 namespace kvdb {
 
-struct LoginRequest {
+struct LoginRequest : public Request {
     std::string username;
     std::string password;
     std::string database;
@@ -55,7 +56,7 @@ struct LoginRequest {
     }
 };
 
-struct LoginResponse {
+struct LoginResponse : public Response {
     int statusCode;
 
     LoginResponse(int _statusCode = StatusCode::Unknown)

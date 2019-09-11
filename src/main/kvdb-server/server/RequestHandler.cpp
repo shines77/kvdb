@@ -32,8 +32,7 @@ RequestHandler::~RequestHandler()
 }
 
 int RequestHandler::handleRequest(ConnectionContext & context,
-                                  const Request & request,
-                                  Response & response)
+                                  const Request & request)
 {
     InputPacketStream stream(request.data());
     MessageHeader header = request.header;
@@ -43,15 +42,15 @@ int RequestHandler::handleRequest(ConnectionContext & context,
         int result = 0;
         switch (header.type) {
         case Message::LoginRequest:
-            result = handleLoginRequest(context, stream, response);
+            result = handleLoginRequest(context, stream);
             break;
 
         case Message::HandShakeRequest:
-            result = handleHandshakeRequest(context, stream, response);
+            result = handleHandshakeRequest(context, stream);
             break;
 
         case Message::QueryRequest:
-            result = handleQueryRequest(context, stream, response);
+            result = handleQueryRequest(context, stream);
             break;
 
         default:
@@ -73,8 +72,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
 }
 
 int RequestHandler::handleLoginRequest(ConnectionContext & context,
-                                       InputPacketStream & stream,
-                                       Response & response)
+                                       InputPacketStream & stream)
 {
     std::string username, password, database;
     int result = stream.readString(username);
@@ -83,12 +81,12 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
         if (result == ParseResult::OK) {
             int result = stream.readString(database);
             if (result == ParseResult::OK) {
-                LoginResponse loginResponse;
+                LoginResponse response;
                 PrepareOutputPacketStream preOS;
-                uint32_t msgLength = loginResponse.prepare(preOS);
+                uint32_t msgLength = response.prepare(preOS);
                 OutputPacketStream os;
                 os.writeHeader(kDefaultSignId, Message::LoginResponse, msgLength, 3);
-                loginResponse.writeTo(os);
+                response.writeTo(os);
 
                 return ParseStatus::Success;
             }
@@ -101,13 +99,12 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
 }
 
 int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
-                                           InputPacketStream & stream,
-                                           Response & response)
+                                           InputPacketStream & stream)
 {
     return ParseStatus::Success;
 }
 
-int RequestHandler::parseFirstQueryCommand(jstd::StringRef & cmd, const jstd::StringRef & qurey)
+int RequestHandler::parseQueryRequestFirstCmd(jstd::StringRef & cmd, const jstd::StringRef & qurey)
 {
     size_t first = 0, last;
     size_t i;
@@ -133,14 +130,13 @@ int RequestHandler::parseFirstQueryCommand(jstd::StringRef & cmd, const jstd::St
 }
 
 int RequestHandler::handleQueryRequest(ConnectionContext & context,
-                                       InputPacketStream & stream,
-                                       Response & response)
+                                       InputPacketStream & stream)
 {
     jstd::StringRef qurey;
     int result = stream.readString(qurey);
     if (result == ParseResult::OK) {
         jstd::StringRef cmd;
-        int result = parseFirstQueryCommand(cmd, qurey);
+        int result = parseQueryRequestFirstCmd(cmd, qurey);
         return (result > 0) ? ParseStatus::Success : ParseStatus::Error;
     }
     else {

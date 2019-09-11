@@ -19,9 +19,6 @@
     <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\RequestHandler.cpp">
       <Filter>src\server</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\RequestParser.cpp">
-      <Filter>src\server</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\Response.cpp">
       <Filter>src\server</Filter>
     </ClCompile>
@@ -43,9 +40,6 @@
       <Filter>src\server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\RequestHandler.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\RequestParser.h">
       <Filter>src\server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Response.h">

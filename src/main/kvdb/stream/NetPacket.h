@@ -13,7 +13,7 @@
 
 #include "kvdb/core/Variant.h"
 #include "kvdb/core/Message.h"
-#include "kvdb/stream/Packet.h"
+#include "kvdb/core/Packet.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
 

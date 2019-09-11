@@ -38,9 +38,6 @@
     <Filter Include="src\core">
       <UniqueIdentifier>{753ff10e-2f00-4308-b588-28a1b6abadac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\core\Message">
-      <UniqueIdentifier>{5d068a63-2c7b-4941-81f6-fb8fbc1858a3}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb\all.h">
@@ -184,9 +181,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\OutputPacketStream.h">
       <Filter>src\stream</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\Packet.h">
-      <Filter>src\stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Message.h">
       <Filter>src\core</Filter>
     </ClInclude>
@@ -201,6 +195,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\PrepareOutputPacketStream.h">
       <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\StatusCode.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\Packet.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\Request.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\Response.h">
+      <Filter>src\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

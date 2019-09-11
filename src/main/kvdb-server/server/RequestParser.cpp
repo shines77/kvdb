@@ -15,7 +15,7 @@ void RequestParser::reset()
     state_ = State::Start;
 }
 
-int RequestParser::handleLoginMessage(ConnectionContext & context, InputStream & stream)
+int RequestParser::handleLoginRequest(ConnectionContext & context, InputStream & stream)
 {
     std::string username, password, database;
     int result = stream.parseString(username);
@@ -34,12 +34,12 @@ int RequestParser::handleLoginMessage(ConnectionContext & context, InputStream &
     return ParseStatus::Failed;
 }
 
-int RequestParser::handleHandshakeMessage(InputStream & stream)
+int RequestParser::handleHandshakeRequest(InputStream & stream)
 {
     return ParseStatus::Success;
 }
 
-int RequestParser::parseFirstQueryMessage(jstd::StringRef & cmd, const jstd::StringRef & qurey)
+int RequestParser::parseQueryRequestFirstCmd(jstd::StringRef & cmd, const jstd::StringRef & qurey)
 {
     size_t first = 0, last;
     size_t i;
@@ -64,13 +64,13 @@ int RequestParser::parseFirstQueryMessage(jstd::StringRef & cmd, const jstd::Str
     return (int)cmd.size();
 }
 
-int RequestParser::handleQueryMessage(InputStream & stream)
+int RequestParser::handleQueryRequest(InputStream & stream)
 {
     jstd::StringRef qurey;
     int result = stream.parseString(qurey);
     if (result == ParseResult::OK) {
         jstd::StringRef cmd;
-        int result = parseFirstQueryMessage(cmd, qurey);
+        int result = parseQueryRequestFirstCmd(cmd, qurey);
         return (result > 0) ? ParseStatus::Success : ParseStatus::Error;
     }
     else {

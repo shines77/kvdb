@@ -63,7 +63,9 @@ public:
         Last
     };
 
-private:
+    MessageHeader header;
+
+protected:
     //
 
 public:

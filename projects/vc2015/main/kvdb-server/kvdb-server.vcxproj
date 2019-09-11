@@ -24,7 +24,6 @@
     <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\ConnectionManager.cpp" />
     <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\KvdbConnection.cpp" />
     <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\RequestHandler.cpp" />
-    <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\RequestParser.cpp" />
     <ClCompile Include="..\..\..\..\src\main\kvdb-server\server\Response.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -38,7 +37,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\IoServicePool.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Request.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\RequestHandler.h" />
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\RequestParser.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Response.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

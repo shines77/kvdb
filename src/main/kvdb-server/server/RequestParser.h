@@ -11,7 +11,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
 
-#include <kvdb/core/Message.h>
+#include <kvdb/core/Request.h>
 #include <kvdb/stream/InputStream.h>
 #include <kvdb/stream/ParseResult.h>
 #include <kvdb/stream/ParseStatus.h>
@@ -58,11 +58,11 @@ public:
     template <typename InputIterator>
     int parse(ConnectionContext & context, Request & req, InputIterator begin, InputIterator end);
 
-    int handleLoginMessage(ConnectionContext & context, InputStream & stream);
-    int handleHandshakeMessage(InputStream & stream);
-    int handleQueryMessage(InputStream & stream);
+    int handleLoginRequest(ConnectionContext & context, InputStream & stream);
+    int handleHandshakeRequest(InputStream & stream);
+    int handleQueryRequest(InputStream & stream);
 
-    int parseFirstQueryMessage(jstd::StringRef & cmd, const jstd::StringRef & qurey);
+    int parseQueryRequestFirstCmd(jstd::StringRef & cmd, const jstd::StringRef & qurey);
 
     int handleRequestData(const char * data);
 
