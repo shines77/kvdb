@@ -11,15 +11,13 @@
 
 namespace kvdb {
 
-static const uint32_t kDefaultSignId = 20190825;
-
 struct PacketHeader {
-    uint32_t signId;
-    uint32_t msgType;
-    uint32_t msgLength;
-    uint32_t varCount;
+    uint32_t sign;
+    uint32_t type;
+    uint32_t length;
+    uint32_t count;
 
-    PacketHeader() : signId(0), msgType(Message::Unknown), msgLength(0), varCount(0) {}
+    PacketHeader() : sign(0), type(0), length(0), count(0) {}
     ~PacketHeader() {}
 };
 
@@ -39,7 +37,21 @@ struct PacketBody
     const char *  data;
 };
 
-static const size_t kMsgHeaderSize = sizeof(PacketHeader);
+class Packet {
+public:
+    enum Type {
+        Unknown = 0,
+
+        Last
+    };
+
+private:
+    //
+
+public:
+    Packet() {}
+    ~Packet() {}
+};
 
 } // namespace kvdb
 

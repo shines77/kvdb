@@ -24,27 +24,27 @@ protected:
     bool is_little_endian_;
 
 public:
-    PacketHeader header;
+    MessageHeader header;
     std::vector<Variant> values;
 
 public:
     NetPacket() : is_little_endian_(false) { init(); }
     virtual ~NetPacket() {}
 
-    uint32_t getSignId() const { return header.signId; }
-    uint32_t getMsgType() const { return header.msgType; }
-    uint32_t getMsgLength() const { return header.msgLength; }
+    uint32_t getSignId() const { return header.sign; }
+    uint32_t getMsgType() const { return header.type; }
+    uint32_t getMsgLength() const { return header.length; }
 
-    void setSignId(uint32_t signId) {
-        header.signId = signId;
+    void setSignId(uint32_t sign) {
+        header.sign = sign;
     }
 
-    void setMsgType(uint32_t msgType) {
-        header.msgType = msgType;
+    void setMsgType(uint32_t type) {
+        header.type = type;
     }
 
-    void setMsgLength(uint32_t msgLength) {
-        header.msgLength = msgLength;
+    void setMsgLength(uint32_t length) {
+        header.length = length;
     }
 
     void init() {
@@ -137,12 +137,12 @@ public:
         values.clear();
 
         // Read the header info.
-        header.signId = stream.readUInt32();
-        header.msgLength = stream.readUInt32();
-        header.msgType = stream.readUInt32();
-        header.varCount = stream.readUInt32();
+        header.sign = stream.readUInt32();
+        header.length = stream.readUInt32();
+        header.type = stream.readUInt32();
+        header.args = stream.readUInt32();
 
-        count = valid_count = header.varCount;
+        count = valid_count = header.args;
 
         // Read the body info.
         for (size_t i = 0; i < count; ++i) {
@@ -230,12 +230,12 @@ public:
         size_t totalSize = calcRequireSize(valid_count);
 
         // Write the header info.
-        header.msgLength = (uint32_t)totalSize;
-        header.varCount = (uint32_t)valid_count;
-        stream.writeUInt32(header.signId);
-        stream.writeUInt32(header.msgLength);
-        stream.writeUInt32(header.msgType);
-        stream.writeUInt32(header.varCount);
+        header.length = (uint32_t)totalSize;
+        header.args = (uint32_t)valid_count;
+        stream.writeUInt32(header.sign);
+        stream.writeUInt32(header.length);
+        stream.writeUInt32(header.type);
+        stream.writeUInt32(header.args);
 
         // Write the body info.
         for (size_t i = 0; i < values.size(); ++i) {

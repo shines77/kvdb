@@ -36,12 +36,12 @@ int RequestHandler::handleRequest(ConnectionContext & context,
                                   Response & response)
 {
     InputPacketStream stream(request.data());
-    PacketHeader header = request.header;
+    MessageHeader header = request.header;
 
-    if (header.msgLength > 0) {
+    if (header.length > 0) {
         const char * first = stream.current();
         int result = 0;
-        switch (header.msgType) {
+        switch (header.type) {
         case Message::LoginRequest:
             result = handleLoginRequest(context, stream, response);
             break;
@@ -60,7 +60,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
         }
 
         const char * last = stream.current();
-        if ((last - first) == (ptrdiff_t)header.msgLength) {
+        if ((last - first) == (ptrdiff_t)header.length) {
             return ParseStatus::Success;
         }
         else {
@@ -83,14 +83,13 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
         if (result == ParseResult::OK) {
             int result = stream.readString(database);
             if (result == ParseResult::OK) {
-                OutputStream os;
-                response.setSignId(kDefaultSignId);
-                response.setMsgType(Message::LoginResponse);
-                response.writeTo(os);
-
                 LoginResponse loginResponse;
+                PrepareOutputPacketStream preOS;
+                uint32_t msgLength = loginResponse.prepare(preOS);
                 OutputPacketStream os;
+                os.writeHeader(kDefaultSignId, Message::LoginResponse, msgLength, 3);
                 loginResponse.writeTo(os);
+
                 return ParseStatus::Success;
             }
         }

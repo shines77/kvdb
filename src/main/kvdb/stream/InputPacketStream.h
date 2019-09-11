@@ -46,7 +46,7 @@ public:
 
     ptrdiff_t length() const { return stream.length(); }
     uint32_t getMsgLength() const {
-        return (uint32_t)(stream.length() - sizeof(PacketHeader));
+        return (uint32_t)(stream.length() - sizeof(MessageHeader));
     }
 
     void reset() {
@@ -57,11 +57,11 @@ public:
         stream.skipToHeader();
     }
 
-    int readHeader(PacketHeader & header) {
-        header.signId = stream.readUInt32();
-        header.msgType = stream.readUInt32();
-        header.msgLength = stream.readUInt32();
-        header.varCount = stream.readUInt32();
+    int readHeader(MessageHeader & header) {
+        header.sign = stream.readUInt32();
+        header.type = stream.readUInt32();
+        header.length = stream.readUInt32();
+        header.args = stream.readUInt32();
         return ReadResult::Ok;
     }
 

@@ -245,20 +245,20 @@ private:
             char header_buf[kMsgHeaderSize];
             size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
             if (readBytes == kMsgHeaderSize) {
-                PacketHeader header;
+                MessageHeader header;
                 InputPacketStream istream(header_buf);
                 istream.readHeader(header);
-                if (header.signId == kDefaultSignId && header.msgLength > 0) {
+                if (header.sign == kDefaultSignId && header.length > 0) {
                     //
                     // Receive the part data of response, if it's not completed, continue to read. 
                     //
-                    response_.reserve(header.msgLength);
-                    response_size_ = header.msgLength;
-                    socket_.async_read_some(boost::asio::buffer(response_.data(), header.msgLength),
+                    response_.reserve(header.length);
+                    response_size_ = header.length;
+                    socket_.async_read_some(boost::asio::buffer(response_.data(), header.length),
                         boost::bind(&KvdbClient::handle_read_some, this,
                                     boost::asio::placeholders::error,
                                     boost::asio::placeholders::bytes_transferred,
-                                    header.msgLength));
+                                    header.length));
                 }
                 else {
                     // The signId is dismatch

@@ -17,8 +17,8 @@
 #include <type_traits>
 
 #include "kvdb/core/DataType.h"
+#include "kvdb/core/Message.h"
 #include "kvdb/jstd/StringRef.h"
-#include "kvdb/stream/Packet.h"
 
 namespace kvdb {
 
@@ -79,7 +79,7 @@ public:
     ptrdiff_t position() const { return this->length(); }
 
     uint32_t getMsgLength() const {
-        return (uint32_t)(this->length() - sizeof(PacketHeader));
+        return (uint32_t)(this->length() - sizeof(MessageHeader));
     }
 
     bool isOverflow()  const { return false; }
@@ -92,49 +92,49 @@ public:
     void setHead(char_type * head) { this->head_ = head; }
     void setCurrent(char_type * cur) { this->cur_ = cur; }
 
-    void writeHeader(const PacketHeader & header) {
-        stream.writeUInt32(header.signId);
-        stream.writeUInt32(header.msgType);
-        stream.writeUInt32(header.msgLength);
-        stream.writeUInt32(header.varCount);
+    void writeHeader(const MessageHeader & header) {
+        stream.writeUInt32(header.sign);
+        stream.writeUInt32(header.type);
+        stream.writeUInt32(header.length);
+        stream.writeUInt32(header.args);
     }
 
-    void writeHeader(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
-        stream.writeUInt32(signId);
-        stream.writeUInt32(msgType);
-        stream.writeUInt32(msgLength);
-        stream.writeUInt32(varCount);
+    void writeHeader(uint32_t sign, uint32_t type, uint32_t length, uint32_t args) {
+        stream.writeUInt32(sign);
+        stream.writeUInt32(type);
+        stream.writeUInt32(length);
+        stream.writeUInt32(args);
     }
 
-    void writeHeaderAndRestore(const PacketHeader & header) {
-        char_type * saveCur = this->current();
+    void writeHeaderAndRestore(const MessageHeader & header) {
+        char_type * savePos = this->current();
         reset();
-        this->writeUInt32(header.signId);
-        this->writeUInt32(header.msgType);
-        this->writeUInt32(header.msgLength);
-        this->writeUInt32(header.varCount);
-        this->setCurrent(saveCur);
+        this->writeUInt32(header.sign);
+        this->writeUInt32(header.type);
+        this->writeUInt32(header.length);
+        this->writeUInt32(header.args);
+        this->setCurrent(savePos);
     }
 
-    void writeHeaderAndRestore(uint32_t signId, uint32_t msgType, uint32_t varCount) {
-        char_type * saveCur = this->current();
-        uint32_t msgLength = getMsgLength();
+    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t args) {
+        char_type * savePos = this->current();
+        uint32_t length = getMsgLength();
         reset();
-        writeUInt32(signId);
-        writeUInt32(msgType);
-        writeUInt32(msgLength);
-        writeUInt32(varCount);
-        setCurrent(saveCur);
+        writeUInt32(sign);
+        writeUInt32(type);
+        writeUInt32(length);
+        writeUInt32(args);
+        setCurrent(savePos);
     }
 
-    void writeHeaderAndRestore(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
-        char_type * saveCur = this->current();
+    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t length, uint32_t args) {
+        char_type * savePos = this->current();
         reset();
-        writeUInt32(signId);
-        writeUInt32(msgType);
-        writeUInt32(msgLength);
-        writeUInt32(varCount);
-        setCurrent(saveCur);
+        writeUInt32(sign);
+        writeUInt32(type);
+        writeUInt32(length);
+        writeUInt32(args);
+        setCurrent(savePos);
     }
 
     void back() {
@@ -242,7 +242,7 @@ public:
     }
 
     void skipToHeader() {
-        next(sizeof(PacketHeader));
+        next(sizeof(MessageHeader));
     }
 
     char get() const {

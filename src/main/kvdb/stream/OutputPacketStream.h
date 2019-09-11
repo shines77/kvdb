@@ -57,10 +57,10 @@ public:
     }
 
     void writeHeader(const PacketHeader & header) {
-        stream.writeUInt32(header.signId);
-        stream.writeUInt32(header.msgType);
-        stream.writeUInt32(header.msgLength);
-        stream.writeUInt32(header.varCount);
+        stream.writeUInt32(header.sign);
+        stream.writeUInt32(header.type);
+        stream.writeUInt32(header.length);
+        stream.writeUInt32(header.args);
     }
 
     void writeHeader(uint32_t signId, uint32_t msgType, uint32_t msgLength, uint32_t varCount) {
@@ -73,10 +73,10 @@ public:
     void writeHeaderAndRestore(const PacketHeader & header) {
         char_type * saveCur = stream.current();
         reset();
-        stream.writeUInt32(header.signId);
-        stream.writeUInt32(header.msgType);
-        stream.writeUInt32(header.msgLength);
-        stream.writeUInt32(header.varCount);
+        stream.writeUInt32(header.sign);
+        stream.writeUInt32(header.type);
+        stream.writeUInt32(header.length);
+        stream.writeUInt32(header.args);
         stream.setCurrent(saveCur);
     }
 
