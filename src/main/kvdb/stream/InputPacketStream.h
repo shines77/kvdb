@@ -17,7 +17,7 @@
 #include <type_traits>
 
 #include "kvdb/core/Variant.h"
-#include "kvdb/core/Message.h"
+#include "kvdb/core/MessageHeader.h"
 #include "kvdb/stream/InputStream.h"
 
 namespace kvdb {

@@ -17,7 +17,7 @@
 #include <type_traits>
 
 #include "kvdb/core/DataType.h"
-#include "kvdb/core/Message.h"
+#include "kvdb/core/MessageHeader.h"
 #include "kvdb/jstd/StringRef.h"
 
 namespace kvdb {

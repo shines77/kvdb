@@ -7,22 +7,14 @@
 #endif
 
 #include "kvdb/basic/stdint.h"
+#include "kvdb/core/MessageHeader.h"
+#include "kvdb/stream/BasicStream.h"
+#include "kvdb/stream/InputPacketStream.h"
+#include "kvdb/stream/OutputPacketStream.h"
 
 namespace kvdb {
 
 static const uint32_t kDefaultSignId = 2019082500;
-
-struct MessageHeader {
-    uint32_t sign;
-    uint32_t type;
-    uint32_t args;
-    uint32_t length;
-
-    MessageHeader() : sign(0), type(0), args(0), length(0) {}
-    ~MessageHeader() {}
-};
-
-static const uint32_t kMsgHeaderSize = sizeof(MessageHeader);
 
 #pragma warning (push)
 #pragma warning (disable: 4200)

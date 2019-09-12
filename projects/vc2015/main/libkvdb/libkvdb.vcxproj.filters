@@ -202,6 +202,9 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\StreamBuffer.h">
       <Filter>src\stream</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageHeader.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\main\kvdb\all.cpp">
