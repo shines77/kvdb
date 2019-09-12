@@ -138,7 +138,7 @@ public:
         int result = ReadResult::Ok;
         uint32_t length;
 
-        uint8_t type = getType();
+        uint8_t type = base_type::getType();
         switch (type) {
         case DataType::String:
             base_type::nextUInt8();

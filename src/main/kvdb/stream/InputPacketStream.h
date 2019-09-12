@@ -50,13 +50,13 @@ public:
         return base_type::readUInt8();
     }
 
-    bool readByte(uint8_t & correct) {
+    bool readByte(uint8_t & value) {
         uint8_t type = base_type::readType();
         value = base_type::readByte();
         return (type == DataType::Int8 || type == DataType::UInt8);
     }
 
-    bool readChar(char_type & correct) {
+    bool readChar(char_type & value) {
         uint8_t type = base_type::readType();
         bool correct = ((typeid(char_type) == typeid(int8_t)   && type == DataType::Int8)
                      || (typeid(char_type) == typeid(uint8_t)  && type == DataType::UInt8)
