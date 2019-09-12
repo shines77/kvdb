@@ -26,12 +26,6 @@ struct MessageData {
 
 #pragma warning (pop)
 
-struct MessageBody
-{
-    MessageHeader header;
-    const char *  data;
-};
-
 class Message {
 public:
     enum Type {
@@ -61,10 +55,10 @@ public:
     MessageHeader header;
 
 protected:
-    const char * data_;
+    const char * body_;
 
 public:
-    Message(uint32_t type = Message::Unknown, const char * data = nullptr) : data_(data) {
+    Message(uint32_t type = Message::Unknown, const char * data = nullptr) : body_(data) {
         this->header.sign = kDefaultSignId;
         this->header.type = type;
     }
@@ -81,10 +75,10 @@ public:
     void setBodyLength(uint32_t length) { this->header.length = length; }
     void setArgs(uint32_t args) { this->header.args = args; }
 
-    char * data() { return (char *)this->data_; }
-    const char * data() const { return this->data_; }
+    char * body() { return (char *)this->body_; }
+    const char * body() const { return this->body_; }
 
-    void setData(const char * data) { this->data_ = data; }
+    void setBody(const char * body) { this->body_ = body; }
 
     template <typename InputStreamTy>
     void readHeader(InputStreamTy & is) {
@@ -113,7 +107,7 @@ public:
     virtual ~BasicMessage() {}
 
     uint32_t prepare() {
-        // Reset the stream position and calculate the total require size.
+        // Calculate the total require size.
         PrepareOutputPacketStream preOS;
         preOS.next(kMsgHeaderSize);
         T * pThis = static_cast<T *>(this);
@@ -128,7 +122,26 @@ public:
         // Need prepare stream space ?
         if ((!needPrepare) && os.isMemoryStream()) {
             uint32_t totalSize = this->prepare();
-            os.reserve(totalSize);
+            os.inflate(totalSize);
+        }
+    }
+
+    uint32_t prepareBody() {
+        // Calculate the body require size.
+        PrepareOutputPacketStream preOS;
+        T * pThis = static_cast<T *>(this);
+        if (pThis != nullptr) {
+            pThis->writeBody(preOS);
+        }
+        return (uint32_t)preOS.position();
+    }
+
+    template <typename OutputStreamTy>
+    void prepareBody(OutputStreamTy & os, bool needPrepare) {
+        // Need prepare stream space ?
+        if ((!needPrepare) && os.isMemoryStream()) {
+            uint32_t bodySize = this->prepareBody();
+            os.inflate(bodySize);
         }
     }
 
@@ -143,6 +156,16 @@ public:
             readStatus = pThis->readBody(is);
         }
         return readStatus;
+    }
+
+    template <typename OutputStreamTy>
+    void writeBody(OutputStreamTy & os, bool needPrepare) {
+        this->prepareBody(os, needPrepare);
+
+        T * pThis = static_cast<T *>(this);
+        if (pThis != nullptr) {
+            pThis->writeBody(os);
+        }
     }
 
     template <typename OutputStreamTy>

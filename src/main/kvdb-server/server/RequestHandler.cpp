@@ -36,7 +36,7 @@ RequestHandler::~RequestHandler()
 int RequestHandler::handleRequest(ConnectionContext & context,
                                   const IRequest & request)
 {
-    InputPacketStream stream(request.data(), request.bodyLength());
+    InputPacketStream stream(request.body(), request.bodyLength());
     MessageHeader header = request.header;
 
     if (header.length > 0) {

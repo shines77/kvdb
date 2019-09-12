@@ -138,9 +138,9 @@ public:
 
         // Read the header info.
         header.sign = stream.readUInt32();
-        header.length = stream.readUInt32();
         header.type = stream.readUInt32();
         header.args = stream.readUInt32();
+        header.length = stream.readUInt32();
 
         count = valid_count = header.args;
 
@@ -233,9 +233,9 @@ public:
         header.length = (uint32_t)totalSize;
         header.args = (uint32_t)valid_count;
         stream.writeUInt32(header.sign);
-        stream.writeUInt32(header.length);
         stream.writeUInt32(header.type);
         stream.writeUInt32(header.args);
+        stream.writeUInt32(header.length);
 
         // Write the body info.
         for (size_t i = 0; i < values.size(); ++i) {

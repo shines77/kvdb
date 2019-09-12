@@ -192,6 +192,13 @@ public:
         }
     }
 
+    void inflate(size_type extraSize, bool needClear = false) {
+        size_type newCapacity = this->length() + extraSize;
+        if (newCapacity > this->capacity()) {
+            this->reserve(newCapacity);
+        }
+    }
+
     void resize(size_type newSize, bool needClear = true) {
         size_type oldSize = this->capacity();
         size_type oldDataSize = oldSize * sizeof(char_type);

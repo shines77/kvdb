@@ -139,7 +139,7 @@ void Connection::handle_read_some(const boost::system::error_code & err,
             this->stop();
         }
         else {
-            request_.setData(&request_buf_[0]);
+            request_.setBody(&request_buf_[0]);
             int result = request_handler_.handleRequest(context_, request_);
             if (result == ParseStatus::Success) {
                 //
