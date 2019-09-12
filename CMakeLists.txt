@@ -5,6 +5,30 @@ project(kvdb-cli)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+# Single thread mode /ML and /MLd have be deprecated from VS 2003.
+option(BoostOption_USE_MULTITHREADED "Enable Boost's library use multithread" ON)
+
+if (WIN32)
+    option(BoostOption_USE_STATIC_LIBS "Enable Boost use static library" ON)
+    option(BoostOption_USE_STATIC_RUNTIME "Enable Boost use static runtime library" OFF)
+else()
+    option(BoostOption_USE_STATIC_LIBS "Enable Boost use static library" OFF)
+    option(BoostOption_USE_STATIC_RUNTIME "Enable Boost use static runtime library" OFF)
+endif()
+
+set(Boost_USE_STATIC_LIBS        BoostOption_USE_STATIC_LIBS)      # only find static libs
+set(Boost_USE_MULTITHREADED      BoostOption_USE_MULTITHREADED)
+set(Boost_USE_STATIC_RUNTIME     BoostOption_USE_STATIC_RUNTIME)
+
+find_package(Boost 1.55 COMPONENTS coroutine context system thread chrono program_options REQUIRED)
+
+if (Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    set(EXTRA_LIBS ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+find_package (Threads)
+
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
@@ -37,8 +61,32 @@ if (NOT MSVC)
 endif()
 
 if (WIN32)
-    add_compile_options(-D_WIN32_WINNT=0x0601 -D_CRT_SECURE_NO_WARNINGS)
+    add_compile_options("-D_WIN32_WINNT=0x0601")
+    add_compile_options("-D_CRT_SECURE_NO_WARNINGS")
     set(EXTRA_LIBS ${EXTRA_LIBS} ws2_32 mswsock)
+    if (Boost_USE_STATIC_RUNTIME)
+        #
+        # Replace all "/MD" flags to "/MT"
+        # See: http://stackoverflow.com/questions/14172856/cmake-compile-with-mt-instead-of-md
+        #
+        set(CompilerFlags
+            CMAKE_CXX_FLAGS
+            CMAKE_CXX_FLAGS_DEBUG
+            CMAKE_CXX_FLAGS_RELEASE
+            CMAKE_CXX_FLAGS_MINSIZEREL
+            CMAKE_CXX_FLAGS_RELWITHDEBINFO
+            CMAKE_C_FLAGS
+            CMAKE_C_FLAGS_DEBUG
+            CMAKE_C_FLAGS_RELEASE
+            CMAKE_C_FLAGS_MINSIZEREL
+            CMAKE_C_FLAGS_RELWITHDEBINFO
+            )
+        foreach(CompilerFlag ${CompilerFlags})
+            if (${CompilerFlag} MATCHES "/MD")
+                string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+            endif()
+        endforeach()
+    endif()
 endif()
 
 if (UNIX)
