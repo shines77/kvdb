@@ -54,7 +54,8 @@ include_directories(src/test)
 include_directories(src/main/kvdb-cli)
 
 set(SOURCE_FILES
-    src/main/kvdb-cli/kvdb-cli.cpp
+	src/main/kvdb-cli/client/KvdbClientApp.cpp
+	src/main/kvdb-cli/kvdb-cli.cpp
     )
 
 add_custom_target(debug
