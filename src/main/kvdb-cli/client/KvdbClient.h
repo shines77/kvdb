@@ -213,7 +213,7 @@ private:
             request_.resize(requestSize);
             request_size_ = requestSize;
 
-            OutputPacketStream ostream(request_.data());
+            OutputPacketStream ostream(request_.data(), requestSize);
             ostream.writeHeader(kDefaultSignId, Message::LoginRequest, msgLength, 3);
             request.writeTo(ostream);
 
@@ -321,15 +321,14 @@ private:
                 request.password = config.password;
                 request.database = config.database;
 
-                PrepareOutputPacketStream preOS;
                 uint32_t requestSize = request.prepare();
                 uint32_t msgLength = requestSize - kMsgHeaderSize;
                 request_.reserve(requestSize);
                 request_size_ = requestSize;
 
-                OutputPacketStream ostream(request_.data());
+                OutputPacketStream ostream(request_.data(), requestSize);
                 ostream.writeHeader(kDefaultSignId, Message::HandShakeRequest, msgLength, 3);
-                request.writeTo(ostream);  
+                request.writeTo(ostream, false);  
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
                 std::cout << "request_.size() = " << ostream.length() << std::endl;

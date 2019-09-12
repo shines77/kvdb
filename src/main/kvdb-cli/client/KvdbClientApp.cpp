@@ -183,7 +183,7 @@ void KvdbClientApp::net_packet_test()
 
     NetPacket packet;
     OutputStream ostream(packetBuf);
-    ostream.setStream(packetBuf);
+    ostream.setBuffer(packetBuf);
     packet.writeTo(ostream);
 
     ptrdiff_t length = ostream.length();

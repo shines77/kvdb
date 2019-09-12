@@ -20,65 +20,26 @@
 #include "kvdb/core/Message.h"
 #include "kvdb/jstd/StringRef.h"
 
+#include "kvdb/stream/StreamBuffer.h"
+
 namespace kvdb {
 
 template <typename T>
-class BasicPrepareStream {
+class BasicPrepareStream : public BasicStreamBuffer<T> {
 public:
-    typedef typename std::remove_pointer<
-                typename std::remove_cv<T>::type
-            >::type     char_type;
+    typedef BasicStreamBuffer<T>                base_type;
+    typedef typename base_type::char_type       char_type;
+    typedef typename base_type::size_type       size_type;
 
-    typedef std::basic_string<char_type>    string_type;
-    typedef jstd::BasicStringRef<char_type> stringref_type;
-
-protected:
-    char_type * cur_;
-    char_type * head_;
+    typedef typename base_type::string_type     string_type;
+    typedef typename base_type::stringref_type  stringref_type;
 
 public:
-    BasicPrepareStream() : cur_(nullptr), head_(nullptr) {}
-    BasicPrepareStream(const char_type * ptr)
-        : cur_(const_cast<char_type *>(ptr)),
-          head_(const_cast<char_type *>(ptr)) {}
+    BasicPrepareStream() : base_type() {}
+    BasicPrepareStream(const char_type * data, size_type size) : base_type(data, size) {}
     template <size_t N>
-    BasicPrepareStream(const char_type(&data)[N]) : cur_(data), head_(data) {}
+    BasicPrepareStream(const char_type(&data)[N]) : base_type(data, N) {}
     ~BasicPrepareStream() {}
-
-    void setStream(const char_type * ptr) {
-        this->cur_ = (char_type *)ptr;
-        this->head_ = (char_type *)ptr;
-    }
-
-    template <size_t N>
-    void setStream(const char_type(&data)[N]) {
-        this->cur_ = (char_type *)data;
-        this->head_ = (char_type *)data;
-    }
-
-    char_type * head() const { return this->head_; }
-    char_type * current() const { return this->cur_; }
-
-    char_type * data() const { return this->head(); }
-
-    ptrdiff_t length() const   { return (this->cur_ - this->head_); }
-    ptrdiff_t position() const { return this->length(); }
-
-    uint32_t getMsgLength() const {
-        return (uint32_t)(this->length() - sizeof(MessageHeader));
-    }
-
-    bool isOverflow()  const { return false; }
-    bool isUnderflow() const { return (this->cur_ < this->head_); }
-
-    bool isMemoryStream() const { return true; }
-
-    void reset() {
-        this->cur_ = this->head_;
-    }
-
-    void setHead(char_type * head) { this->head_ = head; }
-    void setCurrent(char_type * cur) { this->cur_ = cur; }
 
     void back() {
         this->cur_ = (char_type *)((char *)this->cur_ - sizeof(char));

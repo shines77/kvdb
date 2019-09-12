@@ -79,10 +79,10 @@ public:
 
     virtual ~Message() {}
 
-    uint32_t sign(uint32_t sign) const { return this->header.sign; }
-    uint32_t messageType(uint32_t type) const { return this->header.type; }
-    uint32_t bodyLength(uint32_t length) const { return this->header.length; }
-    uint32_t args(uint32_t args) const { return this->header.args; }
+    uint32_t sign() const { return this->header.sign; }
+    uint32_t messageType() const { return this->header.type; }
+    uint32_t bodyLength() const { return this->header.length; }
+    uint32_t args() const { return this->header.args; }
 
     void setSign(uint32_t sign) { this->header.sign = sign; }
     void setMessageType(uint32_t type) { this->header.type = type; }
@@ -136,7 +136,7 @@ public:
         // Need prepare stream space ?
         if ((!needPrepare) && os.isMemoryStream()) {
             uint32_t totalSize = this->prepare();
-            //os.reallocate(totalSize);
+            os.reserve(totalSize);
         }
     }
 

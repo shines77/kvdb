@@ -27,14 +27,15 @@ class BasicInputPacketStream : public BasicInputStream<T, Base> {
 public:
     typedef BasicInputStream<T, Base>           base_type;
     typedef typename base_type::char_type       char_type;
+    typedef typename base_type::size_type       size_type;
 
     typedef typename base_type::string_type     string_type;
     typedef typename base_type::stringref_type  stringref_type;
 
     BasicInputPacketStream() : base_type() {}
-    BasicInputPacketStream(const char_type * value) : base_type(value) {}
+    BasicInputPacketStream(const char_type * data, size_type size) : base_type(data, size) {}
     template <size_t N>
-    BasicInputPacketStream(const char_type(&data)[N]) : base_type(data) {}
+    BasicInputPacketStream(const char_type(&data)[N]) : base_type(data, N) {}
     ~BasicInputPacketStream() {}
 
     int readHeader(MessageHeader & header) {

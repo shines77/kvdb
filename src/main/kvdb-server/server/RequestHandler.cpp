@@ -36,7 +36,7 @@ RequestHandler::~RequestHandler()
 int RequestHandler::handleRequest(ConnectionContext & context,
                                   const IRequest & request)
 {
-    InputPacketStream stream(request.data());
+    InputPacketStream stream(request.data(), request.bodyLength());
     MessageHeader header = request.header;
 
     if (header.length > 0) {
@@ -148,9 +148,9 @@ int RequestHandler::handleQueryRequest(ConnectionContext & context,
     return ParseStatus::Failed;
 }
 
-int RequestHandler::handleRequestData(const char * data)
+int RequestHandler::handleRequestData(const char * data, size_t size)
 {
-    InputStream stream(data);
+    InputStream stream(data, size);
     bool isEndOf = false;
     while (!isEndOf) {
         uint8_t type = stream.getType();

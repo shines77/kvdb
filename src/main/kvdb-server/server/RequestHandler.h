@@ -41,7 +41,7 @@ private:
 
     int parseQueryRequestFirstCmd(jstd::StringRef & cmd, const jstd::StringRef & qurey);
 
-    int handleRequestData(const char * data);
+    int handleRequestData(const char * data, size_t size);
 };
 
 } // namespace server

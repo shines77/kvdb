@@ -27,14 +27,15 @@ class BasicOutputStream : public Base {
 public:
     typedef Base                                base_type;
     typedef typename base_type::char_type       char_type;
+    typedef typename base_type::size_type       size_type;
 
     typedef typename base_type::string_type     string_type;
     typedef typename base_type::stringref_type  stringref_type;
 
     BasicOutputStream() : base_type() {}
-    BasicOutputStream(const char_type * value) : base_type(value) {}
+    BasicOutputStream(const char_type * data, size_type size) : base_type(data, size) {}
     template <size_t N>
-    BasicOutputStream(const char_type(&data)[N]) : base_type(data) {}
+    BasicOutputStream(const char_type(&data)[N]) : base_type(data, N) {}
     ~BasicOutputStream() {}
 
     bool isMemoryStream() const { return true; }
