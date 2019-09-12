@@ -234,7 +234,7 @@ public:
 
     template <typename StringType>
     void getString(StringType & value, size_t length) {
-        value.assign((const char_type *)cur_, length);
+        value.assign((const char_type *)this->cur_, length);
     }
 
     void setByte(uint8_t value) const {
