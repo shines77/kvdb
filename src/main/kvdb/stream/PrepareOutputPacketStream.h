@@ -21,6 +21,8 @@
 
 namespace kvdb {
 
+#if 0
+
 template <typename T>
 class BasicPrepareOutputPacketStream : public BasicPrepareOutputStream<T> {
 public:
@@ -210,6 +212,8 @@ public:
 
 typedef BasicPrepareOutputPacketStream<char>      PrepareOutputPacketStream;
 typedef BasicPrepareOutputPacketStream<wchar_t>   PrepareOutputPacketStreamW;
+
+#endif
 
 } // namespace kvdb
 

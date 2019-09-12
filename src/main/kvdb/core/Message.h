@@ -123,7 +123,6 @@ public:
     uint32_t prepare() {
         // Reset the stream position and calculate the total require size.
         PrepareOutputPacketStream preOS;
-        preOS.reset();
         preOS.next(kMsgHeaderSize);
         T * pThis = static_cast<T *>(this);
         if (pThis != nullptr) {

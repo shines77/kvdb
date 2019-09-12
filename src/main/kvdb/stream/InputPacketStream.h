@@ -17,15 +17,15 @@
 #include <type_traits>
 
 #include "kvdb/core/Variant.h"
-#include "kvdb/core/Packet.h"
+#include "kvdb/core/Message.h"
 #include "kvdb/stream/InputStream.h"
 
 namespace kvdb {
 
-template <typename T>
-class BasicInputPacketStream : public BasicInputStream<T> {
+template <typename T, typename Base = BasicStream<T>>
+class BasicInputPacketStream : public BasicInputStream<T, Base> {
 public:
-    typedef BasicInputStream<T>                 base_type;
+    typedef BasicInputStream<T, Base>           base_type;
     typedef typename base_type::char_type       char_type;
 
     typedef typename base_type::string_type     string_type;
@@ -228,8 +228,11 @@ public:
     }
 };
 
-typedef BasicInputPacketStream<char>      InputPacketStream;
-typedef BasicInputPacketStream<wchar_t>   InputPacketStreamW;
+typedef BasicInputPacketStream<char, BasicStream<char>>         InputPacketStream;
+typedef BasicInputPacketStream<wchar_t, BasicStream<wchar_t>>   InputPacketStreamW;
+
+typedef BasicInputPacketStream<char, BasicPrepareStream<char>>         PrepareInputPacketStream;
+typedef BasicInputPacketStream<wchar_t, BasicPrepareStream<wchar_t>>   PrepareInputPacketStreamW;
 
 } // namespace kvdb
 

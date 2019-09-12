@@ -17,13 +17,14 @@
 #include <type_traits>
 
 #include "kvdb/stream/BasicStream.h"
+#include "kvdb/stream/BasicPrepareStream.h"
 
 namespace kvdb {
 
-template <typename T>
-class BasicInputStream : public BasicStream<T> {
+template <typename T, typename Base = BasicStream<T>>
+class BasicInputStream : public Base {
 public:
-    typedef BasicStream<T>                      base_type;
+    typedef Base                                base_type;
     typedef typename base_type::char_type       char_type;
 
     typedef typename base_type::string_type     string_type;
@@ -34,6 +35,8 @@ public:
     template <size_t N>
     BasicInputStream(const char_type(&data)[N]) : base_type(data) {}
     ~BasicInputStream() {}
+
+    bool isMemoryStream() const { return true; }
 
     uint8_t readType() {
         return readUInt8();
@@ -175,8 +178,11 @@ public:
     }
 };
 
-typedef BasicInputStream<char>      InputStream;
-typedef BasicInputStream<wchar_t>   InputStreamW;
+typedef BasicInputStream<char, BasicStream<char>>       InputStream;
+typedef BasicInputStream<wchar_t, BasicStream<wchar_t>> InputStreamW;
+
+typedef BasicInputStream<char, BasicPrepareStream<char>>        PrepareInputStream;
+typedef BasicInputStream<wchar_t, BasicPrepareStream<wchar_t>>  PrepareInputStreamW;
 
 } // namespace kvdb
 

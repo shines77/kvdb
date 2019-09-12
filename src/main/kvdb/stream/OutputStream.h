@@ -18,13 +18,14 @@
 
 #include "kvdb/core/Message.h"
 #include "kvdb/stream/BasicStream.h"
+#include "kvdb/stream/BasicPrepareStream.h"
 
 namespace kvdb {
 
-template <typename T>
-class BasicOutputStream : public BasicStream<T> {
+template <typename T, typename Base = BasicStream<T>>
+class BasicOutputStream : public Base {
 public:
-    typedef BasicStream<T>                      base_type;
+    typedef Base                                base_type;
     typedef typename base_type::char_type       char_type;
 
     typedef typename base_type::string_type     string_type;
@@ -35,6 +36,8 @@ public:
     template <size_t N>
     BasicOutputStream(const char_type(&data)[N]) : base_type(data) {}
     ~BasicOutputStream() {}
+
+    bool isMemoryStream() const { return true; }
 
     void writeHeader(const MessageHeader & header) {
         this->writeUInt32(header.sign);
@@ -166,8 +169,11 @@ public:
     }
 };
 
-typedef BasicOutputStream<char>      OutputStream;
-typedef BasicOutputStream<wchar_t>   OutputStreamW;
+typedef BasicOutputStream<char, BasicStream<char>>          OutputStream;
+typedef BasicOutputStream<wchar_t, BasicStream<wchar_t>>    OutputStreamW;
+
+typedef BasicOutputStream<char, BasicPrepareStream<char>>          PrepareOutputStream;
+typedef BasicOutputStream<wchar_t, BasicPrepareStream<wchar_t>>    PrepareOutputStreamW;
 
 } // namespace kvdb
 

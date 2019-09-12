@@ -37,7 +37,7 @@ protected:
 
 public:
     Response(uint32_t type = Message::Unknown, const char * data = nullptr)
-        : BasicMessage(type, data) {
+        : BasicMessage<T>(type, data) {
         //
     }
 
