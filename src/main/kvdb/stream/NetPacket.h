@@ -67,7 +67,7 @@ public:
         value = true;
         values.push_back(value);
 
-        value = 8ULL;
+        value = uint64_t(8ULL);
         values.push_back(value);
     }
 
