@@ -154,51 +154,51 @@ public:
         uint8_t type = variant.getType();
         switch (type) {
         case DataType::Bool:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeBool(variant.value.b);
             break;
         case DataType::Int8:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeInt8(variant.value.i8);
             break;
         case DataType::Int16:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeInt16(variant.value.i16);
             break;
         case DataType::Int32:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeInt32(variant.value.i32);
             break;
         case DataType::Int64:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeInt64(variant.value.i64);
             break;
         case DataType::UInt8:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeUInt8(variant.value.u8);
             break;
         case DataType::UInt16:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeUInt16(variant.value.u16);
             break;
         case DataType::UInt32:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeUInt32(variant.value.u32);
             break;
         case DataType::UInt64:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeUInt64(variant.value.u64);
             break;
         case DataType::Pointer:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writePointer(variant.value.ptr);
             break;
         case DataType::Float:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeFloat(variant.value.f);
             break;
         case DataType::Double:
-            base_type::writeType(Type);
+            base_type::writeType(type);
             base_type::writeDouble(variant.value.d);
             break;
         default:
