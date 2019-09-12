@@ -14,9 +14,6 @@
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
 
-//#include "kvdb/stream/PrepareInputPacketStream.h"
-#include "kvdb/stream/PrepareOutputPacketStream.h"
-
 namespace kvdb {
 
 struct LoginRequest : public Request<LoginRequest> {
