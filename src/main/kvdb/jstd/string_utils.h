@@ -32,8 +32,8 @@ bool is_equals_unsafe(const CharTy * str1, const CharTy * str2, size_t length)
 {
     assert(str1 != nullptr && str2 != nullptr);
 
-    static const int kMaxSize = jimi::SSEHelper<CharTy>::kMaxSize;
-    static const int _SIDD_CHAR_OPS = jimi::SSEHelper<CharTy>::_SIDD_CHAR_OPS;
+    static const int kMaxSize = kvdb::SSEHelper<CharTy>::kMaxSize;
+    static const int _SIDD_CHAR_OPS = kvdb::SSEHelper<CharTy>::_SIDD_CHAR_OPS;
     static const int kEqualEach = _SIDD_CHAR_OPS | _SIDD_CMP_EQUAL_EACH
                                 | _SIDD_NEGATIVE_POLARITY | _SIDD_LEAST_SIGNIFICANT;
 
@@ -71,8 +71,8 @@ bool is_equals_unsafe(const CharTy * str1, const CharTy * str2, size_t length)
 {
     assert(str1 != nullptr && str2 != nullptr);
 
-    static const int kMaxSize = jimi::SSEHelper<CharTy>::kMaxSize;
-    static const int _SIDD_CHAR_OPS = jimi::SSEHelper<CharTy>::_SIDD_CHAR_OPS;
+    static const int kMaxSize = kvdb::SSEHelper<CharTy>::kMaxSize;
+    static const int _SIDD_CHAR_OPS = kvdb::SSEHelper<CharTy>::_SIDD_CHAR_OPS;
     static const int kEqualEach = _SIDD_CHAR_OPS | _SIDD_CMP_EQUAL_EACH
                                 | _SIDD_NEGATIVE_POLARITY | _SIDD_LEAST_SIGNIFICANT;
     
@@ -226,8 +226,8 @@ int compare_unsafe(const CharTy * str1, size_t length1, const CharTy * str2, siz
 {
     assert(str1 != nullptr && str2 != nullptr);
 
-    static const int kMaxSize = jimi::SSEHelper<CharTy>::kMaxSize;
-    static const int _SIDD_CHAR_OPS = jimi::SSEHelper<CharTy>::_SIDD_CHAR_OPS;
+    static const int kMaxSize = kvdb::SSEHelper<CharTy>::kMaxSize;
+    static const int _SIDD_CHAR_OPS = kvdb::SSEHelper<CharTy>::_SIDD_CHAR_OPS;
     static const int kEqualEach = _SIDD_CHAR_OPS | _SIDD_CMP_EQUAL_EACH
                                 | _SIDD_NEGATIVE_POLARITY | _SIDD_LEAST_SIGNIFICANT;
 

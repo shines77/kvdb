@@ -24,22 +24,6 @@
 
 namespace kvdb {
 
-struct ReadResult {
-    enum Type {
-        Failed = -1,
-        Ok = 0,
-        Last
-    };
-};
-
-struct WriteResult {
-    enum Type {
-        Failed = -1,
-        Ok = 0,
-        Last
-    };
-};
-
 template <typename T>
 class BasicStream : public BasicStreamBuffer<T> {
 public:

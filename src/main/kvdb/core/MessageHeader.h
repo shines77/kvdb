@@ -10,6 +10,22 @@
 
 namespace kvdb {
 
+struct ReadResult {
+    enum Type {
+        Failed = -1,
+        Ok = 0,
+        Last
+    };
+};
+
+struct WriteResult {
+    enum Type {
+        Failed = -1,
+        Ok = 0,
+        Last
+    };
+};
+
 struct MessageHeader {
     uint32_t sign;
     uint32_t type;
