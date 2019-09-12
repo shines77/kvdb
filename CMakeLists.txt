@@ -69,4 +69,4 @@ add_custom_target(release
 )
 
 add_executable(kvdb-cli ${SOURCE_FILES})
-target_link_libraries(kvc-cli ${EXTRA_LIBS})
+target_link_libraries(kvdb-cli ${EXTRA_LIBS})
