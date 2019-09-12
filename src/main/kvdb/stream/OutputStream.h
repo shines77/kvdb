@@ -94,79 +94,79 @@ public:
     }
 
     void writeByte(uint8_t value) {
-        setByte(value);
-        nextByte();
+        base_type::setByte(value);
+        base_type::nextByte();
     }
 
     void writeChar(char_type value) {
-        setChar(value);
-        nextChar();
+        base_type::setChar(value);
+        base_type::nextChar();
     }
 
     void writeBool(bool value) {
-        setBool(value);
-        nextBool();
+        base_type::setBool(value);
+        base_type::nextBool();
     }
 
     void writeInt8(int8_t value) {
-        setInt8(value);
-        nextInt8();
+        base_type::setInt8(value);
+        base_type::nextInt8();
     }
 
     void writeInt16(int16_t value) {
-        setInt16(value);
-        nextInt16();
+        base_type::setInt16(value);
+        base_type::nextInt16();
     }
 
     void writeInt32(int32_t value) {
-        setInt32(value);
-        nextInt16();
+        base_type::setInt32(value);
+        base_type::nextInt16();
     }
 
     void writeInt64(int64_t value) {
-        setInt64(value);
-        nextInt64();
+        base_type::setInt64(value);
+        base_type::nextInt64();
     }
 
     void writeUInt8(uint8_t value) {
-        setUInt8(value);
-        nextUInt8();
+        base_type::setUInt8(value);
+        base_type::nextUInt8();
     }
 
     void writeUInt16(uint16_t value) {
-        setUInt16(value);
-        nextUInt16();
+        base_type::setUInt16(value);
+        base_type::nextUInt16();
     }
 
     void writeUInt32(uint32_t value) {
-        setUInt32(value);
-        nextUInt32();
+        base_type::setUInt32(value);
+        base_type::nextUInt32();
     }
 
     void writeUInt64(uint64_t value) {
-        setUInt64(value);
-        nextUInt64();
+        base_type::setUInt64(value);
+        base_type::nextUInt64();
     }
 
     void writePointer(void * value) {
-        setPointer(value);
-        nextPointer();
+        base_type::setPointer(value);
+        base_type::nextPointer();
     }
 
     void writeFloat(float value) {
-        setFloat(value);
-        nextFloat();
+        base_type::setFloat(value);
+        base_type::nextFloat();
     }
 
     void writeDouble(double value) {
-        setDouble(value);
-        nextDouble();
+        base_type::setDouble(value);
+        base_type::nextDouble();
     }
 
     template <typename StringType>
     void writeString(const StringType & value) {
-        setString(value);
-        nextChar((int)value.size());
+        base_type::setString(value);
+        base_type::nextChar((int)value.size());
     }
 };
 
