@@ -51,6 +51,7 @@ include_directories(include)
 include_directories(src)
 include_directories(src/main)
 include_directories(src/test)
+include_directories(src/main/kvdb-cli)
 
 set(SOURCE_FILES
     src/main/kvdb-cli/kvdb-cli.cpp
