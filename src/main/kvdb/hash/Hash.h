@@ -802,7 +802,7 @@ public:
         static const std::uint32_t N = sizeof(hash_type);
         static const std::uint32_t align_mask = sizeof(hash_type) - 1;
 
-        //return hash::Times31(key, len);
+        //return hasher::Times31(key, len);
 
 #if defined(_IS_X86_64_) || defined(_IS_X86_32_)
         return primaryHash_aligned(key, len, seed);
@@ -971,8 +971,8 @@ public:
     //*/
 
     hash_type secondaryHash(const char * key, std::size_t len) const {
-        //return static_cast<hash_type>(hash::OpenSSL_Hash(key, len));
-        return static_cast<hash_type>(hash::Times31(key, len));
+        //return static_cast<hash_type>(hasher::OpenSSL_Hash(key, len));
+        return static_cast<hash_type>(hasher::Times31(key, len));
     }
 
     ///*
@@ -987,7 +987,7 @@ public:
     //*/
 
     hash_type OpenSSLHash(const char * key, std::size_t len) const {
-        return static_cast<hash_type>(hash::OpenSSL_Hash(key, len));
+        return static_cast<hash_type>(hasher::OpenSSL_Hash(key, len));
     }
 };
 

@@ -20,19 +20,16 @@ namespace detail {
 //////////////////////////////////////////
 
 template <typename CharTy>
-static
 inline std::size_t StrLen(const CharTy * str) {
     return (std::size_t)::strlen((const char *)str);
 }
 
 template <>
-static
 inline std::size_t StrLen(const char * str) {
     return (std::size_t)::strlen(str);
 }
 
 template <>
-static
 inline std::size_t StrLen(const unsigned char * str) {
     return (std::size_t)::strlen((const char *)str);
 }
@@ -40,13 +37,11 @@ inline std::size_t StrLen(const unsigned char * str) {
 #if defined(_WIN32) || defined(WIN32) || defined(OS_WINDOWS) || defined(__WINDOWS__)
 
 template <>
-static
 inline std::size_t StrLen(const short * str) {
     return (std::size_t)::wcslen((const wchar_t *)str);
 }
 
 template <>
-static
 inline std::size_t StrLen(const unsigned short * str) {
     return (std::size_t)::wcslen((const wchar_t *)str);
 }
@@ -54,7 +49,6 @@ inline std::size_t StrLen(const unsigned short * str) {
 #endif // _WIN32
 
 template <>
-static
 inline std::size_t StrLen(const wchar_t * str) {
     return (std::size_t)::wcslen((const wchar_t *)str);
 }
