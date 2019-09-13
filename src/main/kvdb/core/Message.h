@@ -80,6 +80,26 @@ public:
 
     void setBody(const char * body) { this->body_ = body; }
 
+    MessageHeader & getHeader() const { return const_cast<Message *>(this)->header; }
+
+    void setHeader(uint32_t sign, uint32_t length) {
+        this->header.sign   = sign;
+        this->header.length = length;
+    }
+
+    void setHeader(uint32_t sign, uint32_t args, uint32_t length) {
+        this->header.sign   = sign;
+        this->header.args   = args;
+        this->header.length = length;
+    }
+
+    void setHeader(uint32_t sign, uint32_t type, uint32_t args, uint32_t length) {
+        this->header.sign   = sign;
+        this->header.type   = type;
+        this->header.args   = args;
+        this->header.length = length;
+    }
+
     template <typename InputStreamTy>
     void readHeader(InputStreamTy & is) {
         this->header.sign   = is.readUInt32();
@@ -120,8 +140,10 @@ public:
     template <typename OutputStreamTy>
     void prepare(OutputStreamTy & os, bool needPrepare) {
         // Need prepare stream space ?
-        if ((!needPrepare) && os.isMemoryStream()) {
+        if (needPrepare && os.isMemoryStream()) {
             uint32_t totalSize = this->prepare();
+            // Setting the message's body length
+            this->header.length = totalSize - kMsgHeaderSize;
             os.inflate(totalSize);
         }
     }
@@ -139,8 +161,10 @@ public:
     template <typename OutputStreamTy>
     void prepareBody(OutputStreamTy & os, bool needPrepare) {
         // Need prepare stream space ?
-        if ((!needPrepare) && os.isMemoryStream()) {
+        if (needPrepare && os.isMemoryStream()) {
             uint32_t bodySize = this->prepareBody();
+            // Setting the message's body length
+            this->header.length = bodySize;
             os.inflate(bodySize);
         }
     }

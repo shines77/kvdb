@@ -126,8 +126,16 @@ public:
 
     void setAutoRelease(bool needRelease) { this->autoRelease_ = needRelease; }
 
-    ptrdiff_t length() const   { return (this->cur_ - this->head_); }
-    ptrdiff_t position() const { return this->length(); }
+    size_type length() const   {
+        assert(this->cur_ >= this->head_);
+        return size_type(this->cur_ - this->head_);
+    }
+    size_type position() const { return this->length(); }
+
+    size_type remain() const   {
+        assert(this->tail_ >= this->cur_);
+        return size_type(this->tail_ - this->cur_);
+    }
 
     size_type capacity() const {
         assert(this->tail_ >= this->head_);
@@ -174,17 +182,19 @@ public:
     }
 
     void clear() {
-        ::memset(this->cur_, 0, this->capacity() * sizeof(char_type));
+        ::memset((void *)this->cur_, 0, this->capacity() * sizeof(char_type));
     }
 
     void reserve(size_type newCapacity, bool needClear = false) {
         if (newCapacity > this->capacity()) {
+            size_type oldPos = this->position();
             this->internal_destroy();
 
             char_type * newData = allocator_.allocate(newCapacity);
-            this->cur_ = newData;
+            this->cur_ = newData + oldPos;
             this->head_ = newData;
             this->tail_ = newData + newCapacity;
+            this->autoRelease_ = allocator_.isAutoRelease();
 
             if (needClear) {
                 this->clear();
@@ -193,28 +203,42 @@ public:
     }
 
     void inflate(size_type extraSize, bool needClear = false) {
-        size_type newCapacity = this->length() + extraSize;
+        size_type oldPos = this->position();
+        size_type newCapacity = oldPos + extraSize;
         if (newCapacity > this->capacity()) {
-            this->reserve(newCapacity);
-        }
-    }
+            char_type * newData = allocator_.allocate(newCapacity * sizeof(char_type));
 
-    void resize(size_type newSize, bool needClear = true) {
-        size_type oldSize = this->capacity();
-        size_type oldDataSize = oldSize * sizeof(char_type);
-        if (newSize > oldSize) {
-            char_type * newData = allocator_.allocate(capacity);
-
-            ::memmove((void *)newData, (const void *)this->data(), oldDataSize);
+            ::memmove((void *)newData, (const void *)this->data(), oldPos * sizeof(char_type));
             if (needClear) {
-                ::memset(this->newData + oldSize, 0, (newSize - oldSize) * sizeof(char_type));
+                ::memset((void *)(newData + oldPos), 0, extraSize * sizeof(char_type));
             }
 
             this->internal_destroy();
 
-            this->cur_ = data;
-            this->head_ = data;
-            this->tail_ = data + newSize;
+            this->cur_ = newData + oldPos;
+            this->head_ = newData;
+            this->tail_ = newData + newCapacity;
+            this->autoRelease_ = allocator_.isAutoRelease();
+        }
+    }
+
+    void resize(size_type newSize, bool needClear = true) {
+        size_type oldCapacity = this->capacity();
+        if (newSize > oldCapacity) {
+            size_type oldPos = this->position();
+            char_type * newData = allocator_.allocate(newSize * sizeof(char_type));
+
+            ::memmove((void *)newData, (const void *)this->data(), oldCapacity * sizeof(char_type));
+            if (needClear) {
+                ::memset((void *)(newData + oldCapacity), 0, (newSize - oldCapacity) * sizeof(char_type));
+            }
+
+            this->internal_destroy();
+
+            this->cur_ = newData + oldPos;
+            this->head_ = newData;
+            this->tail_ = newData + newSize;
+            this->autoRelease_ = allocator_.isAutoRelease();
         }
     }
 

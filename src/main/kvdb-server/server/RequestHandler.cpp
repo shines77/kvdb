@@ -34,7 +34,8 @@ RequestHandler::~RequestHandler()
 }
 
 int RequestHandler::handleRequest(ConnectionContext & context,
-                                  const IRequest & request)
+                                  const IRequest & request,
+                                  OutputPacketStream & os)
 {
     InputPacketStream stream(request.body(), request.bodyLength());
     MessageHeader header = request.header;
@@ -44,15 +45,15 @@ int RequestHandler::handleRequest(ConnectionContext & context,
         int result = 0;
         switch (header.type) {
         case Message::LoginRequest:
-            result = handleLoginRequest(context, stream);
+            result = handleLoginRequest(context, stream, os);
             break;
 
         case Message::HandShakeRequest:
-            result = handleHandshakeRequest(context, stream);
+            result = handleHandshakeRequest(context, stream, os);
             break;
 
         case Message::QueryRequest:
-            result = handleQueryRequest(context, stream);
+            result = handleQueryRequest(context, stream, os);
             break;
 
         default:
@@ -74,22 +75,21 @@ int RequestHandler::handleRequest(ConnectionContext & context,
 }
 
 int RequestHandler::handleLoginRequest(ConnectionContext & context,
-                                       InputPacketStream & stream)
+                                       InputPacketStream & is,
+                                       OutputPacketStream & os)
 {
     std::string username, password, database;
-    int result = stream.readString(username);
+    int result = is.readString(username);
     if (result == ParseResult::OK) {
-        int result = stream.readString(password);
+        int result = is.readString(password);
         if (result == ParseResult::OK) {
-            int result = stream.readString(database);
+            int result = is.readString(database);
             if (result == ParseResult::OK) {
-                OutputPacketStream os;
                 LoginResponse response;
                 response.setSign(kDefaultSignId);
                 response.setMessageType(Message::LoginResponse);
-                response.setBodyLength(0);
                 response.setArgs(3);
-
+                response.setBodyLength(0);
                 response.writeTo(os);
                 return ParseStatus::Success;
             }
@@ -102,7 +102,8 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
 }
 
 int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
-                                           InputPacketStream & stream)
+                                           InputPacketStream & is,
+                                           OutputPacketStream & os)
 {
     return ParseStatus::Success;
 }
@@ -133,10 +134,11 @@ int RequestHandler::parseQueryRequestFirstCmd(jstd::StringRef & cmd, const jstd:
 }
 
 int RequestHandler::handleQueryRequest(ConnectionContext & context,
-                                       InputPacketStream & stream)
+                                       InputPacketStream & is,
+                                       OutputPacketStream & os)
 {
     jstd::StringRef qurey;
-    int result = stream.readString(qurey);
+    int result = is.readString(qurey);
     if (result == ParseResult::OK) {
         jstd::StringRef cmd;
         int result = parseQueryRequestFirstCmd(cmd, qurey);

@@ -27,7 +27,9 @@ Connection::Connection(boost::asio::io_service & io_service,
     : socket_(io_service),
       context_(io_service),
       connection_manager_(manager),
-      request_handler_(handler)
+      request_handler_(handler),
+      request_size_(0),
+      response_size_(0)
 {
 }
 
@@ -139,10 +141,19 @@ void Connection::handle_read_some(const boost::system::error_code & err,
             this->stop();
         }
         else {
+            OutputPacketStream os(response_buf_.data(), response_size_);
             request_.setBody(&request_buf_[0]);
-            int result = request_handler_.handleRequest(context_, request_);
+            int result = request_handler_.handleRequest(context_, request_, os);
             if (result == ParseStatus::Success) {
-                //
+                if (os.data() != nullptr) {
+                    boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.length()),
+                        boost::bind(&Connection::handle_write, this,
+                                    boost::asio::placeholders::error)
+                    );
+                }
+                else {
+                    start_read_request();
+                }
             }
             else if (result == ParseStatus::Failed) {
                 //

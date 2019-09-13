@@ -208,14 +208,14 @@ private:
             request.password = config.password;
             request.database = config.database;
 
-            uint32_t requestSize = request.prepare();
-            uint32_t msgLength = requestSize - kMsgHeaderSize;
-            request_.resize(requestSize);
+            uint32_t bodyLength = request.prepareBody();
+            uint32_t requestSize = bodyLength + kMsgHeaderSize;
+            request_.reserve(requestSize);
             request_size_ = requestSize;
 
             OutputPacketStream ostream(request_.data(), requestSize);
-            ostream.writeHeader(kDefaultSignId, Message::LoginRequest, msgLength, 3);
-            request.writeTo(ostream);
+            request.setHeader(kDefaultSignId, bodyLength);
+            request.writeTo(ostream, false);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
             std::cout << "request_.size() = " << ostream.length() << std::endl;
@@ -321,14 +321,14 @@ private:
                 request.password = config.password;
                 request.database = config.database;
 
-                uint32_t requestSize = request.prepare();
-                uint32_t msgLength = requestSize - kMsgHeaderSize;
+                uint32_t bodyLength = request.prepareBody();
+                uint32_t requestSize = bodyLength + kMsgHeaderSize;
                 request_.reserve(requestSize);
                 request_size_ = requestSize;
 
                 OutputPacketStream ostream(request_.data(), requestSize);
-                ostream.writeHeader(kDefaultSignId, Message::HandShakeRequest, msgLength, 3);
-                request.writeTo(ostream, false);  
+                request.setHeader(kDefaultSignId, bodyLength);
+                request.writeTo(ostream, false);
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
                 std::cout << "request_.size() = " << ostream.length() << std::endl;
