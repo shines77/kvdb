@@ -173,7 +173,7 @@ public:
     int readFrom(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
 
-        typename OutputStreamTy::base_type & isb = is.downcastTo();
+        typename InputStreamTy::base_type & isb = is.downcastTo();
         Message::readHeader(isb);
 
         T * pThis = static_cast<T *>(this);
