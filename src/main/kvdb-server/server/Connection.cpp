@@ -142,7 +142,7 @@ void Connection::handle_read_some(const boost::system::error_code & err,
         }
         else {
             OutputPacketStream os(response_buf_.data(), response_size_);
-            request_.setBody(&request_buf_[0]);
+            request_.setBody(request_buf_.data());
             int result = request_handler_.handleRequest(context_, request_, os);
             if (result == ParseStatus::Success) {
                 if (os.data() != nullptr) {

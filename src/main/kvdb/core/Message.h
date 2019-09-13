@@ -173,7 +173,8 @@ public:
     int readFrom(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
 
-        Message::readHeader(is);
+        typename OutputStreamTy::base_type & isb = is.downcastTo();
+        Message::readHeader(isb);
 
         T * pThis = static_cast<T *>(this);
         if (pThis != nullptr) {
@@ -196,7 +197,8 @@ public:
     void writeTo(OutputStreamTy & os, bool needPrepare = true) {
         this->prepare(os, needPrepare);
 
-        Message::writeHeader(os);
+        typename OutputStreamTy::base_type & osb = os.downcastTo();
+        Message::writeHeader(osb);
 
         T * pThis = static_cast<T *>(this);
         if (pThis != nullptr) {

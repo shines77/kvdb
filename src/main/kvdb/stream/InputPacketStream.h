@@ -38,12 +38,12 @@ public:
     BasicInputPacketStream(const char_type(&data)[N]) : base_type(data, N) {}
     ~BasicInputPacketStream() {}
 
-    int readHeader(MessageHeader & header) {
-        header.sign = base_type::readUInt32();
-        header.type = base_type::readUInt32();
-        header.args = base_type::readUInt32();
-        header.length = base_type::readUInt32();
-        return ReadResult::Ok;
+    base_type & downcastTo() {
+        return (*static_cast<base_type *>(this));
+    }
+
+    const base_type & downcastTo() const {
+        return (*const_cast<const base_type *>(static_cast<base_type *>(this)));
     }
 
     uint8_t readType() {

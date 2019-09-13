@@ -24,11 +24,11 @@ struct LoginRequest : public Request<LoginRequest> {
     std::string database;
 
     LoginRequest(const char * data = nullptr)
-        : Request(Message::LogoutRequest, data) {
+        : Request(Message::LoginRequest, data) {
         setArgs(kArgs);
     }
     LoginRequest(std::string _username, std::string _password, std::string _database)
-        : Request(Message::LogoutRequest, nullptr),
+        : Request(Message::LoginRequest, nullptr),
           username(_username), password(_password), database(_database) {
         setArgs(kArgs);
     }
@@ -56,12 +56,12 @@ struct LoginResponse : public Response<LoginResponse> {
     int statusCode;
 
     LoginResponse(const char * data = nullptr)
-        : Response(Message::LogoutRequest, data),
+        : Response(Message::LoginResponse, data),
           statusCode(StatusCode::Unknown) {
         setArgs(kArgs);
     }
     LoginResponse(int _statusCode)
-        : Response(Message::LogoutResponse, nullptr),
+        : Response(Message::LoginResponse, nullptr),
           statusCode(_statusCode) {
         setArgs(kArgs);
     }

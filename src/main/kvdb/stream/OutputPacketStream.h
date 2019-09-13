@@ -40,12 +40,20 @@ public:
 
     bool isMemoryStream() const { return true; }
 
+    base_type & downcastTo() {
+        return (*static_cast<base_type *>(this));
+    }
+
+    const base_type & downcastTo() const {
+        return (*const_cast<const base_type *>(static_cast<base_type *>(this)));
+    }
+
     void writeType(uint8_t type) {
-        base_type::writeUInt8(type);
+        base_type::writeType(type);
     }
 
     void writeType(uint32_t type) {
-        base_type::writeUInt8((uint8_t)type);
+        base_type::writeType((uint8_t)type);
     }
 
     void writeByte(uint8_t value) {

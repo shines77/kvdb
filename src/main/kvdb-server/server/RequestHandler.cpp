@@ -88,8 +88,9 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
                 LoginResponse response;
                 response.setSign(kDefaultSignId);
                 response.setMessageType(Message::LoginResponse);
-                response.setArgs(3);
+                response.setArgs(1);
                 response.setBodyLength(0);
+                response.statusCode = 0;
                 response.writeTo(os);
                 return ParseStatus::Success;
             }

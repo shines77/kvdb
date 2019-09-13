@@ -120,7 +120,7 @@ public:
 
     void writeInt32(int32_t value) {
         base_type::setInt32(value);
-        base_type::nextInt16();
+        base_type::nextInt32();
     }
 
     void writeInt64(int64_t value) {
