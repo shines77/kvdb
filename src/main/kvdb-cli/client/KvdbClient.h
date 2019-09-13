@@ -204,24 +204,24 @@ private:
             //
             KvdbClientConfig & config = KvdbClientApp::client_config;
             LoginRequest request;
-            request.username = config.username;
-            request.password = config.password;
-            request.database = config.database;
+            request.sUsername = config.username;
+            request.sPassword = config.password;
+            request.sDatabase = config.database;
 
             uint32_t bodyLength = request.prepareBody();
             uint32_t requestSize = bodyLength + kMsgHeaderSize;
             request_.reserve(requestSize);
             request_size_ = requestSize;
 
-            OutputPacketStream ostream(request_.data(), requestSize);
+            OutputPacketStream os(request_.data(), requestSize);
             request.setHeader(kDefaultSignId, bodyLength);
-            request.writeTo(ostream, false);
+            request.writeTo(os, false);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
-            std::cout << "request_.size() = " << ostream.length() << std::endl;
+            std::cout << "request_.size() = " << os.length() << std::endl;
             std::cout << std::endl;
 
-            boost::asio::async_write(socket_, boost::asio::buffer(ostream.head(), ostream.length()),
+            boost::asio::async_write(socket_, boost::asio::buffer(os.head(), os.length()),
                 boost::bind(&KvdbClient::handle_write_request, this,
                             boost::asio::placeholders::error));
         }
@@ -316,32 +316,144 @@ private:
                 //
 
                 KvdbClientConfig & config = KvdbClientApp::client_config;
-                LoginRequest request;
-                request.username = config.username;
-                request.password = config.password;
-                request.database = config.database;
+                HandShakeRequest request;
+                request.iVersion = 1;
 
                 uint32_t bodyLength = request.prepareBody();
                 uint32_t requestSize = bodyLength + kMsgHeaderSize;
                 request_.reserve(requestSize);
                 request_size_ = requestSize;
 
-                OutputPacketStream ostream(request_.data(), requestSize);
+                OutputPacketStream os(request_.data(), requestSize);
                 request.setHeader(kDefaultSignId, bodyLength);
-                request.writeTo(ostream, false);
+                request.writeTo(os, false);
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
-                std::cout << "request_.size() = " << ostream.length() << std::endl;
+                std::cout << "request_.size() = " << os.length() << std::endl;
                 std::cout << std::endl;
 
-                boost::asio::async_write(socket_, boost::asio::buffer(ostream.head(), ostream.length()),
-                    boost::bind(&KvdbClient::handle_write_request, this,
+                boost::asio::async_write(socket_, boost::asio::buffer(os.head(), os.length()),
+                    boost::bind(&KvdbClient::handle_write_handshake_request, this,
                                 boost::asio::placeholders::error));
             }
         }
         else {
             std::cout << "KvdbClient::handle_read_some() Error: " << err.message() << "\n";
         }
+    }
+
+    void handle_write_handshake_request(const boost::system::error_code & err)
+    {
+        std::cout << "KvdbClient::handle_write_handshake_request()" << std::endl;
+        std::cout << std::endl;
+
+        if (!err) {
+            char header_buf[kMsgHeaderSize];
+            size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
+            if (readBytes == kMsgHeaderSize) {
+                MessageHeader header;
+                InputPacketStream istream(header_buf);
+                istream.readHeader(header);
+                if (header.sign == kDefaultSignId && header.length > 0) {
+                    //
+                    // Receive the part data of response, if it's not completed, continue to read. 
+                    //
+                    response_.reserve(header.length);
+                    response_size_ = header.length;
+                    socket_.async_read_some(boost::asio::buffer(response_.data(), header.length),
+                        boost::bind(&KvdbClient::handle_read_handshake_some, this,
+                                    boost::asio::placeholders::error,
+                                    boost::asio::placeholders::bytes_transferred,
+                                    header.length));
+                }
+                else {
+                    // The signId is dismatch
+                    std::cout << "KvdbClient::handle_write_handshake_request() Error: The signId is dismatch.\n" << std::endl;
+                }
+            }
+            else {
+                // Read packet header error.
+                std::cout << "KvdbClient::handle_write_handshake_request() Error: Read packet header error.\n" << std::endl;
+            }
+        }
+        else {
+            std::cout << "KvdbClient::handle_write_handshake_request() Error: " << err.message() << "\n";
+        }
+    }
+
+    void handle_read_handshake_some(const boost::system::error_code & err,
+                                    std::size_t bytes_transferred,
+                                    std::size_t bytes_wanted)
+    {
+        std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;
+        std::cout << "error_code = " << err.value() << std::endl;
+        std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
+        std::cout << "bytes_wanted = " << bytes_wanted << std::endl;
+        std::cout << std::endl;
+
+        if (!err) {
+            if (bytes_transferred < bytes_wanted) {
+                std::cout << "KvdbClient::handle_read_handshake_some(): Receive next partment." << std::endl;
+                //
+                // Receive the data of next partment.
+                //
+                // response_buf_.consume(bytes_transferred);
+                // boost::asio::buffer(response_buf_.data(), bytes_wanted - bytes_transferred),
+                //
+                socket_.async_read_some(boost::asio::buffer(&response_[bytes_transferred],
+                    bytes_wanted - bytes_transferred),
+                    boost::bind(&KvdbClient::handle_read_handshake_some, this,
+                        boost::asio::placeholders::error,
+                        boost::asio::placeholders::bytes_transferred,
+                        bytes_wanted - bytes_transferred)
+                );
+            }
+            else if (bytes_transferred == 0) {
+                //
+                // Error: no data read.
+                //
+                this->stop();
+            }
+            else {
+                std::cout << "KvdbClient::handle_read_handshake_some(): Read all wanted bytes." << std::endl;
+                //
+                // The connection was successful, send the request.
+                //
+                // response_buf_.commit(request_size_);
+                //
+
+                KvdbClientConfig & config = KvdbClientApp::client_config;
+                ConnectRequest request;
+                request.iVersion = 1;
+
+                uint32_t bodyLength = request.prepareBody();
+                uint32_t requestSize = bodyLength + kMsgHeaderSize;
+                request_.reserve(requestSize);
+                request_size_ = requestSize;
+
+                OutputPacketStream os(request_.data(), requestSize);
+                request.setHeader(kDefaultSignId, bodyLength);
+                request.writeTo(os, false);
+
+                std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;
+                std::cout << "request_.size() = " << os.length() << std::endl;
+                std::cout << std::endl;
+
+                boost::asio::async_write(socket_, boost::asio::buffer(os.head(), os.length()),
+                    boost::bind(&KvdbClient::handle_write_connect_request, this,
+                                boost::asio::placeholders::error));
+            }
+        }
+        else {
+            std::cout << "KvdbClient::handle_read_handshake_some() Error: " << err.message() << "\n";
+        }
+    }
+
+    void handle_write_connect_request(const boost::system::error_code & err)
+    {
+        std::cout << "KvdbClient::handle_write_connect_request()" << std::endl;
+        std::cout << "error_code = " << err.value() << std::endl;
+        std::cout << std::endl;
     }
 };
 

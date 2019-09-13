@@ -19,64 +19,209 @@ namespace kvdb {
 
 struct LoginRequest : public Request<LoginRequest> {
     static const uint32_t kArgs = 3;
-    std::string username;
-    std::string password;
-    std::string database;
+    std::string sUsername;
+    std::string sPassword;
+    std::string sDatabase;
 
     LoginRequest(const char * data = nullptr)
         : Request(Message::LoginRequest, data) {
         setArgs(kArgs);
+        init();
     }
-    LoginRequest(std::string _username, std::string _password, std::string _database)
+    LoginRequest(std::string username, std::string password, std::string database)
         : Request(Message::LoginRequest, nullptr),
-          username(_username), password(_password), database(_database) {
+          sUsername(username), sPassword(password), sDatabase(database) {
         setArgs(kArgs);
     }
     virtual ~LoginRequest() {}
 
+    void init() {
+    }
+
     template <typename InputStreamTy>
     int readBody(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
-        readStatus |= is.readString(username);
-        readStatus |= is.readString(password);
-        readStatus |= is.readString(database);
+        readStatus |= is.readString(sUsername);
+        readStatus |= is.readString(sPassword);
+        readStatus |= is.readString(sDatabase);
         return readStatus;
     }
 
     template <typename OutputStreamTy>
     void writeBody(OutputStreamTy & os) {
-        os.writeString(username);
-        os.writeString(password);
-        os.writeString(database);
+        os.writeString(sUsername);
+        os.writeString(sPassword);
+        os.writeString(sDatabase);
     }
 };
 
 struct LoginResponse : public Response<LoginResponse> {
     static const uint32_t kArgs = 1;
-    int statusCode;
+    int iStatusCode;
 
     LoginResponse(const char * data = nullptr)
         : Response(Message::LoginResponse, data),
-          statusCode(StatusCode::Unknown) {
+          iStatusCode(StatusCode::Unknown) {
         setArgs(kArgs);
+        init();
     }
-    LoginResponse(int _statusCode)
+    LoginResponse(int statusCode)
         : Response(Message::LoginResponse, nullptr),
-          statusCode(_statusCode) {
+          iStatusCode(statusCode) {
         setArgs(kArgs);
     }
     virtual ~LoginResponse() {}
 
+    void init() {
+        iStatusCode = StatusCode::Unknown;
+    }
+
     template <typename InputStreamTy>
     int readBody(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
-        readStatus |= is.readInt32(statusCode);
+        readStatus |= is.readInt32(iStatusCode);
         return readStatus;
     }
 
     template <typename OutputStreamTy>
     void writeBody(OutputStreamTy & os) {
-        os.writeInt32(statusCode);
+        os.writeInt32(iStatusCode);
+    }
+};
+
+struct HandShakeRequest : public Request<HandShakeRequest> {
+    static const uint32_t kArgs = 3;
+    uint32_t iVersion;
+
+    HandShakeRequest(const char * data = nullptr)
+        : Request(Message::HandShakeRequest, data),
+          iVersion(0) {
+        setArgs(kArgs);
+        init();
+    }
+    HandShakeRequest(uint32_t version)
+        : Request(Message::HandShakeRequest, nullptr),
+          iVersion(version) {
+        setArgs(kArgs);
+    }
+    virtual ~HandShakeRequest() {}
+
+    void init() {
+        iVersion = 0;
+    }
+
+    template <typename InputStreamTy>
+    int readBody(InputStreamTy & is) {
+        int readStatus = ReadResult::Ok;
+        readStatus |= is.readUInt32(iVersion);
+        return readStatus;
+    }
+
+    template <typename OutputStreamTy>
+    void writeBody(OutputStreamTy & os) {
+        os.writeUInt32(iVersion);
+    }
+};
+
+struct HandShakeResponse : public Response<HandShakeResponse> {
+    static const uint32_t kArgs = 1;
+    int iStatusCode;
+
+    HandShakeResponse(const char * data = nullptr)
+        : Response(Message::HandShakeResponse, data),
+          iStatusCode(StatusCode::Unknown) {
+        setArgs(kArgs);
+        init();
+    }
+    HandShakeResponse(int statusCode)
+        : Response(Message::HandShakeResponse, nullptr),
+          iStatusCode(statusCode) {
+        setArgs(kArgs);
+    }
+    virtual ~HandShakeResponse() {}
+
+    void init() {
+        iStatusCode = 0;
+    }
+
+    template <typename InputStreamTy>
+    int readBody(InputStreamTy & is) {
+        int readStatus = ReadResult::Ok;
+        readStatus |= is.readInt32(iStatusCode);
+        return readStatus;
+    }
+
+    template <typename OutputStreamTy>
+    void writeBody(OutputStreamTy & os) {
+        os.writeInt32(iStatusCode);
+    }
+};
+
+struct ConnectRequest : public Request<ConnectRequest> {
+    static const uint32_t kArgs = 3;
+    uint32_t iVersion;
+
+    ConnectRequest(const char * data = nullptr)
+        : Request(Message::ConnectRequest, data),
+          iVersion(0) {
+        setArgs(kArgs);
+        init();
+    }
+    ConnectRequest(uint32_t version)
+        : Request(Message::ConnectRequest, nullptr),
+          iVersion(version) {
+        setArgs(kArgs);
+    }
+    virtual ~ConnectRequest() {}
+
+    void init() {
+        iVersion = 0;
+    }
+
+    template <typename InputStreamTy>
+    int readBody(InputStreamTy & is) {
+        int readStatus = ReadResult::Ok;
+        readStatus |= is.readUInt32(iVersion);
+        return readStatus;
+    }
+
+    template <typename OutputStreamTy>
+    void writeBody(OutputStreamTy & os) {
+        os.writeUInt32(iVersion);
+    }
+};
+
+struct ConnectResponse : public Response<ConnectResponse> {
+    static const uint32_t kArgs = 1;
+    int iStatusCode;
+
+    ConnectResponse(const char * data = nullptr)
+        : Response(Message::ConnectResponse, data),
+          iStatusCode(StatusCode::Unknown) {
+        setArgs(kArgs);
+        init();
+    }
+    ConnectResponse(int statusCode)
+        : Response(Message::ConnectResponse, nullptr),
+          iStatusCode(statusCode) {
+        setArgs(kArgs);
+    }
+    virtual ~ConnectResponse() {}
+
+    void init() {
+        iStatusCode = 0;
+    }
+
+    template <typename InputStreamTy>
+    int readBody(InputStreamTy & is) {
+        int readStatus = ReadResult::Ok;
+        readStatus |= is.readInt32(iStatusCode);
+        return readStatus;
+    }
+
+    template <typename OutputStreamTy>
+    void writeBody(OutputStreamTy & os) {
+        os.writeInt32(iStatusCode);
     }
 };
 

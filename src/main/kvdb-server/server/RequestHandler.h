@@ -37,6 +37,7 @@ public:
 private:
     int handleLoginRequest(ConnectionContext & context, InputPacketStream & is, OutputPacketStream & os);
     int handleHandshakeRequest(ConnectionContext & context, InputPacketStream & is, OutputPacketStream & os);
+    int handleConnectRequest(ConnectionContext & context, InputPacketStream & is, OutputPacketStream & os);
     int handleQueryRequest(ConnectionContext & context, InputPacketStream & is, OutputPacketStream & os);
 
     int parseQueryRequestFirstCmd(jstd::StringRef & cmd, const jstd::StringRef & qurey);

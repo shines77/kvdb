@@ -33,47 +33,6 @@ RequestHandler::~RequestHandler()
 {
 }
 
-int RequestHandler::handleRequest(ConnectionContext & context,
-                                  const IRequest & request,
-                                  OutputPacketStream & os)
-{
-    InputPacketStream stream(request.body(), request.bodyLength());
-    MessageHeader header = request.header;
-
-    if (header.length > 0) {
-        const char * first = stream.current();
-        int result = 0;
-        switch (header.type) {
-        case Message::LoginRequest:
-            result = handleLoginRequest(context, stream, os);
-            break;
-
-        case Message::HandShakeRequest:
-            result = handleHandshakeRequest(context, stream, os);
-            break;
-
-        case Message::QueryRequest:
-            result = handleQueryRequest(context, stream, os);
-            break;
-
-        default:
-            // Unknown type message
-            break;
-        }
-
-        const char * last = stream.current();
-        if ((last - first) == (ptrdiff_t)header.length) {
-            return ParseStatus::Success;
-        }
-        else {
-            return ParseStatus::Error;
-        }
-    }
-    else {
-        return ParseStatus::TooSmall;
-    }
-}
-
 int RequestHandler::handleLoginRequest(ConnectionContext & context,
                                        InputPacketStream & is,
                                        OutputPacketStream & os)
@@ -90,7 +49,7 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
                 response.setMessageType(Message::LoginResponse);
                 response.setArgs(1);
                 response.setBodyLength(0);
-                response.statusCode = 0;
+                response.iStatusCode = 0;
                 response.writeTo(os);
                 return ParseStatus::Success;
             }
@@ -106,7 +65,42 @@ int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
                                            InputPacketStream & is,
                                            OutputPacketStream & os)
 {
-    return ParseStatus::Success;
+    uint32_t iVersion;
+    bool result = is.readUInt32(iVersion);
+    if (result) {
+        HandShakeResponse response;
+        response.setSign(kDefaultSignId);
+        response.setMessageType(Message::HandShakeResponse);
+        response.setArgs(1);
+        response.setBodyLength(0);
+        response.iStatusCode = 0;
+        response.writeTo(os);
+
+        return ParseStatus::Success;
+    }
+    
+    return ParseStatus::Failed;
+}
+
+int RequestHandler::handleConnectRequest(ConnectionContext & context,
+                                         InputPacketStream & is,
+                                         OutputPacketStream & os)
+{
+    uint32_t iVersion;
+    bool result = is.readUInt32(iVersion);
+    if (result) {
+        ConnectResponse response;
+        response.setSign(kDefaultSignId);
+        response.setMessageType(Message::ConnectResponse);
+        response.setArgs(1);
+        response.setBodyLength(0);
+        response.iStatusCode = 0;
+        response.writeTo(os);
+
+        return ParseStatus::Success;
+    }
+
+    return ParseStatus::Failed;
 }
 
 int RequestHandler::parseQueryRequestFirstCmd(jstd::StringRef & cmd, const jstd::StringRef & qurey)
@@ -178,6 +172,51 @@ int RequestHandler::handleRequestData(const char * data, size_t size)
         }
     }
     return 0;
+}
+
+int RequestHandler::handleRequest(ConnectionContext & context,
+                                  const IRequest & request,
+                                  OutputPacketStream & os)
+{
+    InputPacketStream stream(request.body(), request.bodyLength());
+    MessageHeader header = request.header;
+
+    if (header.length > 0) {
+        const char * first = stream.current();
+        int result = 0;
+        switch (header.type) {
+        case Message::LoginRequest:
+            result = handleLoginRequest(context, stream, os);
+            break;
+
+        case Message::HandShakeRequest:
+            result = handleHandshakeRequest(context, stream, os);
+            break;
+
+        case Message::ConnectRequest:
+            result = handleConnectRequest(context, stream, os);
+            break;
+
+        case Message::QueryRequest:
+            result = handleQueryRequest(context, stream, os);
+            break;
+
+        default:
+            // Unknown type message
+            break;
+        }
+
+        const char * last = stream.current();
+        if ((last - first) == (ptrdiff_t)header.length) {
+            return ParseStatus::Success;
+        }
+        else {
+            return ParseStatus::Error;
+        }
+    }
+    else {
+        return ParseStatus::TooSmall;
+    }
 }
 
 } // namespace server
