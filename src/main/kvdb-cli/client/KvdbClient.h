@@ -26,7 +26,7 @@
 #include "client/common.h"
 #include "client/KvdbClientApp.h"
 
-#include "kvdb/core/Messages.h"
+#include "kvdb/core/MessagesDefine.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
 #include "kvdb/stream/InputPacketStream.h"

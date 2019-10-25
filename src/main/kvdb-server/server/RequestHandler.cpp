@@ -10,7 +10,7 @@
 #include <kvdb/core/Message.h>
 #include <kvdb/core/Request.h>
 #include <kvdb/core/Response.h>
-#include <kvdb/core/Messages.h>
+#include <kvdb/core/MessagesDefine.h>
 
 #include <kvdb/server/ServerStatus.h>
 #include <kvdb/stream/ParseResult.h>

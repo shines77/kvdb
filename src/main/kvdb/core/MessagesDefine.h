@@ -1,6 +1,6 @@
 
-#ifndef KVDB_CORE_MESSAGES_H
-#define KVDB_CORE_MESSAGES_H
+#ifndef KVDB_CORE_MESSAGES_DEF_H
+#define KVDB_CORE_MESSAGES_DEF_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
