@@ -42,7 +42,7 @@ public:
     int readHeader(MessageHeader & header) {
         header.sign   = this->readUInt32();
         header.type   = this->readUInt32();
-        header.args   = this->readUInt32();
+        header.info   = this->readUInt32();
         header.length = this->readUInt32();
         return ReadResult::Ok;
     }

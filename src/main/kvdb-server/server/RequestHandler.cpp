@@ -45,9 +45,7 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
             int result = is.readString(database);
             if (result == ParseResult::OK) {
                 LoginResponse response;
-                response.setSign(kDefaultSignId);
-                response.setMessageType(MessageType::LoginResponse);
-                response.setArgs(1);
+                response.setSign(kDefaultSign);
                 response.setBodyLength(0);
                 response.iStatusCode = 0;
                 response.writeTo(os);
@@ -69,9 +67,7 @@ int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
     bool result = is.readUInt32(iVersion);
     if (result) {
         HandShakeResponse response;
-        response.setSign(kDefaultSignId);
-        response.setMessageType(MessageType::HandShakeResponse);
-        response.setArgs(1);
+        response.setSign(kDefaultSign);
         response.setBodyLength(0);
         response.iStatusCode = 0;
         response.writeTo(os);
@@ -90,9 +86,7 @@ int RequestHandler::handleConnectRequest(ConnectionContext & context,
     bool result = is.readUInt32(iVersion);
     if (result) {
         ConnectResponse response;
-        response.setSign(kDefaultSignId);
-        response.setMessageType(MessageType::ConnectResponse);
-        response.setArgs(1);
+        response.setSign(kDefaultSign);
         response.setBodyLength(0);
         response.iStatusCode = 0;
         response.writeTo(os);

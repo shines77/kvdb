@@ -214,7 +214,7 @@ private:
             request_size_ = requestSize;
 
             OutputPacketStream os(request_.data(), requestSize);
-            request.setHeader(kDefaultSignId, bodyLength);
+            request.setHeader(kDefaultSign, bodyLength);
             request.writeTo(os, false);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
@@ -247,7 +247,7 @@ private:
                 MessageHeader header;
                 InputPacketStream istream(header_buf);
                 istream.readHeader(header);
-                if (header.sign == kDefaultSignId && header.length > 0) {
+                if (header.sign == kDefaultSign && header.length > 0) {
                     //
                     // Receive the part data of response, if it's not completed, continue to read. 
                     //
@@ -325,7 +325,7 @@ private:
                 request_size_ = requestSize;
 
                 OutputPacketStream os(request_.data(), requestSize);
-                request.setHeader(kDefaultSignId, bodyLength);
+                request.setHeader(kDefaultSign, bodyLength);
                 request.writeTo(os, false);
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
@@ -354,7 +354,7 @@ private:
                 MessageHeader header;
                 InputPacketStream istream(header_buf);
                 istream.readHeader(header);
-                if (header.sign == kDefaultSignId && header.length > 0) {
+                if (header.sign == kDefaultSign && header.length > 0) {
                     //
                     // Receive the part data of response, if it's not completed, continue to read. 
                     //
@@ -432,7 +432,7 @@ private:
                 request_size_ = requestSize;
 
                 OutputPacketStream os(request_.data(), requestSize);
-                request.setHeader(kDefaultSignId, bodyLength);
+                request.setHeader(kDefaultSign, bodyLength);
                 request.writeTo(os, false);
 
                 std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;

@@ -15,7 +15,7 @@
 
 namespace kvdb {
 
-static const uint32_t kDefaultSignId = 2019082500;
+static const uint32_t kDefaultSign = 2019082500;
 
 #pragma warning (push)
 #pragma warning (disable: 4200)
@@ -36,7 +36,7 @@ protected:
 
 public:
     Message(uint32_t type = MessageType::Unknown, const char * data = nullptr) : body_(data) {
-        this->header.sign = kDefaultSignId;
+        this->header.sign = kDefaultSign;
         this->header.type = type;
     }
 
@@ -45,12 +45,16 @@ public:
     uint32_t sign() const { return this->header.sign; }
     uint32_t messageType() const { return this->header.type; }
     uint32_t bodyLength() const { return this->header.length; }
-    uint32_t args() const { return this->header.args; }
+    uint32_t info() const { return this->header.info.value(); }
+    uint32_t version() const { return this->header.info.version; }
+    uint32_t args() const { return this->header.info.args; }
 
     void setSign(uint32_t sign) { this->header.sign = sign; }
     void setMessageType(uint32_t type) { this->header.type = type; }
     void setBodyLength(uint32_t length) { this->header.length = length; }
-    void setArgs(uint32_t args) { this->header.args = args; }
+    void setInfo(uint32_t info) { this->header.info = info; }
+    void setVersion(uint32_t version) { this->header.info.version = version; }
+    void setArgs(uint32_t args) { this->header.info.args = args; }
 
     char * body() { return (char *)this->body_; }
     const char * body() const { return this->body_; }
@@ -64,24 +68,32 @@ public:
         this->header.length = length;
     }
 
-    void setHeader(uint32_t sign, uint32_t args, uint32_t length) {
+    void setHeader(uint32_t sign, uint32_t type, uint32_t length) {
         this->header.sign   = sign;
-        this->header.args   = args;
+        this->header.type           = type;
         this->header.length = length;
     }
 
-    void setHeader(uint32_t sign, uint32_t type, uint32_t args, uint32_t length) {
-        this->header.sign   = sign;
-        this->header.type   = type;
-        this->header.args   = args;
-        this->header.length = length;
+    void setHeader(uint32_t sign, uint32_t version, uint32_t args, uint32_t length) {
+        this->header.sign           = sign;
+        this->header.info.version  = version;
+        this->header.info.args      = args;
+        this->header.length         = length;
+    }
+
+    void setHeader(uint32_t sign, uint32_t type, uint32_t version, uint32_t args, uint32_t length) {
+        this->header.sign           = sign;
+        this->header.type           = type;
+        this->header.info.version  = version;
+        this->header.info.args      = args;
+        this->header.length         = length;
     }
 
     template <typename InputStreamTy>
     void readHeader(InputStreamTy & is) {
         this->header.sign   = is.readUInt32();
         this->header.type   = is.readUInt32();
-        this->header.args   = is.readUInt32();
+        this->header.info   = is.readUInt32();
         this->header.length = is.readUInt32();
     }
 
@@ -89,7 +101,7 @@ public:
     void writeHeader(OutputStreamTy & os) {
         os.writeUInt32(this->header.sign);
         os.writeUInt32(this->header.type);
-        os.writeUInt32(this->header.args);
+        os.writeUInt32(this->header.info.value());
         os.writeUInt32(this->header.length);
     }
 };
@@ -99,6 +111,7 @@ class BasicMessage : public Message {
 public:
     BasicMessage(uint32_t type = MessageType::Unknown, const char * data = nullptr)
         : Message(type, data) {
+        Message::setInfo(T::kVerInfo);
     }
 
     virtual ~BasicMessage() {}
@@ -108,9 +121,8 @@ public:
         PrepareOutputPacketStream preOS;
         preOS.next(kMsgHeaderSize);
         T * pThis = static_cast<T *>(this);
-        if (pThis != nullptr) {
-            pThis->writeBody(preOS);
-        }
+        assert(pThis != nullptr);
+        pThis->writeBody(preOS);
         return (uint32_t)preOS.position();
     }
 
@@ -129,9 +141,8 @@ public:
         // Calculate the body require size.
         PrepareOutputPacketStream preOS;
         T * pThis = static_cast<T *>(this);
-        if (pThis != nullptr) {
-            pThis->writeBody(preOS);
-        }
+        assert(pThis != nullptr);
+        pThis->writeBody(preOS);
         return (uint32_t)preOS.position();
     }
 
@@ -154,9 +165,8 @@ public:
         Message::readHeader(isb);
 
         T * pThis = static_cast<T *>(this);
-        if (pThis != nullptr) {
-            readStatus = pThis->readBody(is);
-        }
+        assert(pThis != nullptr);
+        readStatus = pThis->readBody(is);
         return readStatus;
     }
 
@@ -165,9 +175,8 @@ public:
         this->prepareBody(os, needPrepare);
 
         T * pThis = static_cast<T *>(this);
-        if (pThis != nullptr) {
-            pThis->writeBody(os);
-        }
+        assert(pThis != nullptr);
+        pThis->writeBody(os);
     }
 
     template <typename OutputStreamTy>
@@ -178,9 +187,8 @@ public:
         Message::writeHeader(osb);
 
         T * pThis = static_cast<T *>(this);
-        if (pThis != nullptr) {
-            pThis->writeBody(os);
-        }
+        assert(pThis != nullptr);
+        pThis->writeBody(os);
     }
 };
 

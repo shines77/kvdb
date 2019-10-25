@@ -43,14 +43,14 @@ public:
     void writeHeader(const MessageHeader & header) {
         this->writeUInt32(header.sign);
         this->writeUInt32(header.type);
-        this->writeUInt32(header.args);
+        this->writeUInt32(header.info);
         this->writeUInt32(header.length);
     }
 
-    void writeHeader(uint32_t sign, uint32_t type, uint32_t args, uint32_t length) {
+    void writeHeader(uint32_t sign, uint32_t type, uint32_t info, uint32_t length) {
         this->writeUInt32(sign);
         this->writeUInt32(type);
-        this->writeUInt32(args);
+        this->writeUInt32(info);
         this->writeUInt32(length);
     }
 
@@ -59,38 +59,38 @@ public:
         this->reset();
         this->writeUInt32(header.sign);
         this->writeUInt32(header.type);
-        this->writeUInt32(header.args);
+        this->writeUInt32(header.info);
         this->writeUInt32(header.length);
         this->setCurrent(savePos);
     }
 
-    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t args) {
+    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t info) {
         char_type * savePos = this->current();
         uint32_t length = this->getMsgLength();
         this->reset();
         this->writeUInt32(sign);
         this->writeUInt32(type);
-        this->writeUInt32(args);
+        this->writeUInt32(info);
         this->writeUInt32(length);
         this->setCurrent(savePos);
     }
 
-    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t args, uint32_t length) {
+    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t info, uint32_t length) {
         char_type * savePos = this->current();
         this->reset();
         this->writeUInt32(sign);
         this->writeUInt32(type);
-        this->writeUInt32(args);
+        this->writeUInt32(info);
         this->writeUInt32(length);
         this->setCurrent(savePos);
     }
 
     void writeType(uint8_t type) {
-        writeUInt8(type);
+        this->writeUInt8(type);
     }
 
     void writeType32(uint32_t type) {
-        writeUInt8((uint8_t)type);
+        this->writeUInt8((uint8_t)type);
     }
 
     void writeByte(uint8_t value) {

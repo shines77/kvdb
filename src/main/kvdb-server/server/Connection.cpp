@@ -73,7 +73,7 @@ void Connection::start_read_request()
         InputPacketStream istream(header_buf);
         istream.readHeader(header);
         uint32_t requestSize = header.length;
-        if (header.sign == kDefaultSignId && requestSize > 0) {
+        if (header.sign == kDefaultSign && requestSize > 0) {
             //
             // Receive the part data of response, if it's not completed, continue to read. 
             //
