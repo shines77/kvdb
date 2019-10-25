@@ -7,6 +7,7 @@
 #endif
 
 #include "kvdb/basic/stdint.h"
+#include "kvdb/core/MessageType.h"
 #include "kvdb/core/MessageHeader.h"
 #include "kvdb/stream/BasicStream.h"
 #include "kvdb/stream/InputPacketStream.h"
@@ -28,37 +29,13 @@ struct MessageData {
 
 class Message {
 public:
-    enum Type {
-        Unknown = 0,
-
-        LoginRequest,
-        LoginResponse,
-
-        HandShakeRequest,
-        HandShakeResponse,
-
-        ConnectRequest,
-        ConnectResponse,
-
-        QueryRequest,
-        QueryResponse,
-
-        DisconnectRequest,
-        DisconnectResponse,
-
-        LogoutRequest,
-        LogoutResponse,
-
-        Last
-    };
-
     MessageHeader header;
 
 protected:
     const char * body_;
 
 public:
-    Message(uint32_t type = Message::Unknown, const char * data = nullptr) : body_(data) {
+    Message(uint32_t type = MessageType::Unknown, const char * data = nullptr) : body_(data) {
         this->header.sign = kDefaultSignId;
         this->header.type = type;
     }
@@ -120,7 +97,7 @@ public:
 template <typename T>
 class BasicMessage : public Message {
 public:
-    BasicMessage(uint32_t type = Message::Unknown, const char * data = nullptr)
+    BasicMessage(uint32_t type = MessageType::Unknown, const char * data = nullptr)
         : Message(type, data) {
     }
 

@@ -6,14 +6,15 @@
 #pragma once
 #endif
 
-#include <string>
-
+#include "kvdb/basic/stdint.h"
 #include "kvdb/core/Request.h"
 #include "kvdb/core/Response.h"
 #include "kvdb/core/StatusCode.h"
 #include "kvdb/stream/BasicStream.h"
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
+
+#include <string>
 
 namespace kvdb {
 
@@ -24,12 +25,12 @@ struct LoginRequest : public Request<LoginRequest> {
     std::string sDatabase;
 
     LoginRequest(const char * data = nullptr)
-        : Request(Message::LoginRequest, data) {
+        : Request(MessageType::LoginRequest, data) {
         setArgs(kArgs);
         init();
     }
     LoginRequest(std::string username, std::string password, std::string database)
-        : Request(Message::LoginRequest, nullptr),
+        : Request(MessageType::LoginRequest, nullptr),
           sUsername(username), sPassword(password), sDatabase(database) {
         setArgs(kArgs);
     }
@@ -60,13 +61,13 @@ struct LoginResponse : public Response<LoginResponse> {
     int iStatusCode;
 
     LoginResponse(const char * data = nullptr)
-        : Response(Message::LoginResponse, data),
+        : Response(MessageType::LoginResponse, data),
           iStatusCode(StatusCode::Unknown) {
         setArgs(kArgs);
         init();
     }
     LoginResponse(int statusCode)
-        : Response(Message::LoginResponse, nullptr),
+        : Response(MessageType::LoginResponse, nullptr),
           iStatusCode(statusCode) {
         setArgs(kArgs);
     }
@@ -94,13 +95,13 @@ struct HandShakeRequest : public Request<HandShakeRequest> {
     uint32_t iVersion;
 
     HandShakeRequest(const char * data = nullptr)
-        : Request(Message::HandShakeRequest, data),
+        : Request(MessageType::HandShakeRequest, data),
           iVersion(0) {
         setArgs(kArgs);
         init();
     }
     HandShakeRequest(uint32_t version)
-        : Request(Message::HandShakeRequest, nullptr),
+        : Request(MessageType::HandShakeRequest, nullptr),
           iVersion(version) {
         setArgs(kArgs);
     }
@@ -128,13 +129,13 @@ struct HandShakeResponse : public Response<HandShakeResponse> {
     int iStatusCode;
 
     HandShakeResponse(const char * data = nullptr)
-        : Response(Message::HandShakeResponse, data),
+        : Response(MessageType::HandShakeResponse, data),
           iStatusCode(StatusCode::Unknown) {
         setArgs(kArgs);
         init();
     }
     HandShakeResponse(int statusCode)
-        : Response(Message::HandShakeResponse, nullptr),
+        : Response(MessageType::HandShakeResponse, nullptr),
           iStatusCode(statusCode) {
         setArgs(kArgs);
     }
@@ -162,13 +163,13 @@ struct ConnectRequest : public Request<ConnectRequest> {
     uint32_t iVersion;
 
     ConnectRequest(const char * data = nullptr)
-        : Request(Message::ConnectRequest, data),
+        : Request(MessageType::ConnectRequest, data),
           iVersion(0) {
         setArgs(kArgs);
         init();
     }
     ConnectRequest(uint32_t version)
-        : Request(Message::ConnectRequest, nullptr),
+        : Request(MessageType::ConnectRequest, nullptr),
           iVersion(version) {
         setArgs(kArgs);
     }
@@ -196,13 +197,13 @@ struct ConnectResponse : public Response<ConnectResponse> {
     int iStatusCode;
 
     ConnectResponse(const char * data = nullptr)
-        : Response(Message::ConnectResponse, data),
+        : Response(MessageType::ConnectResponse, data),
           iStatusCode(StatusCode::Unknown) {
         setArgs(kArgs);
         init();
     }
     ConnectResponse(int statusCode)
-        : Response(Message::ConnectResponse, nullptr),
+        : Response(MessageType::ConnectResponse, nullptr),
           iStatusCode(statusCode) {
         setArgs(kArgs);
     }
