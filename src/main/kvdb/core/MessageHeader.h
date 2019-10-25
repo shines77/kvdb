@@ -35,7 +35,7 @@ struct VersionInfo {
     uint16_t args;
 
     VersionInfo() : version(0), args(0) {}
-    VersionInfo(uint32_t info) : version(GET_MSG_VERSION(info)), args(GET_MSG_ARGS(info)) {}
+    explicit VersionInfo(uint32_t info) : version(GET_MSG_VERSION(info)), args(GET_MSG_ARGS(info)) {}
     VersionInfo(uint16_t ver, uint16_t _args) : version(ver), args(_args) {}
     ~VersionInfo() {}
 
