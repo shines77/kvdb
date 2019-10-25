@@ -70,13 +70,13 @@ public:
 
     void setHeader(uint32_t sign, uint32_t type, uint32_t length) {
         this->header.sign   = sign;
-        this->header.type           = type;
+        this->header.type   = type;
         this->header.length = length;
     }
 
     void setHeader(uint32_t sign, uint32_t version, uint32_t args, uint32_t length) {
         this->header.sign           = sign;
-        this->header.info.version  = version;
+        this->header.info.version   = version;
         this->header.info.args      = args;
         this->header.length         = length;
     }
@@ -84,7 +84,7 @@ public:
     void setHeader(uint32_t sign, uint32_t type, uint32_t version, uint32_t args, uint32_t length) {
         this->header.sign           = sign;
         this->header.type           = type;
-        this->header.info.version  = version;
+        this->header.info.version   = version;
         this->header.info.args      = args;
         this->header.length         = length;
     }

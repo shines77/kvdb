@@ -1,6 +1,6 @@
 
-#ifndef KVDB_CORE_MESSAGES_DEF_H
-#define KVDB_CORE_MESSAGES_DEF_H
+#ifndef KVDB_CORE_MESSAGES_DEFINE_H
+#define KVDB_CORE_MESSAGES_DEFINE_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
@@ -59,8 +59,7 @@ struct LoginResponse : public Response<LoginResponse> {
     int iStatusCode;
 
     LoginResponse(const char * data = nullptr)
-        : Response(MessageType::LoginResponse, data),
-          iStatusCode(StatusCode::Unknown) {
+        : Response(MessageType::LoginResponse, data) {
         init();
     }
     LoginResponse(int statusCode)
@@ -91,8 +90,7 @@ struct HandShakeRequest : public Request<HandShakeRequest> {
     uint32_t iVersion;
 
     HandShakeRequest(const char * data = nullptr)
-        : Request(MessageType::HandShakeRequest, data),
-          iVersion(0) {
+        : Request(MessageType::HandShakeRequest, data) {
         init();
     }
     HandShakeRequest(uint32_t version)
@@ -123,8 +121,7 @@ struct HandShakeResponse : public Response<HandShakeResponse> {
     int iStatusCode;
 
     HandShakeResponse(const char * data = nullptr)
-        : Response(MessageType::HandShakeResponse, data),
-          iStatusCode(StatusCode::Unknown) {
+        : Response(MessageType::HandShakeResponse, data) {
         init();
     }
     HandShakeResponse(int statusCode)
@@ -134,7 +131,7 @@ struct HandShakeResponse : public Response<HandShakeResponse> {
     virtual ~HandShakeResponse() {}
 
     void init() {
-        iStatusCode = 0;
+        iStatusCode = StatusCode::Unknown;
     }
 
     template <typename InputStreamTy>
@@ -155,8 +152,7 @@ struct ConnectRequest : public Request<ConnectRequest> {
     uint32_t iVersion;
 
     ConnectRequest(const char * data = nullptr)
-        : Request(MessageType::ConnectRequest, data),
-          iVersion(0) {
+        : Request(MessageType::ConnectRequest, data) {
         init();
     }
     ConnectRequest(uint32_t version)
@@ -187,8 +183,7 @@ struct ConnectResponse : public Response<ConnectResponse> {
     int iStatusCode;
 
     ConnectResponse(const char * data = nullptr)
-        : Response(MessageType::ConnectResponse, data),
-          iStatusCode(StatusCode::Unknown) {
+        : Response(MessageType::ConnectResponse, data) {
         init();
     }
     ConnectResponse(int statusCode)
@@ -198,7 +193,7 @@ struct ConnectResponse : public Response<ConnectResponse> {
     virtual ~ConnectResponse() {}
 
     void init() {
-        iStatusCode = 0;
+        iStatusCode = StatusCode::Unknown;
     }
 
     template <typename InputStreamTy>
@@ -216,4 +211,4 @@ struct ConnectResponse : public Response<ConnectResponse> {
 
 } // namespace kvdb
 
-#endif // KVDB_CORE_MESSAGES_H
+#endif // KVDB_CORE_MESSAGES_DEFINE_H
