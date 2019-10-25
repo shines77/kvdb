@@ -46,7 +46,7 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
             if (result == ParseResult::OK) {
                 LoginResponse response;
                 response.setSign(kDefaultSignId);
-                response.setMessageType(Message::LoginResponse);
+                response.setMessageType(MessageType::LoginResponse);
                 response.setArgs(1);
                 response.setBodyLength(0);
                 response.iStatusCode = 0;
@@ -70,7 +70,7 @@ int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
     if (result) {
         HandShakeResponse response;
         response.setSign(kDefaultSignId);
-        response.setMessageType(Message::HandShakeResponse);
+        response.setMessageType(MessageType::HandShakeResponse);
         response.setArgs(1);
         response.setBodyLength(0);
         response.iStatusCode = 0;
@@ -91,7 +91,7 @@ int RequestHandler::handleConnectRequest(ConnectionContext & context,
     if (result) {
         ConnectResponse response;
         response.setSign(kDefaultSignId);
-        response.setMessageType(Message::ConnectResponse);
+        response.setMessageType(MessageType::ConnectResponse);
         response.setArgs(1);
         response.setBodyLength(0);
         response.iStatusCode = 0;
@@ -185,19 +185,19 @@ int RequestHandler::handleRequest(ConnectionContext & context,
         const char * first = stream.current();
         int result = 0;
         switch (header.type) {
-        case Message::LoginRequest:
+        case MessageType::LoginRequest:
             result = handleLoginRequest(context, stream, os);
             break;
 
-        case Message::HandShakeRequest:
+        case MessageType::HandShakeRequest:
             result = handleHandshakeRequest(context, stream, os);
             break;
 
-        case Message::ConnectRequest:
+        case MessageType::ConnectRequest:
             result = handleConnectRequest(context, stream, os);
             break;
 
-        case Message::QueryRequest:
+        case MessageType::QueryRequest:
             result = handleQueryRequest(context, stream, os);
             break;
 
