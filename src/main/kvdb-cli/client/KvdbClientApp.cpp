@@ -246,9 +246,9 @@ int KvdbClientApp::run_kvdb_shell(int argc, char * argv[])
         unsigned char commands[1024];
         do {
 #if defined(_WIN32)
-            int cmd_len = scanf_s("%s", &commands, (int)(sizeof(commands) - 1));
+            int cmd_len = scanf_s("%s", &commands[0], (int)(sizeof(commands) - 1));
 #else
-            int cmd_len = scanf("%s", &commands);
+            int cmd_len = scanf("%s", &commands[0]);
 #endif
             if (cmd_len <= 0) continue;
 
@@ -256,7 +256,7 @@ int KvdbClientApp::run_kvdb_shell(int argc, char * argv[])
             unsigned char ch;
 
             // Find the first non space char position.
-            while (ch = commands[first] != '\0') {
+            while ((ch = commands[first]) != '\0') {
                 if (likely(ch != ' ')) {
                     first++;
                     if (first >= cmd_len)
