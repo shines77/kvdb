@@ -43,6 +43,7 @@ public:
     virtual void welcome() = 0;
     virtual void print_usage() = 0;
     virtual int  main(int argc, char * argv[]) = 0;
+    virtual int  main() = 0;
 
     virtual void initialize() {
         // Default is do nothing !
@@ -70,6 +71,11 @@ public:
         this->welcome();
         int result = this->main(argc_, argv_);
         return result;
+    }
+
+    int run(int argc, char * argv[]) {
+        this->set_args(argc, argv);
+        return this->run();
     }
 };
 

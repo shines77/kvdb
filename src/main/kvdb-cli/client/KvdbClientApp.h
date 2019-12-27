@@ -45,13 +45,15 @@ public:
     virtual void welcome() override;
     virtual void print_usage() override;
     virtual int  main(int argc, char * argv[]) override;
+    virtual int  main() override;
 
     void init_options();
-    void parse_command_line();
+    int  parse_args(int argc, char * argv[]);
+    int  parse_args();
 
     void net_packet_test();
-    void run_kvdb_client(const std::string & address, uint16_t port);
-    int  run_kvdb_shell(int argc, char * argv[]);
+    void run_client(const std::string & address, uint16_t port);
+    int  run_shell(int argc, char * argv[]);
 };
 
 } // namespace client

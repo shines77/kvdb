@@ -92,12 +92,12 @@ void KvdbClientApp::print_usage()
     std::cerr << std::endl;
 }
 
-void KvdbClientApp::parse_command_line()
+int KvdbClientApp::parse_args(int argc, char * argv[])
 {
     // Parse the command line.
     options::variables_map args_map;
     try {
-        options::store(options::parse_command_line(argc_, argv_, options_desc), args_map);
+        options::store(options::parse_command_line(argc, argv, options_desc), args_map);
     }
     catch (const std::exception & ex) {
         std::cout << "Exception is: " << ex.what() << std::endl;
@@ -107,8 +107,8 @@ void KvdbClientApp::parse_command_line()
     // Option: help
     size_t nn = args_map.count("help");
     if (args_map.count("help") > 0) {
-        print_usage();
-        ::exit(EXIT_FAILURE);
+        this->print_usage();
+        return EXIT_FAILURE;
     }
 
     // Option: host
@@ -125,11 +125,11 @@ void KvdbClientApp::parse_command_line()
     boost::asio::ip::tcp::endpoint server_endpoint(ip_address, server_port);
     if (!is_valid_ip_v4(server_address)) {
         std::cerr << "Error: ip address \"" << server_address.c_str() << "\" format is wrong." << std::endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
     if (!is_socket_port(server_port)) {
         std::cerr << "Error: port [" << server_port << "] number must be range in (0, 65535]." << std::endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     client_config.remote = server_host;
@@ -147,7 +147,7 @@ void KvdbClientApp::parse_command_line()
     std::cout << "username: " << username.c_str() << std::endl;
     if (username.size() <= 0) {
         std::cerr << "Error: username \"" << username.c_str() << "\" is empty." << std::endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     client_config.username = username;
@@ -159,7 +159,7 @@ void KvdbClientApp::parse_command_line()
     std::cout << "password: " << password.c_str() << std::endl;
     if (password.size() <= 0) {
         std::cerr << "Error: password \"" << password.c_str() << "\" is empty." << std::endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     client_config.password = password;
@@ -171,10 +171,17 @@ void KvdbClientApp::parse_command_line()
     std::cout << "database: " << database.c_str() << std::endl;
     if (database.size() <= 0) {
         std::cerr << "Error: database \"" << database.c_str() << "\" is empty." << std::endl;
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     client_config.database = database;
+
+    return EXIT_SUCCESS;
+}
+
+int KvdbClientApp::parse_args()
+{
+    return this->parse_args(argc_, argv_);
 }
 
 void KvdbClientApp::net_packet_test()
@@ -192,7 +199,7 @@ void KvdbClientApp::net_packet_test()
     int count = packet.readFrom(istream);
 }
 
-void KvdbClientApp::run_kvdb_client(const std::string & address, uint16_t port)
+void KvdbClientApp::run_client(const std::string & address, uint16_t port)
 {
     try {
         // Alias of size_t
@@ -237,7 +244,7 @@ void KvdbClientApp::run_kvdb_client(const std::string & address, uint16_t port)
     }
 }
 
-int KvdbClientApp::run_kvdb_shell(int argc, char * argv[])
+int KvdbClientApp::run_shell(int argc, char * argv[])
 {
     bool exit = false;
 
@@ -323,17 +330,28 @@ int KvdbClientApp::run_kvdb_shell(int argc, char * argv[])
 
 int KvdbClientApp::main(int argc, char * argv[])
 {
-    init_options();
-    parse_command_line();
+    int result;
+    this->init_options();
+    result = this->parse_args(argc, argv);
 
     printf("\n");
 
-    net_packet_test();
+    if (result == EXIT_SUCCESS) {
+        this->net_packet_test();
+        this->run_client(client_config.address, client_config.port);
 
-    run_kvdb_client(client_config.address, client_config.port);
+        result = this->run_shell(argc, argv);
+    }
+    else {
+        ::exit(EXIT_FAILURE);
+    }
 
-    int result = run_kvdb_shell(argc, argv);
     return result;
+}
+
+int KvdbClientApp::main()
+{
+    return this->main(argc_, argv_);
 }
 
 } // namespace client
