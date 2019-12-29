@@ -86,6 +86,7 @@ public:
     ~KvdbServer()
     {
         this->stop();
+        this->wait();
     }
 
     void do_signal_set() {
@@ -150,25 +151,30 @@ public:
         });
     }
 
-    void join()
+    void wait()
     {
-        if (thread_->joinable()) {
-            thread_->join();
+        if (thread_.get() != nullptr) {
+            if (thread_->joinable()) {
+                thread_->join();
+            }
+            thread_.reset();
         }
     }
 
 private:
     void do_accept()
     {
+        if (acceptor_.is_open()) {
 #if USE_KVDB_CONNECTION
-        new_connection_.reset(new KvdbConnection(io_service_pool_.get_io_service(),
-                                                 buffer_size_, packet_size_, g_need_echo));
+            new_connection_.reset(new KvdbConnection(io_service_pool_.get_io_service(),
+                                                     buffer_size_, packet_size_, g_need_echo));
 #else
-        new_connection_.reset(new Connection(io_service_pool_.get_io_service(),
-                                             connection_manager_, request_handler_));
+            new_connection_.reset(new Connection(io_service_pool_.get_io_service(),
+                                                 connection_manager_, request_handler_));
 #endif
-        acceptor_.async_accept(new_connection_->socket(), boost::bind(&KvdbServer::handle_accept,
-                               this, boost::asio::placeholders::error, new_connection_));
+            acceptor_.async_accept(new_connection_->socket(), boost::bind(&KvdbServer::handle_accept,
+                                   this, boost::asio::placeholders::error, new_connection_));
+        }
     }
 
     void handle_accept(const boost::system::error_code & ec,
@@ -186,6 +192,7 @@ private:
             if (new_connection) {
                 connection_manager_.start(new_connection);
             }
+
             do_accept();
         }
         else {

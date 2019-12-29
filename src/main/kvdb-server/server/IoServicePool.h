@@ -32,6 +32,9 @@ private:
     /// The next io_service to use for a connection.
     std::atomic<uint32_t> next_io_service_;
 
+    /// The pool of threads to run all of the io_services.
+    std::vector<boost::shared_ptr<boost::thread>> threads_;
+
 public:
     /// Construct the io_service pool.
     explicit IoServicePool(uint32_t pool_size)
@@ -53,24 +56,22 @@ public:
 
     ~IoServicePool()
     {
-        stop();
+        this->stop();
+        this->wait();
     }
 
     /// Run all io_service objects in the pool.
     void run()
     {
         // Create a pool of threads to run all of the io_services.
-        std::vector< boost::shared_ptr<boost::thread> > threads;
         for (std::size_t i = 0; i < io_services_.size(); ++i) {
             boost::shared_ptr<boost::thread> thread(new boost::thread(
                 boost::bind(&boost::asio::io_service::run, io_services_[i])));
-            threads.push_back(thread);
+            threads_.push_back(thread);
         }
 
         // Wait for all threads in the pool to exit.
-        for (std::size_t i = 0; i < threads.size(); ++i) {
-            threads[i]->join();
-        }
+        this->wait();
     }
 
     /// Stop all io_service objects in the pool.
@@ -79,6 +80,19 @@ public:
         // Explicitly stop all io_services.
         for (std::size_t i = 0; i < io_services_.size(); ++i) {
             io_services_[i]->stop();
+        }
+    }
+
+    void wait()
+    {
+        // Wait for all threads in the pool to exit.
+        for (std::size_t i = 0; i < threads_.size(); ++i) {
+            if (threads_[i].get() != nullptr) {
+                if (threads_[i]->joinable()) {
+                    threads_[i]->join();
+                }
+                threads_[i].reset();
+            }
         }
     }
 

@@ -237,7 +237,7 @@ void KvdbClientApp::run_client(const std::string & address, uint16_t port)
         }
         //*/
 
-        client.join();
+        client.wait();
     }
     catch (const std::exception & ex) {
         std::cerr << "Exception: " << ex.what() << std::endl;

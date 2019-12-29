@@ -71,6 +71,7 @@ public:
 
     ~KvdbClient() {
         this->stop();
+        this->wait();
     }
 
     void do_signal_set() {
@@ -133,7 +134,6 @@ public:
         this->disconnect();
 
         io_service_.stop();
-        this->join();
     }
 
     //
@@ -165,10 +165,13 @@ public:
         });
     }
 
-    void join()
+    void wait()
     {
-        if (thread_->joinable()) {
-            thread_->join();
+        if (thread_.get() != nullptr) {
+            if (thread_->joinable()) {
+                thread_->join();
+            }
+            thread_.reset();
         }
     }
 
