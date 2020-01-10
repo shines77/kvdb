@@ -26,7 +26,7 @@
 #include "server/KvdbConnection.h"
 #include "server/ConnectionManager.h"
 
-using namespace boost::asio;
+using namespace boost::asio::ip;
 
 #define USE_KVDB_CONNECTION     0
 
@@ -40,23 +40,23 @@ class KvdbServer : public boost::enable_shared_from_this<KvdbServer>,
                    private boost::noncopyable
 {
 private:
-    IoServicePool                       io_service_pool_;
-    boost::asio::ip::tcp::acceptor      acceptor_;
-    connection_ptr                      new_connection_;
+    IoServicePool                   io_service_pool_;
+    tcp::acceptor                   acceptor_;
+    connection_ptr                  new_connection_;
 
     /// The connection manager which owns all live connections.
-    ConnectionManager                   connection_manager_;
+    ConnectionManager               connection_manager_;
 
     ///
-    RequestHandler                      request_handler_;
+    RequestHandler                  request_handler_;
 
-    std::shared_ptr<std::thread>        thread_;
+    std::shared_ptr<std::thread>    thread_;
 
     /// The signal_set is used to register for process termination notifications.
-    boost::asio::signal_set             signals_;
+    boost::asio::signal_set         signals_;
 
-    uint32_t                            buffer_size_;
-    uint32_t                            packet_size_;
+    uint32_t                        buffer_size_;
+    uint32_t                        packet_size_;
 
 public:
     KvdbServer(const std::string & address, const std::string & port,
@@ -106,10 +106,10 @@ public:
 
     void start(const std::string & address, const std::string & port)
     {
-        ip::tcp::resolver resolver(io_service_pool_.get_first_io_service());
-        ip::tcp::resolver::query query(address, port);
-        ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-        boost::asio::ip::tcp::endpoint endpoint = *endpoint_iterator;
+        tcp::resolver resolver(io_service_pool_.get_first_io_service());
+        tcp::resolver::query query(address, port);
+        tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+        tcp::endpoint endpoint = *endpoint_iterator;
 
         boost::system::error_code err;
         acceptor_.open(endpoint.protocol(), err); 

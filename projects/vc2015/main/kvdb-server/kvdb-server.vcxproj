@@ -38,6 +38,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Request.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\RequestHandler.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Response.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\WokerThread.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F93202C8-108E-4FA7-917B-BF28E078A484}</ProjectGuid>

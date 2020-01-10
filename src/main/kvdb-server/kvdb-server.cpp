@@ -15,6 +15,7 @@
 
 #include "server/common.h"
 #include "server/KvdbServer.h"
+#include "server/WokerThread.h"
 
 #include "kvdb/all.h"
 
@@ -96,6 +97,9 @@ void run_kvdb_server(const std::string & address, const std::string & port,
     catch (const std::exception & ex) {
         std::cerr << "Exception: " << ex.what() << std::endl;
     }
+
+    WorkerThread workerThread;
+    workerThread.start();
 }
 
 void make_spaces(std::string & spaces, std::size_t size)

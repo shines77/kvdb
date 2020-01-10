@@ -66,5 +66,8 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\ConnectionContext.h">
       <Filter>src\server</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\WokerThread.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

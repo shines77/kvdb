@@ -20,10 +20,19 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb\all.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\asio\AsioHacksFwd.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\asio\DeadlineTimer.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\asio\IoContext.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\asio\IpAddress.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\asio\IpNetwork.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\asio\Resolver.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\asio\Strand.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\basic\compiler.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\inttypes.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\msvc\inttypes.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\msvc\stdbool.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\msvc\stdint.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\basic\platform.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\stddef.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\stdint.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\basic\stdsize.h" />
@@ -75,6 +84,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\Power2.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\SSEHelper.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\StopWatch.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\utils\Optional.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\main\kvdb\all.cpp" />
