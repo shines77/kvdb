@@ -60,11 +60,7 @@ public:
 
     virtual ~WorkerThread() {
         this->stop();
-
-        if (this->thread_.get() != nullptr) {
-            this->wait();
-            this->thread_.reset();
-        }
+        this->wait();
     }
 
     bool start()
