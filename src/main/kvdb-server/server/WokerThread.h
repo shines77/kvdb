@@ -43,7 +43,9 @@ private:
     std::unique_ptr<std::thread> thread_;
 
     std::atomic<int32_t>        connections_;
-    std::atomic<bool>           stopped_;
+    std::atomic<bool>           startting_;
+    std::atomic<bool>           running_;
+    std::atomic<bool>           stopping_;
 
     socket_container_t          socketContainer_;
 
@@ -55,8 +57,10 @@ private:
     kvdb::Asio::DeadlineTimer   updateTimer_;
 
 public:
-    WorkerThread() : connections_(0), stopped_(false), ioContext_(1),
-                     acceptSocket_(ioContext_), updateTimer_(ioContext_) {}
+    WorkerThread() : connections_(0), startting_(false), running_(false), stopping_(false),
+                     ioContext_(1), acceptSocket_(ioContext_), updateTimer_(ioContext_) {
+        //
+    }
 
     virtual ~WorkerThread() {
         this->stop();
@@ -65,36 +69,55 @@ public:
 
     bool start()
     {
+        if (this->startting_ || this->running_)
+            return false;
+
         if (this->thread_.get() != nullptr)
             return false;
 
-        this->stopped_ = false;
+        this->startting_ = true;
+
         this->thread_.reset(new std::thread(&WorkerThread::run, this));
         return true;
     }
 
     void stop()
     {
-        this->stopped_ = true;
-        this->ioContext_.stop();
+        if (this->running_ && !this->stopping_) {
+            this->stopping_ = true;
+
+            this->ioContext_.stop();
+        }
     }
 
     void wait()
     {
-        assert(this->thread_.get() != nullptr);
+        if (this->running_) {
+            assert(this->thread_.get() != nullptr);
 
-        if (this->thread_.get() != nullptr) {
-            if (this->thread_->joinable()) {
-                this->thread_->join();
+            if (this->thread_.get() != nullptr) {
+                if (this->thread_->joinable()) {
+                    this->thread_->join();
+                }
+                this->thread_.reset();
             }
-            this->thread_.reset();
+
+            this->stopping_ = false;
+            this->running_ = false;
         }
     }
 
 protected:
     void run()
     {
-        this->ioContext_.run();
+        if (this->startting_ && !this->running_) {
+
+            this->ioContext_.run();
+
+            this->startting_ = false;
+            this->running_ = true;
+            this->stopping_ = false;
+        }
     }
 
 };

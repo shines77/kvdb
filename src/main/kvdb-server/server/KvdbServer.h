@@ -44,6 +44,9 @@ private:
     tcp::acceptor                   acceptor_;
     connection_ptr                  new_connection_;
 
+    std::string                     remote_address_;
+    std::string                     remote_port_;
+
     /// The connection manager which owns all live connections.
     ConnectionManager               connection_manager_;
 
@@ -51,6 +54,9 @@ private:
     RequestHandler                  request_handler_;
 
     std::shared_ptr<std::thread>    thread_;
+    std::atomic<bool>               startting_;
+    std::atomic<bool>               running_;
+    std::atomic<bool>               stopping_;
 
     /// The signal_set is used to register for process termination notifications.
     boost::asio::signal_set         signals_;
@@ -63,24 +69,24 @@ public:
                const std::string & docRoot,
                uint32_t pool_size = std::thread::hardware_concurrency())
         : io_service_pool_(pool_size), acceptor_(io_service_pool_.get_first_io_service()),
+          remote_address_(address), remote_port_(port),
           request_handler_(docRoot),
+          startting_(false), running_(false), stopping_(false),
           signals_(io_service_pool_.get_first_io_service())
     {
         do_signal_set();
-
-        start(address, port);
     }
 
     KvdbServer(const std::string & address, uint16_t port,
                const std::string & docRoot,
                uint32_t pool_size = std::thread::hardware_concurrency())
         : io_service_pool_(pool_size), acceptor_(io_service_pool_.get_first_io_service()),
+          remote_address_(address), remote_port_(std::to_string(port)),
           request_handler_(docRoot),
+          startting_(false), running_(false), stopping_(false),
           signals_(io_service_pool_.get_first_io_service())
     {
         do_signal_set();
-
-        start(address, std::to_string(port));
     }
 
     ~KvdbServer()
@@ -104,8 +110,18 @@ public:
         signals_.async_wait(boost::bind(&KvdbServer::handle_stop, this));
     }
 
-    void start(const std::string & address, const std::string & port)
+    bool start()
     {
+        return start(remote_address_, remote_port_);
+    }
+
+    bool start(const std::string & address, const std::string & port)
+    {
+        if (this->startting_ || this->running_)
+            return false;
+
+        this->startting_ = true;
+
         tcp::resolver resolver(io_service_pool_.get_first_io_service());
         tcp::resolver::query query(address, port);
         tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
@@ -121,7 +137,7 @@ public:
                << err.message().c_str();
             std::cout << err_info.str().c_str() << std::endl;
             throw std::exception(err_info.str().c_str());
-            return;
+            return false;
         }
 
         boost::asio::socket_base::reuse_address option(true);
@@ -130,41 +146,60 @@ public:
         acceptor_.listen();
 
         do_accept();
+
+        this->run();
+
+        return true;
     }
 
     void stop()
     {
-        if (acceptor_.is_open()) {
-            acceptor_.cancel();
-            acceptor_.close();
+        if (this->running_ && !this->stopping_) {
+            this->stopping_ = true;
+
+            if (this->acceptor_.is_open()) {
+                this->acceptor_.cancel();
+                this->acceptor_.close();
+            }
+
+            this->connection_manager_.stop_all();
+
+            this->io_service_pool_.stop();
         }
-
-        connection_manager_.stop_all();
-
-        io_service_pool_.stop();
-    }
-
-    void run()
-    {
-        thread_ = std::make_shared<std::thread>([this]() {
-            io_service_pool_.run();
-        });
     }
 
     void wait()
     {
-        if (thread_.get() != nullptr) {
-            if (thread_->joinable()) {
-                thread_->join();
+        if (this->running_) {
+            if (this->thread_.get() != nullptr) {
+                if (this->thread_->joinable()) {
+                    this->thread_->join();
+                }
+                this->thread_.reset();
             }
-            thread_.reset();
+
+            this->stopping_ = false;
+            this->running_ = false;
         }
     }
 
 private:
+    void run()
+    {
+        if (this->startting_ && !this->running_) {
+            this->thread_ = std::make_shared<std::thread>([this]() {
+                io_service_pool_.start();
+            });
+
+            this->startting_ = false;
+            this->running_ = true;
+            this->stopping_ = false;
+        }
+    }
+
     void do_accept()
     {
-        if (acceptor_.is_open()) {
+        if (this->acceptor_.is_open()) {
 #if USE_KVDB_CONNECTION
             new_connection_.reset(new KvdbConnection(io_service_pool_.get_io_service(),
                                                      buffer_size_, packet_size_, g_need_echo));
@@ -184,7 +219,7 @@ private:
         // Check whether the server was stopped by a signal before this completion
         // handler had a chance to run.
         //
-        if (!acceptor_.is_open()) {
+        if (!this->acceptor_.is_open()) {
             return;
         }
 
@@ -201,7 +236,7 @@ private:
                 std::cout << "kvdb_server::handle_accept() - Error: (code = " << ec.value() << ") "
                           << ec.message().c_str() << std::endl;
                 if (new_connection) {
-                    connection_manager_.stop(new_connection);
+                    this->connection_manager_.stop(new_connection);
                     new_connection.reset();
                 }
             }
@@ -210,7 +245,7 @@ private:
 
     void handle_stop()
     {
-        stop();
+        this->stop();
     }
 };
 

@@ -27,18 +27,22 @@ private:
     std::vector<io_service_ptr> io_services_;
 
     /// The work that keeps the io_services running.
-    std::vector<io_work_ptr> workes_;
+    std::vector<io_work_ptr>    workes_;
 
     /// The next io_service to use for a connection.
-    std::atomic<uint32_t> next_io_service_;
+    std::atomic<uint32_t>       next_io_service_;
 
     /// The pool of threads to run all of the io_services.
     std::vector<boost::shared_ptr<boost::thread>> threads_;
 
+    std::atomic<bool>           startting_;
+    std::atomic<bool>           running_;
+    std::atomic<bool>           stopping_;
+
 public:
     /// Construct the io_service pool.
     explicit IoServicePool(uint32_t pool_size)
-        : next_io_service_(0)
+        : next_io_service_(0), startting_(false), running_(false), stopping_(false)
     {
         if (pool_size == 0) {
             throw std::runtime_error("io_service_pool size is 0.");
@@ -60,39 +64,46 @@ public:
         this->wait();
     }
 
-    /// Run all io_service objects in the pool.
-    void run()
+    /// Start
+    bool start()
     {
-        // Create a pool of threads to run all of the io_services.
-        for (std::size_t i = 0; i < io_services_.size(); ++i) {
-            boost::shared_ptr<boost::thread> thread(new boost::thread(
-                boost::bind(&boost::asio::io_service::run, io_services_[i])));
-            threads_.push_back(thread);
-        }
+        if (this->startting_ || this->running_)
+            return false;
 
-        // Wait for all threads in the pool to exit.
-        this->wait();
+        this->startting_ = true;
+        this->run();
+
+        return true;
     }
 
     /// Stop all io_service objects in the pool.
     void stop()
     {
-        // Explicitly stop all io_services.
-        for (std::size_t i = 0; i < io_services_.size(); ++i) {
-            io_services_[i]->stop();
+        if (this->running_ && !this->stopping_) {
+            this->stopping_ = true;
+
+            // Explicitly stop all io_services.
+            for (std::size_t i = 0; i < io_services_.size(); ++i) {
+                io_services_[i]->stop();
+            }
         }
     }
 
+    /// Wait for all threads in the pool to exit.
     void wait()
     {
-        // Wait for all threads in the pool to exit.
-        for (std::size_t i = 0; i < threads_.size(); ++i) {
-            if (threads_[i].get() != nullptr) {
-                if (threads_[i]->joinable()) {
-                    threads_[i]->join();
+        if (this->running_) {
+            for (std::size_t i = 0; i < threads_.size(); ++i) {
+                if (threads_[i].get() != nullptr) {
+                    if (threads_[i]->joinable()) {
+                        threads_[i]->join();
+                    }
+                    threads_[i].reset();
                 }
-                threads_[i].reset();
             }
+
+            this->stopping_ = false;
+            this->running_ = false;
         }
     }
 
@@ -108,6 +119,14 @@ public:
     }
 
     /// Get an io_service to use.
+    boost::asio::io_service & get_first_io_service()
+    {
+        // Use a round-robin scheme to choose the next io_service to use.
+        boost::asio::io_service & io_service = *io_services_[0];
+        return io_service;
+    }
+
+    /// Get an io_service to use.
     boost::asio::io_service & get_now_io_service()
     {
         // Use a round-robin scheme to choose the next io_service to use.
@@ -117,12 +136,23 @@ public:
         return io_service;
     }
 
-    /// Get an io_service to use.
-    boost::asio::io_service & get_first_io_service()
+protected:
+    /// Run all io_service objects in the pool.
+    void run()
     {
-        // Use a round-robin scheme to choose the next io_service to use.
-        boost::asio::io_service & io_service = *io_services_[0];
-        return io_service;
+        if (this->startting_ && !this->running_) {
+
+            // Create a pool of threads to run all of the io_services.
+            for (std::size_t i = 0; i < io_services_.size(); ++i) {
+                boost::shared_ptr<boost::thread> thread(new boost::thread(
+                    boost::bind(&boost::asio::io_service::run, io_services_[i])));
+                threads_.push_back(thread);
+            }
+
+            this->startting_ = false;
+            this->running_ = true;
+            this->stopping_ = false;
+        }
     }
 };
 

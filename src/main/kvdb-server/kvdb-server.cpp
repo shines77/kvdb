@@ -59,7 +59,7 @@ void run_kvdb_server(const std::string & address, const std::string & port,
     try {
         std::string doc_root = "";
         KvdbServer server(address, port, doc_root, thread_num);
-        server.run();
+        server.start();
 
         std::cout << "Server has bind and listening ..." << std::endl;
         if (confirm) {
