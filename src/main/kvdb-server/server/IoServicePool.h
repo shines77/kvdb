@@ -92,7 +92,7 @@ public:
     /// Wait for all threads in the pool to exit.
     void wait()
     {
-        if (this->running_) {
+        if (this->startting_ || this->running_) {
             for (std::size_t i = 0; i < threads_.size(); ++i) {
                 if (threads_[i].get() != nullptr) {
                     if (threads_[i]->joinable()) {

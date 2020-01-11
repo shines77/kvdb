@@ -170,7 +170,7 @@ public:
 
     void wait()
     {
-        if (this->running_) {
+        if (this->startting_ || this->running_) {
             if (this->thread_.get() != nullptr) {
                 if (this->thread_->joinable()) {
                     this->thread_->join();
@@ -189,11 +189,13 @@ private:
         if (this->startting_ && !this->running_) {
             this->thread_ = std::make_shared<std::thread>([this]() {
                 io_service_pool_.start();
-            });
 
-            this->startting_ = false;
-            this->running_ = true;
-            this->stopping_ = false;
+                this->startting_ = false;
+                this->running_ = true;
+                this->stopping_ = false;
+
+                io_service_pool_.wait();
+            });
         }
     }
 

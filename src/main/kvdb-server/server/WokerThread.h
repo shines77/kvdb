@@ -92,7 +92,7 @@ public:
 
     void wait()
     {
-        if (this->running_) {
+        if (this->startting_ || this->running_) {
             assert(this->thread_.get() != nullptr);
 
             if (this->thread_.get() != nullptr) {
