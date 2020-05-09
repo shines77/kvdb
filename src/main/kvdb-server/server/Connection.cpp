@@ -147,7 +147,7 @@ void Connection::handle_read_some(const boost::system::error_code & err,
             if (result == ParseStatus::Success) {
                 if (os.data() != nullptr) {
                     boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.length()),
-                        boost::bind(&Connection::handle_write, this,
+                        boost::bind(&Connection::handle_write, this->shared_from_this(),
                                     boost::asio::placeholders::error)
                     );
                 }
@@ -167,7 +167,7 @@ void Connection::handle_read_some(const boost::system::error_code & err,
         }
     }
     else if (err != boost::asio::error::operation_aborted) {
-        connection_manager_.stop(shared_from_this());
+        connection_manager_.stop(this->shared_from_this());
     }
 }
 
@@ -185,7 +185,7 @@ void Connection::handle_write(const boost::system::error_code & err)
         start_read_request();
     }
     else if (err != boost::asio::error::operation_aborted) {
-        connection_manager_.stop(shared_from_this());
+        connection_manager_.stop(this->shared_from_this());
     }
 }
 

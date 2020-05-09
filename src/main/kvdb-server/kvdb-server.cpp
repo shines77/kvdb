@@ -100,6 +100,7 @@ void run_kvdb_server(const std::string & address, const std::string & port,
 
     WorkerThread workerThread;
     workerThread.start();
+    workerThread.stop();
 }
 
 void make_spaces(std::string & spaces, std::size_t size)
