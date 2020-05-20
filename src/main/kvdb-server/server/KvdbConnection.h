@@ -13,6 +13,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
+#include <boost/core/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/smart_ptr.hpp>
 

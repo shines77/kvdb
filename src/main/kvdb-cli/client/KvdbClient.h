@@ -52,7 +52,7 @@ private:
 
     std::string                     local_;
     std::string                     address_;
-    uint16_t                        port_;
+    std::uint16_t                   port_;
 
     std::shared_ptr<std::thread>    thread_;
 
@@ -63,6 +63,11 @@ private:
     std::size_t                     response_size_;
 
 public:
+    KvdbClient(boost::asio::io_service & io_service)
+        : io_service_(io_service), socket_(io_service), signals_(io_service),
+        address_(""), port_(0), request_size_(0), response_size_(0) {
+        do_signal_set();
+    }
     KvdbClient(boost::asio::io_service & io_service, const std::string & address, uint16_t port)
         : io_service_(io_service), socket_(io_service), signals_(io_service),
           address_(address), port_(port), request_size_(0), response_size_(0) {
@@ -89,43 +94,78 @@ public:
         signals_.async_wait(boost::bind(&KvdbClient::handle_stop, this));
     }
 
-    void start(const std::string & address, uint16_t port)
+    void start(const std::string & endpoint)
     {
-        std::cout << "start(address, port)" << std::endl;
-        //
-        // Start an asynchronous resolve to translate the server and service names
-        // into a list of endpoints.
-        //
-        boost::asio::ip::address local;
-        local.from_string(address);
+        const char * token = std::strstr(endpoint.c_str(), ":");
+        if (token != nullptr) {
+            std::string address, port;
+            address.append(endpoint.c_str(), token - 1);
+            port.append(token + 1, endpoint.c_str() + endpoint.size());
 
-        boost::asio::ip::tcp::endpoint endpoint(local, port);
-        remote_endpoint_ = endpoint;
+            std::uint16_t port_num = std::atoi(port.c_str());
+            this->start(address, port_num);
+        }
+        else {
+            std::cout << "KvdbClient::start(endpoint): Invalid endpoint string." << std::endl;
+        }
+    }
 
-        std::string s_port;
-        s_port = std::to_string(port);
+    void start(const std::string & address, std::uint16_t port_num)
+    {
+        std::cout << "KvdbClient::start(address, port)" << std::endl;
 
-        boost::asio::ip::tcp::resolver resolver(io_service_);
-        boost::asio::ip::tcp::resolver::query query(address, s_port);
-        endpoint_iterator_ = resolver.resolve(query);
+        if (port_num == 0) {
+            std::cout << "KvdbClient::start(address, port): Invalid port number." << std::endl;
+            return;
+        }
 
-        // Form the request. We specify the "Connection: close" header so that the
-        // server will close the socket after transmitting the response. This will
-        // allow us to treat all data up until the EOF as the content.
-        /*
-        std::ostream request_stream(&request_buf_);
-        request_stream << "GET " << port << " HTTP/1.1\r\n";
-        request_stream << "Host: " << address << "\r\n";
-        request_stream << "Accept: * / *\r\n";
-        request_stream << "Connection: close\r\n\r\n";
-        //*/
+        try {
+            //
+            // Start an asynchronous resolve to translate the server and service names
+            // into a list of endpoints.
+            //
+            boost::asio::ip::address remote_ip;
+            remote_ip.from_string(address);
 
-        connect();
+            boost::asio::ip::tcp::endpoint endpoint(remote_ip, port_num);
+            remote_endpoint_ = endpoint;
+
+            std::string port = std::to_string(port_num);
+
+            address_ = address;
+            port_ = port_num;
+
+            boost::asio::ip::tcp::resolver resolver(io_service_);
+            boost::asio::ip::tcp::resolver::query query(address, port);
+            endpoint_iterator_ = resolver.resolve(query);
+
+            // Form the request. We specify the "Connection: close" header so that the
+            // server will close the socket after transmitting the response. This will
+            // allow us to treat all data up until the EOF as the content.
+            /*
+            std::ostream request_stream(&request_buf_);
+            request_stream << "GET " << port << " HTTP/1.1\r\n";
+            request_stream << "Host: " << address << "\r\n";
+            request_stream << "Accept: * / *\r\n";
+            request_stream << "Connection: close\r\n\r\n";
+            //*/
+        }
+        catch (const std::exception & ex) {
+            std::cerr << "Exception: " << ex.what() << std::endl;
+        }
+
+        this->connect();
+    }
+
+    void start(const std::string & address, const std::string & port)
+    {
+        std::uint16_t port_num = std::atoi(port.c_str());
+        this->start(address, port_num);
     }
 
     void start()
     {
-        start(address_, port_);
+        this->start(address_, port_);
     }
 
     void stop()
@@ -212,7 +252,7 @@ private:
             request.sDatabase = config.database;
 
             uint32_t bodyLength = request.prepareBody();
-            uint32_t requestSize = bodyLength + kMsgHeaderSize;
+            uint32_t requestSize = kMsgHeaderSize + bodyLength;
             request_.reserve(requestSize);
             request_size_ = requestSize;
 

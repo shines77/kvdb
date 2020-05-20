@@ -43,9 +43,11 @@ private:
     std::unique_ptr<std::thread> thread_;
 
     std::atomic<int32_t>        connections_;
+
     std::atomic<bool>           startting_;
     std::atomic<bool>           running_;
     std::atomic<bool>           stopping_;
+    std::atomic<bool>           stopped_;
 
     socket_container_t          socketContainer_;
 
@@ -57,7 +59,7 @@ private:
     kvdb::Asio::DeadlineTimer   updateTimer_;
 
 public:
-    WorkerThread() : connections_(0), startting_(false), running_(false), stopping_(false),
+    WorkerThread() : connections_(0), startting_(false), running_(false), stopping_(false), stopped_(true),
                      ioContext_(1), acceptSocket_(ioContext_), updateTimer_(ioContext_) {
         //
     }
@@ -72,18 +74,26 @@ public:
         if (this->startting_ || this->running_)
             return false;
 
-        if (this->thread_.get() != nullptr)
-            return false;
+        if (this->stopped_) {
+            if (this->thread_.get() != nullptr)
+                return false;
 
-        this->startting_ = true;
+            this->startting_ = true;
+            this->running_ = false;
 
-        this->thread_.reset(new std::thread(&WorkerThread::run, this));
-        return true;
+            this->thread_.reset(new std::thread(&WorkerThread::run, this));
+            return true;
+        }
+
+        return false;
     }
 
     void stop()
     {
-        if (this->running_ && !this->stopping_) {
+        if (this->stopped_ || this->stopping_)
+            return;
+
+        if (this->running_) {
             this->stopping_ = true;
 
             this->ioContext_.stop();
@@ -93,7 +103,7 @@ public:
     void wait()
     {
         if (this->startting_ || this->running_) {
-            assert(this->thread_.get() != nullptr);
+            //assert(this->thread_.get() != nullptr);
 
             if (this->thread_.get() != nullptr) {
                 if (this->thread_->joinable()) {
@@ -104,6 +114,7 @@ public:
 
             this->stopping_ = false;
             this->running_ = false;
+            this->stopped_ = true;
         }
     }
 
@@ -111,12 +122,12 @@ protected:
     void run()
     {
         if (this->startting_ && !this->running_) {
+            this->startting_ = false;
 
             this->ioContext_.run();
-
-            this->startting_ = false;
+            
             this->running_ = true;
-            this->stopping_ = false;
+            this->stopped_ = false;
         }
     }
 
