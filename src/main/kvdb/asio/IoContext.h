@@ -55,7 +55,11 @@ public:
 
 template <typename T>
 inline decltype(auto) post(IoContextBaseNamespace::IoContextBase & ioContext, T && t)
-                        // -> BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(IoContextBaseNamespace::IoContextBase, void())
+#if BOOST_VERSION >= 106600
+                        -> BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(IoContextBaseNamespace::IoContextBase, void())
+#else
+                        -> BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(T, void ())
+#endif
 {
 #if BOOST_VERSION >= 106600
     return boost::asio::post(ioContext, std::forward<T>(t));
@@ -66,6 +70,11 @@ inline decltype(auto) post(IoContextBaseNamespace::IoContextBase & ioContext, T 
 
 template <typename T>
 inline decltype(auto) get_io_context(T && ioObject)
+#if BOOST_VERSION >= 106600
+                        -> IoContextBaseNamespace::IoContextBase
+#else
+                        -> boost::asio::io_service
+#endif
 {
 #if BOOST_VERSION >= 106600
     return ioObject.get_executor().context();
