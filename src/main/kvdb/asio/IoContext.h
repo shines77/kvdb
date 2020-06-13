@@ -72,7 +72,6 @@ inline
     boost::asio::io_service
 #endif
 get_io_context(T && ioObject)
-
 {
 #if BOOST_VERSION >= 106600
     return ioObject.get_executor().context();
