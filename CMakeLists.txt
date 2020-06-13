@@ -130,12 +130,12 @@ include_directories(src/test)
 include_directories(src/main/kvdb-server)
 
 set(SOURCE_FILES
-	src/main/kvdb-cli/server/Connection.cpp
-	src/main/kvdb-cli/server/ConnectionManager.cpp
-	src/main/kvdb-cli/server/KvdbConnection.cpp
-	src/main/kvdb-cli/server/RequestHandler.cpp
-	src/main/kvdb-cli/server/Response.cpp
-	src/main/kvdb-cli/kvdb-server.cpp
+	src/main/kvdb-server/server/Connection.cpp
+	src/main/kvdb-server/server/ConnectionManager.cpp
+	src/main/kvdb-server/server/KvdbConnection.cpp
+	src/main/kvdb-server/server/RequestHandler.cpp
+	src/main/kvdb-server/server/Response.cpp
+	src/main/kvdb-server/kvdb-server.cpp
     )
 
 # add_custom_target(debug
