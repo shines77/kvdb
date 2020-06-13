@@ -26,6 +26,8 @@
 #include "kvdb/asio/IoContext.h"
 #include "kvdb/asio/DeadlineTimer.h"
 
+using namespace boost::asio;
+
 using namespace boost::asio::ip;
 using boost::asio::ip::tcp;
 
