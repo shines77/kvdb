@@ -54,7 +54,12 @@ public:
 };
 
 template <typename T>
-inline boost::asio::async_initiate<T, void()>
+inline
+#if BOOST_VERSION >= 106600
+boost::asio::async_initiate<T, void()>
+#else
+auto
+#endif
 post(IoContextBaseNamespace::IoContextBase & ioContext, T && t)
 {
 #if BOOST_VERSION >= 106600

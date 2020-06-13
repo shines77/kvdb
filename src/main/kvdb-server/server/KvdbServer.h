@@ -135,8 +135,9 @@ public:
             std::ostream os(&err_info);
             os << "kvdb_server::start() - Error: (code = " << err.value() << ") "
                << err.message().c_str();
-            std::cout << err_info.str().c_str() << std::endl;
-            throw std::exception(err_info.str().c_str());
+            std::string str_info = err_info.str();
+            std::cout << str_info.c_str() << std::endl;
+            throw std::exception(str_info.c_str());
             return false;
         }
 
