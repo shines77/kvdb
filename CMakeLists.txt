@@ -120,3 +120,35 @@ add_custom_target(release
 
 add_executable(kvdb-cli ${SOURCE_FILES})
 target_link_libraries(kvdb-cli ${EXTRA_LIBS})
+
+project(kvdb-server)
+
+include_directories(include)
+include_directories(src)
+include_directories(src/main)
+include_directories(src/test)
+include_directories(src/main/kvdb-server)
+
+set(SOURCE_FILES
+	src/main/kvdb-cli/server/Connection.cpp
+	src/main/kvdb-cli/server/ConnectionManager.cpp
+	src/main/kvdb-cli/server/KvdbConnection.cpp
+	src/main/kvdb-cli/server/RequestHandler.cpp
+	src/main/kvdb-cli/server/Response.cpp
+	src/main/kvdb-cli/kvdb-server.cpp
+    )
+
+add_custom_target(debug
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
+    COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
+)
+
+add_custom_target(release
+    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
+    COMMENT "Switch CMAKE_BUILD_TYPE to Release"
+)
+
+add_executable(kvdb-server ${SOURCE_FILES})
+target_link_libraries(kvdb-server ${EXTRA_LIBS})
