@@ -54,7 +54,7 @@ public:
 };
 
 template <typename T>
-inline BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(T, void())
+inline boost::asio::async_initiate<T, void()>
 post(IoContextBaseNamespace::IoContextBase & ioContext, T && t)
 {
 #if BOOST_VERSION >= 106600
