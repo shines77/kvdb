@@ -41,10 +41,8 @@ public:
     bool isMemoryStream() const { return true; }
 
     void writeHeader(const MessageHeader & header) {
-        this->writeUInt32(header.sign);
-        this->writeUInt32(header.type);
-        this->writeUInt32(header.info);
-        this->writeUInt32(header.length);
+        this->writeUInt32(header.lenValue());
+        this->writeUInt32(header.infoValue());
     }
 
     void writeHeader(uint32_t sign, uint32_t type, uint32_t info, uint32_t length) {
@@ -57,31 +55,36 @@ public:
     void writeHeaderAndRestore(const MessageHeader & header) {
         char_type * savePos = this->current();
         this->reset();
-        this->writeUInt32(header.sign);
-        this->writeUInt32(header.type);
-        this->writeUInt32(header.info);
-        this->writeUInt32(header.length);
+        this->writeUInt32(header.lenValue());
+        this->writeUInt32(header.infoValue());
         this->setCurrent(savePos);
     }
 
-    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t info) {
+    void writeHeaderAndRestore(uint8_t sign, uint16_t opcode, uint8_t version) {
+        MessageHeader header;
+        uint32_t length = this->getLength();
+        header.setLength(length);
+        header.setSign(sign);
+        header.setOpcode(opcode);
+        header.setVersion(version);
+
         char_type * savePos = this->current();
-        uint32_t length = this->getMsgLength();
+        
         this->reset();
-        this->writeUInt32(sign);
-        this->writeUInt32(type);
-        this->writeUInt32(info);
-        this->writeUInt32(length);
+        this->writeHeader(header);
         this->setCurrent(savePos);
     }
 
-    void writeHeaderAndRestore(uint32_t sign, uint32_t type, uint32_t info, uint32_t length) {
+    void writeHeaderAndRestore(uint8_t sign, uint16_t opcode, uint8_t version, uint32_t length) {
+        MessageHeader header;
+        header.setLength(length);
+        header.setSign(sign);
+        header.setOpcode(opcode);
+        header.setVersion(version);
+
         char_type * savePos = this->current();
         this->reset();
-        this->writeUInt32(sign);
-        this->writeUInt32(type);
-        this->writeUInt32(info);
-        this->writeUInt32(length);
+        this->writeHeader(header);
         this->setCurrent(savePos);
     }
 
