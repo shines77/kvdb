@@ -144,11 +144,11 @@ set(SOURCE_FILES
 #     COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
 # )
 
-add_custom_target(release
-    COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
-    COMMENT "Switch CMAKE_BUILD_TYPE to Release"
-)
+# add_custom_target(release
+#     COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
+#     COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target all
+#     COMMENT "Switch CMAKE_BUILD_TYPE to Release"
+# )
 
 add_executable(kvdb-server ${SOURCE_FILES})
 target_link_libraries(kvdb-server ${EXTRA_LIBS})
