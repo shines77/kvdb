@@ -45,7 +45,7 @@ public:
 
     uint8_t flags() const { return this->header.flags(); }
     uint32_t length() const { return this->header.length(); }
-    uint32_t bodyLength() const { return (this->header.length() - sizeof(MessageHeader)); }
+    uint32_t totalSize() const { return (this->header.length() + sizeof(MessageHeader)); }
 
     uint8_t sign() const { return this->header.sign(); }
     uint8_t version() const { return this->header.version(); }
@@ -72,7 +72,8 @@ public:
 
     void setBody(const char * body) { this->body_ = body; }
 
-    MessageHeader & getHeader() const { return const_cast<Message *>(this)->header; }
+    MessageHeader & getHeader() { return const_cast<Message *>(this)->header; }
+    const MessageHeader & getHeader() const { return const_cast<const Message *>(this)->header; }
 
     void setHeader(uint8_t sign, uint32_t length) {
         this->setLength(length);

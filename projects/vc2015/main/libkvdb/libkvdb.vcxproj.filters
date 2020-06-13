@@ -211,9 +211,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageType.h">
       <Filter>src\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessagesDefine.h">
-      <Filter>src\core</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\asio\AsioHacksFwd.h">
       <Filter>src\asio</Filter>
     </ClInclude>
@@ -243,6 +240,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\utils\Optional.h">
       <Filter>src\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageDefine.h">
+      <Filter>src\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

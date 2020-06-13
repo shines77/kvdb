@@ -8,9 +8,17 @@
 
 #include "kvdb/basic/stdint.h"
 
+#define USE_INGO_ARGS   0
+
+#if defined(USE_INGO_ARGS) && (USE_INGO_ARGS != 0)
 #define MAKE_MSG_VERINFO(ver, args)     (((ver << 16) & 0xFFFF0000U) | (args & 0x0000FFFFU))
 #define GET_MSG_VERSION(info)           ((info & 0xFFFF0000U) >> 16)
 #define GET_MSG_ARGS(info)              (info & 0x0000FFFFU)
+#else
+#define MAKE_MSG_VERINFO(ver, args)     (ver & 0x000000FFU)
+#define GET_MSG_VERSION(info)           (info & 0x000000FFU)
+#define GET_MSG_ARGS(info)              ((info & 0xFFFF0000U) >> 16)
+#endif
 
 namespace kvdb {
 

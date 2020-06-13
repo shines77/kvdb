@@ -10,7 +10,7 @@
 #include <kvdb/core/Message.h>
 #include <kvdb/core/Request.h>
 #include <kvdb/core/Response.h>
-#include <kvdb/core/MessagesDefine.h>
+#include <kvdb/core/MessageDefine.h>
 
 #include <kvdb/server/ServerStatus.h>
 #include <kvdb/stream/ParseResult.h>
@@ -44,7 +44,7 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
         if (result == ParseResult::OK) {
             int result = is.readString(database);
             if (result == ParseResult::OK) {
-                LoginResponse response;
+                LoginResponse_v0 response;
                 response.setSign(kShortSign);
                 response.setBodyLength(0);
                 response.iStatusCode = 0;
@@ -66,7 +66,7 @@ int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
     uint32_t iVersion;
     bool result = is.readUInt32(iVersion);
     if (result) {
-        HandShakeResponse response;
+        HandShakeResponse_v0 response;
         response.setSign(kShortSign);
         response.setBodyLength(0);
         response.iStatusCode = 0;
@@ -85,7 +85,7 @@ int RequestHandler::handleConnectRequest(ConnectionContext & context,
     uint32_t iVersion;
     bool result = is.readUInt32(iVersion);
     if (result) {
-        ConnectResponse response;
+        ConnectResponse_v0 response;
         response.setSign(kShortSign);
         response.setBodyLength(0);
         response.iStatusCode = 0;
@@ -172,7 +172,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
                                   const IRequest & request,
                                   OutputPacketStream & os)
 {
-    InputPacketStream stream(request.body(), request.bodyLength());
+    InputPacketStream stream(request.body(), request.length());
     MessageHeader header = request.header;
 
     if (header.length() > 0) {

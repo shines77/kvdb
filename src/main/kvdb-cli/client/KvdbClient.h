@@ -26,7 +26,7 @@
 #include "client/common.h"
 #include "client/KvdbClientApp.h"
 
-#include "kvdb/core/MessagesDefine.h"
+#include "kvdb/core/MessageDefine.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
 #include "kvdb/stream/InputPacketStream.h"
@@ -246,7 +246,7 @@ private:
             // The connection was successful. Send the request.
             //
             KvdbClientConfig & config = KvdbClientApp::client_config;
-            LoginRequest request;
+            LoginRequest_v0 request;
             request.sUsername = config.username;
             request.sPassword = config.password;
             request.sDatabase = config.database;
@@ -360,7 +360,7 @@ private:
                 //
 
                 KvdbClientConfig & config = KvdbClientApp::client_config;
-                HandShakeRequest request;
+                HandShakeRequest_v0 request;
                 request.iVersion = 1;
 
                 uint32_t bodyLength = request.prepareBody();
@@ -468,7 +468,7 @@ private:
                 //
 
                 KvdbClientConfig & config = KvdbClientApp::client_config;
-                ConnectRequest request;
+                ConnectRequest_v0 request;
                 request.iVersion = 1;
 
                 uint32_t bodyLength = request.prepareBody();
