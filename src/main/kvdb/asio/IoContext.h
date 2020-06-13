@@ -54,13 +54,7 @@ public:
 };
 
 template <typename T>
-inline
-#if BOOST_VERSION >= 106600
-//boost::asio::async_initiate<T, void()>
-BOOST_ASIO_INITFN_RESULT_TYPE(T, void ())
-#else
-BOOST_ASIO_INITFN_RESULT_TYPE(T, void ())
-#endif
+inline BOOST_ASIO_INITFN_RESULT_TYPE(T, void ())
 post(IoContextBaseNamespace::IoContextBase & ioContext, T && t)
 {
 #if BOOST_VERSION >= 106600
@@ -70,21 +64,25 @@ post(IoContextBaseNamespace::IoContextBase & ioContext, T && t)
 #endif
 }
 
-template <typename T>
-inline
 #if BOOST_VERSION >= 106600
-    boost::asio::io_context &
-#else
-    boost::asio::io_service &
-#endif
+
+template <typename T>
+inline boost::asio::io_context &
 get_io_context(T && ioObject)
 {
-#if BOOST_VERSION >= 106600
     return ioObject.get_executor().context();
-#else
-    return ioObject.get_io_service();
-#endif
 }
+
+#else
+
+template <typename T>
+inline boost::asio::io_service &
+get_io_context(T && ioObject)
+{
+    return ioObject.get_io_service();
+}
+
+#endif
 
 } // namespace Asio
 } // namespace kvdb
