@@ -11,6 +11,7 @@
 #include <string>
 #include <memory>
 #include <thread>
+#include <stdexcept>
 #include <functional>
 
 #include <boost/noncopyable.hpp>
@@ -137,7 +138,8 @@ public:
                << err.message().c_str();
             std::string str_info = err_info.str();
             std::cout << str_info.c_str() << std::endl;
-            throw std::exception(str_info.c_str());
+            std::logic_error logic_err(str_info.c_str());
+            throw std::exception(logic_err);
             return false;
         }
 

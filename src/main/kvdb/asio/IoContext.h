@@ -56,7 +56,8 @@ public:
 template <typename T>
 inline
 #if BOOST_VERSION >= 106600
-boost::asio::async_initiate<T, void()>
+//boost::asio::async_initiate<T, void()>
+BOOST_ASIO_INITFN_RESULT_TYPE(T, void ())
 #else
 BOOST_ASIO_INITFN_RESULT_TYPE(T, void ())
 #endif
