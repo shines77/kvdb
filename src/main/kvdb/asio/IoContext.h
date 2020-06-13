@@ -58,7 +58,7 @@ inline
 #if BOOST_VERSION >= 106600
 boost::asio::async_initiate<T, void()>
 #else
-auto
+BOOST_ASIO_INITFN_RESULT_TYPE(T, void ())
 #endif
 post(IoContextBaseNamespace::IoContextBase & ioContext, T && t)
 {
@@ -72,9 +72,9 @@ post(IoContextBaseNamespace::IoContextBase & ioContext, T && t)
 template <typename T>
 inline
 #if BOOST_VERSION >= 106600
-    IoContextBaseNamespace::IoContextBase
+    boost::asio::io_context &
 #else
-    boost::asio::io_service
+    boost::asio::io_service &
 #endif
 get_io_context(T && ioObject)
 {
