@@ -40,10 +40,8 @@ public:
     bool isMemoryStream() const { return true; }
 
     int readHeader(MessageHeader & header) {
-        header.sign   = this->readUInt32();
-        header.type   = this->readUInt32();
-        header.info   = this->readUInt32();
-        header.length = this->readUInt32();
+        header.setLenValue(this->readUInt32());
+        header.setInfoValue(this->readUInt32());
         return ReadResult::Ok;
     }
 

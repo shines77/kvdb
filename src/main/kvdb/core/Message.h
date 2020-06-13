@@ -16,6 +16,7 @@
 namespace kvdb {
 
 static const uint32_t kDefaultSign = 2019082500;
+static const uint32_t kShortSign = 77;
 
 #pragma warning (push)
 #pragma warning (disable: 4200)
@@ -35,26 +36,36 @@ protected:
     const char * body_;
 
 public:
-    Message(uint32_t type = MessageType::Unknown, const char * data = nullptr) : body_(data) {
-        this->header.sign = kDefaultSign;
-        this->header.type = type;
+    Message(uint32_t opcode = MessageType::Unknown, const char * data = nullptr) : body_(data) {
+        this->header.info.sign = kShortSign;
+        this->header.info.opcode = opcode;
     }
 
     virtual ~Message() {}
 
-    uint32_t sign() const { return this->header.sign; }
-    uint32_t messageType() const { return this->header.type; }
-    uint32_t bodyLength() const { return this->header.length; }
-    uint32_t info() const { return this->header.info.value(); }
-    uint32_t version() const { return this->header.info.version; }
-    uint32_t args() const { return this->header.info.args; }
+    uint8_t flags() const { return this->header.flags(); }
+    uint32_t length() const { return this->header.length(); }
+    uint32_t bodyLength() const { return (this->header.length() - sizeof(MessageHeader)); }
 
-    void setSign(uint32_t sign) { this->header.sign = sign; }
-    void setMessageType(uint32_t type) { this->header.type = type; }
-    void setBodyLength(uint32_t length) { this->header.length = length; }
-    void setInfo(uint32_t info) { this->header.info = info; }
-    void setVersion(uint32_t version) { this->header.info.version = version; }
-    void setArgs(uint32_t args) { this->header.info.args = args; }
+    uint8_t sign() const { return this->header.sign(); }
+    uint8_t version() const { return this->header.version(); }
+    uint16_t opcode() const { return this->header.opcode(); }
+    uint32_t args() const { /* Not implemented yet. */ return 0; }
+
+    uint32_t lenValue() const { return this->header.lenValue(); }
+    void setLenValue(uint32_t value) { this->header.setLenValue(value); }
+
+    void setFlags(uint8_t flags) { this->header.setFlags(flags); }
+    void setLength(uint32_t length) { this->header.setLength(length); }
+    void setBodyLength(uint32_t length) { this->header.setLength(length + sizeof(MessageHeader)); }
+
+    void setSign(uint8_t sign) { this->header.setSign(sign); }
+    void setVersion(uint8_t version) { this->header.info.version = version; }
+    void setOpcode(uint16_t opcode) { this->header.setOpcode(opcode); }
+    void setArgs(uint32_t args) { /* Not implemented yet. */ }
+
+    uint32_t infoValue() const { return this->header.infoValue(); }
+    void setInfoValue(uint32_t value) { this->header.setInfoValue(value); }
 
     char * body() { return (char *)this->body_; }
     const char * body() const { return this->body_; }
@@ -63,55 +74,52 @@ public:
 
     MessageHeader & getHeader() const { return const_cast<Message *>(this)->header; }
 
-    void setHeader(uint32_t sign, uint32_t length) {
-        this->header.sign   = sign;
-        this->header.length = length;
+    void setHeader(uint8_t sign, uint32_t length) {
+        this->setLength(length);
+        this->setSign(sign);
     }
 
-    void setHeader(uint32_t sign, uint32_t type, uint32_t length) {
-        this->header.sign   = sign;
-        this->header.type   = type;
-        this->header.length = length;
+    void setHeader(uint8_t sign, uint16_t opcode, uint32_t length) {
+        this->setLength(length);
+
+        this->setSign(sign);
+        this->setOpcode(opcode);
     }
 
-    void setHeader(uint32_t sign, uint32_t version, uint32_t args, uint32_t length) {
-        this->header.sign           = sign;
-        this->header.info.version   = version;
-        this->header.info.args      = args;
-        this->header.length         = length;
+    void setHeader(uint8_t sign, uint8_t version, uint32_t args, uint32_t length) {
+        this->setLength(length);
+
+        this->setSign(sign);
+        this->setVersion(version);
     }
 
-    void setHeader(uint32_t sign, uint32_t type, uint32_t version, uint32_t args, uint32_t length) {
-        this->header.sign           = sign;
-        this->header.type           = type;
-        this->header.info.version   = version;
-        this->header.info.args      = args;
-        this->header.length         = length;
+    void setHeader(uint8_t sign, uint16_t opcode, uint8_t version, uint32_t args, uint32_t length) {
+        this->setLength(length);
+
+        this->setSign(sign);
+        this->setVersion(version);
+        this->setOpcode(opcode);
     }
 
     template <typename InputStreamTy>
     void readHeader(InputStreamTy & is) {
-        this->header.sign   = is.readUInt32();
-        this->header.type   = is.readUInt32();
-        this->header.info   = is.readUInt32();
-        this->header.length = is.readUInt32();
+        this->setLenValue(is.readUInt32());
+        this->setInfoValue(is.readUInt32());
     }
 
     template <typename OutputStreamTy>
     void writeHeader(OutputStreamTy & os) {
-        os.writeUInt32(this->header.sign);
-        os.writeUInt32(this->header.type);
-        os.writeUInt32(this->header.info.value());
-        os.writeUInt32(this->header.length);
+        os.writeUInt32(this->lenValue());
+        os.writeUInt32(this->infoValue());
     }
 };
 
 template <typename T>
 class BasicMessage : public Message {
 public:
-    BasicMessage(uint32_t type = MessageType::Unknown, const char * data = nullptr)
-        : Message(type, data) {
-        Message::setInfo(T::kVerInfo);
+    BasicMessage(uint32_t opcode = MessageType::Unknown, const char * data = nullptr)
+        : Message(opcode, data) {
+        Message::setVersion(T::kVerInfo);
     }
 
     virtual ~BasicMessage() {}
@@ -132,7 +140,7 @@ public:
         if (needPrepare && os.isMemoryStream()) {
             uint32_t totalSize = this->prepare();
             // Setting the message's body length
-            this->header.length = totalSize - kMsgHeaderSize;
+            this->header.setLength(totalSize - kMsgHeaderSize);
             os.inflate(totalSize);
         }
     }
@@ -152,7 +160,7 @@ public:
         if (needPrepare && os.isMemoryStream()) {
             uint32_t bodySize = this->prepareBody();
             // Setting the message's body length
-            this->header.length = bodySize;
+            this->header.setLength(bodySize);
             os.inflate(bodySize);
         }
     }

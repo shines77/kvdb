@@ -31,30 +31,49 @@ public:
     NetPacket() : is_little_endian_(false) { init(); }
     virtual ~NetPacket() {}
 
-    uint32_t getSign() const { return this->header.sign; }
-    uint32_t getVersion() const { return this->header.info.version; }
-    uint32_t getArgs() const { return this->header.info.args; }
-    uint32_t getMsgType() const { return this->header.type; }
-    uint32_t getMsgLength() const { return this->header.length; }
+    uint8_t getFlags() const { return this->header.flags(); }
+    uint32_t getLength() const { return this->header.length(); }
 
-    void setSign(uint32_t sign) {
-        this->header.sign = sign;
+    uint32_t lenValue() const { return this->header.lenValue(); }
+
+    uint8_t getSign() const { return this->header.sign(); }
+    uint8_t getVersion() const { return this->header.version(); }
+    uint16_t getOpcode() const { return this->header.opcode(); }
+
+    uint32_t getArgs() const { /* Not implemented yet. */ return 0; }
+
+    uint32_t infoValue() const { return this->header.infoValue(); }
+
+    void setFlags(uint8_t flags) {
+        this->header.setFlags(flags);
     }
 
-    void setVersion(uint32_t version) {
-        this->header.info.version = version;
+    void setLength(uint32_t length) {
+        this->header.setLength(length);
+    }
+
+    void setLenValue(uint32_t value) {
+        this->header.setLenValue(value);
+    }
+
+    void setSign(uint8_t sign) {
+        this->header.setSign(sign);
+    }
+
+    void setVersion(uint8_t version) {
+        this->header.setVersion(version);
+    }
+
+    void setOpcode(uint16_t opcode) {
+        this->header.setVersion(opcode);
     }
 
     void setArgs(uint32_t args) {
-        this->header.info.args = args;
+        /* Not implemented yet. */
     }
 
-    void setMsgType(uint32_t type) {
-        this->header.type = type;
-    }
-
-    void setMsgLength(uint32_t length) {
-        this->header.length = length;
+    void setInfoValue(uint32_t value) {
+        this->header.setInfoValue(value);
     }
 
     void init() {
@@ -147,12 +166,10 @@ public:
         values.clear();
 
         // Read the header info.
-        this->header.sign = stream.readUInt32();
-        this->header.type = stream.readUInt32();
-        this->header.info = stream.readUInt32();
-        this->header.length = stream.readUInt32();
+        this->header.setLenValue(stream.readUInt32());
+        this->header.setInfoValue(stream.readUInt32());
 
-        count = valid_count = this->header.info.args;
+        count = valid_count = this->header.args();
 
         // Read the body info.
         for (size_t i = 0; i < count; ++i) {
@@ -240,12 +257,10 @@ public:
         size_t totalSize = calcRequireSize(valid_count);
 
         // Write the header info.
-        this->header.length = (uint32_t)totalSize;
-        this->header.info.args = (uint32_t)valid_count;
-        stream.writeUInt32(this->header.sign);
-        stream.writeUInt32(this->header.type);
-        stream.writeUInt32(this->header.info);
-        stream.writeUInt32(this->header.length);
+        this->header.setLength((uint32_t)totalSize);
+        this->header.setArgs((uint32_t)valid_count);
+        stream.writeUInt32(this->header.lenValue());
+        stream.writeUInt32(this->header.infoValue());
 
         // Write the body info.
         for (size_t i = 0; i < values.size(); ++i) {

@@ -45,7 +45,7 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
             int result = is.readString(database);
             if (result == ParseResult::OK) {
                 LoginResponse response;
-                response.setSign(kDefaultSign);
+                response.setSign(kShortSign);
                 response.setBodyLength(0);
                 response.iStatusCode = 0;
                 response.writeTo(os);
@@ -67,7 +67,7 @@ int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
     bool result = is.readUInt32(iVersion);
     if (result) {
         HandShakeResponse response;
-        response.setSign(kDefaultSign);
+        response.setSign(kShortSign);
         response.setBodyLength(0);
         response.iStatusCode = 0;
         response.writeTo(os);
@@ -86,7 +86,7 @@ int RequestHandler::handleConnectRequest(ConnectionContext & context,
     bool result = is.readUInt32(iVersion);
     if (result) {
         ConnectResponse response;
-        response.setSign(kDefaultSign);
+        response.setSign(kShortSign);
         response.setBodyLength(0);
         response.iStatusCode = 0;
         response.writeTo(os);
@@ -175,10 +175,10 @@ int RequestHandler::handleRequest(ConnectionContext & context,
     InputPacketStream stream(request.body(), request.bodyLength());
     MessageHeader header = request.header;
 
-    if (header.length > 0) {
+    if (header.length() > 0) {
         const char * first = stream.current();
         int result = 0;
-        switch (header.type) {
+        switch (header.opcode()) {
         case MessageType::LoginRequest:
             result = handleLoginRequest(context, stream, os);
             break;
@@ -196,12 +196,12 @@ int RequestHandler::handleRequest(ConnectionContext & context,
             break;
 
         default:
-            // Unknown type message
+            // Unknown opcode message
             break;
         }
 
         const char * last = stream.current();
-        if ((last - first) == (ptrdiff_t)header.length) {
+        if ((last - first) == (ptrdiff_t)header.length()) {
             return ParseStatus::Success;
         }
         else {

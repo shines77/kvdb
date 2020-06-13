@@ -257,7 +257,7 @@ private:
             request_size_ = requestSize;
 
             OutputPacketStream os(request_.data(), requestSize);
-            request.setHeader(kDefaultSign, bodyLength);
+            request.setHeader(kShortSign, bodyLength);
             request.writeTo(os, false);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
@@ -290,17 +290,18 @@ private:
                 MessageHeader header;
                 InputPacketStream istream(header_buf);
                 istream.readHeader(header);
-                if (header.sign == kDefaultSign && header.length > 0) {
+                uint32_t bodyLength = header.length();
+                if (header.sign() == kShortSign && bodyLength > 0) {
                     //
                     // Receive the part data of response, if it's not completed, continue to read. 
                     //
-                    response_.reserve(header.length);
-                    response_size_ = header.length;
-                    socket_.async_read_some(boost::asio::buffer(response_.data(), header.length),
+                    response_.reserve(bodyLength);
+                    response_size_ = bodyLength;
+                    socket_.async_read_some(boost::asio::buffer(response_.data(), bodyLength),
                         boost::bind(&KvdbClient::handle_read_some, this,
                                     boost::asio::placeholders::error,
                                     boost::asio::placeholders::bytes_transferred,
-                                    header.length));
+                                    bodyLength));
                 }
                 else {
                     // The signId is dismatch
@@ -368,7 +369,7 @@ private:
                 request_size_ = requestSize;
 
                 OutputPacketStream os(request_.data(), requestSize);
-                request.setHeader(kDefaultSign, bodyLength);
+                request.setHeader(kShortSign, bodyLength);
                 request.writeTo(os, false);
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
@@ -397,17 +398,18 @@ private:
                 MessageHeader header;
                 InputPacketStream istream(header_buf);
                 istream.readHeader(header);
-                if (header.sign == kDefaultSign && header.length > 0) {
+                uint32_t bodyLength = header.length();
+                if (header.sign() == kShortSign && bodyLength > 0) {
                     //
                     // Receive the part data of response, if it's not completed, continue to read. 
                     //
-                    response_.reserve(header.length);
-                    response_size_ = header.length;
-                    socket_.async_read_some(boost::asio::buffer(response_.data(), header.length),
+                    response_.reserve(bodyLength);
+                    response_size_ = bodyLength;
+                    socket_.async_read_some(boost::asio::buffer(response_.data(), bodyLength),
                         boost::bind(&KvdbClient::handle_read_handshake_some, this,
                                     boost::asio::placeholders::error,
                                     boost::asio::placeholders::bytes_transferred,
-                                    header.length));
+                                    bodyLength));
                 }
                 else {
                     // The signId is dismatch
@@ -475,7 +477,7 @@ private:
                 request_size_ = requestSize;
 
                 OutputPacketStream os(request_.data(), requestSize);
-                request.setHeader(kDefaultSign, bodyLength);
+                request.setHeader(kShortSign, bodyLength);
                 request.writeTo(os, false);
 
                 std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;
