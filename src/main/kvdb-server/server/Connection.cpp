@@ -70,10 +70,9 @@ void Connection::start_read_request()
     size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
     if (readBytes == kMsgHeaderSize) {
         MessageHeader header;
-        InputPacketStream istream(header_buf);
-        istream.readHeader(header);
+        header.readHeader(header_buf);
         uint32_t requestSize = header.bodySize();
-        if (header.sign() == kShortSign && requestSize > 0) {
+        if (header.verifySign() && requestSize > 0) {
             //
             // Receive the part data of response, if it's not completed, continue to read. 
             //

@@ -34,59 +34,11 @@ public:
 
     BasicOutputStream() : base_type() {}
     BasicOutputStream(const char_type * data, size_type size) : base_type(data, size) {}
-    template <size_t N>
+    template <size_type N>
     BasicOutputStream(const char_type(&data)[N]) : base_type(data, N) {}
     ~BasicOutputStream() {}
 
     bool isMemoryStream() const { return true; }
-
-    void writeHeader(const MessageHeader & header) {
-        this->writeUInt32(header.sizeValue());
-        this->writeUInt32(header.infoValue());
-    }
-
-    void writeHeader(uint32_t sign, uint32_t type, uint32_t info, uint32_t length) {
-        this->writeUInt32(sign);
-        this->writeUInt32(type);
-        this->writeUInt32(info);
-        this->writeUInt32(length);
-    }
-
-    void writeHeaderAndRestore(const MessageHeader & header) {
-        char_type * savePos = this->current();
-        this->reset();
-        this->writeUInt32(header.sizeValue());
-        this->writeUInt32(header.infoValue());
-        this->setCurrent(savePos);
-    }
-
-    void writeHeaderAndRestore(uint8_t sign, uint16_t opcode, uint8_t version) {
-        MessageHeader header;
-        uint32_t length = this->getLength();
-        header.setBodySize(length);
-        header.setSign(sign);
-        header.setOpcode(opcode);
-        header.setVersion(version);
-
-        char_type * savePos = this->current();
-        
-        this->reset();
-        this->writeHeader(header);
-        this->setCurrent(savePos);
-    }
-
-    void writeHeaderAndRestore(uint8_t sign, uint16_t opcode, uint8_t version, uint32_t length) {
-        MessageHeader header;
-        header.setBodySize(length);
-        header.setSign(sign);
-        header.setOpcode(opcode);
-        header.setVersion(version);
-
-        char_type * savePos = this->current();
-        this->reset();
-        this->writeHeader(header);
-        this->setCurrent(savePos);
-    }
 
     void writeType(uint8_t type) {
         this->writeUInt8(type);

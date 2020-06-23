@@ -15,9 +15,6 @@
 
 namespace kvdb {
 
-static const uint32_t kDefaultSign = 2019082500;
-static const uint32_t kShortSign = 77;
-
 #pragma warning (push)
 #pragma warning (disable: 4200)
 
@@ -61,9 +58,6 @@ public:
     uint16_t opcode() const { return this->header.opcode(); }
     uint32_t args() const { /* Not implemented yet. */ return 0; }
 
-    uint32_t sizeValue() const { return this->header.sizeValue(); }
-    void setSizeValue(uint32_t value) { this->header.setSizeValue(value); }
-
     void setFlags(uint8_t flags) { this->header.setFlags(flags); }
     void setBodySize(uint32_t size) { this->header.setBodySize(size); }
     void setTotalSize(uint32_t size) { this->header.setTotalSize(size); }
@@ -73,7 +67,10 @@ public:
     void setOpcode(uint16_t opcode) { this->header.setOpcode(opcode); }
     void setArgs(uint32_t args) { /* Not implemented yet. */ }
 
+    uint32_t sizeValue() const { return this->header.sizeValue(); }
     uint32_t infoValue() const { return this->header.infoValue(); }
+
+    void setSizeValue(uint32_t value) { this->header.setSizeValue(value); }
     void setInfoValue(uint32_t value) { this->header.setInfoValue(value); }
 
     char * body() { return (char *)this->body_; }
@@ -84,36 +81,22 @@ public:
     MessageHeader & getHeader() { return const_cast<Message *>(this)->header; }
     const MessageHeader & getHeader() const { return const_cast<const Message *>(this)->header; }
 
-    void setHeader(uint8_t sign, uint32_t size) {
-        this->setBodySize(size);
+    void setHeader(uint32_t bodySize, uint8_t sign = kShortSign) {
+        this->setBodySize(bodySize);
         this->setSign(sign);
     }
 
-    void setHeaderTotal(uint8_t sign, uint32_t totalSize) {
+    void setHeaderTotal(uint32_t totalSize, uint8_t sign = kShortSign) {
         this->setTotalSize(totalSize);
         this->setSign(sign);
     }
 
-    void setHeader(uint8_t sign, uint16_t opcode, uint32_t size) {
-        this->setBodySize(size);
+    void setHeader(uint16_t opcode, uint8_t version, uint32_t bodySize, uint8_t sign = kShortSign) {
+        this->setBodySize(bodySize);
 
         this->setSign(sign);
         this->setOpcode(opcode);
-    }
-
-    void setHeader(uint8_t sign, uint8_t version, uint32_t args, uint32_t size) {
-        this->setBodySize(size);
-
-        this->setSign(sign);
         this->setVersion(version);
-    }
-
-    void setHeader(uint8_t sign, uint16_t opcode, uint8_t version, uint32_t args, uint32_t size) {
-        this->setBodySize(size);
-
-        this->setSign(sign);
-        this->setVersion(version);
-        this->setOpcode(opcode);
     }
 
     template <typename InputStreamTy>

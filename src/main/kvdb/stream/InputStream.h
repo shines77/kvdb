@@ -33,17 +33,11 @@ public:
 
     BasicInputStream() : base_type(nullptr) {}
     BasicInputStream(const char_type * data, size_type size) : base_type(data, size) {}
-    template <size_t N>
+    template <size_type N>
     BasicInputStream(const char_type(&data)[N]) : base_type(data, N) {}
     ~BasicInputStream() {}
 
     bool isMemoryStream() const { return true; }
-
-    int readHeader(MessageHeader & header) {
-        header.setSizeValue(this->readUInt32());
-        header.setInfoValue(this->readUInt32());
-        return ReadResult::Ok;
-    }
 
     uint8_t readType() {
         return readUInt8();

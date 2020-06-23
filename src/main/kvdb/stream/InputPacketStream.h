@@ -34,7 +34,7 @@ public:
 
     BasicInputPacketStream() : base_type() {}
     BasicInputPacketStream(const char_type * data, size_type size) : base_type(data, size) {}
-    template <size_t N>
+    template <size_type N>
     BasicInputPacketStream(const char_type(&data)[N]) : base_type(data, N) {}
     ~BasicInputPacketStream() {}
 

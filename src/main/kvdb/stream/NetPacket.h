@@ -32,7 +32,8 @@ public:
     virtual ~NetPacket() {}
 
     uint8_t getFlags() const { return this->header.flags(); }
-    uint32_t getLength() const { return this->header.bodySize(); }
+    uint32_t getBodySize() const { return this->header.bodySize(); }
+    uint32_t getTotalSize() const { return this->header.totalSize(); }
 
     uint32_t sizeValue() const { return this->header.sizeValue(); }
 
@@ -48,8 +49,12 @@ public:
         this->header.setFlags(flags);
     }
 
-    void setLength(uint32_t length) {
-        this->header.setBodySize(length);
+    void setBodySize(uint32_t size) {
+        this->header.setBodySize(size);
+    }
+
+    void setTotalSize(uint32_t totalSize) {
+        this->header.setTotalSize(totalSize);
     }
 
     void setSizeValue(uint32_t value) {

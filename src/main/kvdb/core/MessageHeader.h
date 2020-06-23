@@ -8,6 +8,11 @@
 
 #include "kvdb/basic/stdint.h"
 
+#include "kvdb/stream/InputStream.h"
+#include "kvdb/stream/OutputStream.h"
+#include "kvdb/stream/InputPacketStream.h"
+#include "kvdb/stream/OutputPacketStream.h"
+
 #define USE_INGO_ARGS   0
 
 #if defined(USE_INGO_ARGS) && (USE_INGO_ARGS != 0)
@@ -21,6 +26,9 @@
 #endif
 
 namespace kvdb {
+
+static const uint32_t kDefaultSign = 2019082500;
+static const uint32_t kShortSign = 77;
 
 struct ReadResult {
     enum Type {
@@ -208,10 +216,6 @@ struct MessageHeader {
 
     uint32_t infoValue() const { return this->info.value(); }
 
-    void getInfo(uint8_t & sign, uint8_t & version, uint16_t & opcode) {
-        this->info.getInfo(sign, version, opcode);
-    }
-
     void setSign(uint32_t sign) { this->info.setSign(sign); }
     void setVersion(uint32_t version) { this->info.setVersion(version); }
     void setOpcode(uint32_t opcode) { this->info.setOpcode(opcode); }
@@ -219,8 +223,89 @@ struct MessageHeader {
 
     void setInfoValue(uint32_t value) { this->info.setValue(value); }
 
+    void getInfo(uint8_t & sign, uint8_t & version, uint16_t & opcode) {
+        this->info.getInfo(sign, version, opcode);
+    }
+
     void setInfo(uint8_t sign, uint8_t version, uint16_t opcode) {
         this->info.setInfo(sign, version, opcode);
+    }
+
+    bool verifySign() const {
+        return (this->sign() == kShortSign);
+    }
+
+    int readHeader(const char * data, std::size_t size) {
+        assert(size >= sizeof(MessageHeader));
+        InputStream is(data, size);
+        this->setSizeValue(is.readUInt32());
+        this->setInfoValue(is.readUInt32());
+        return ReadResult::Ok;
+    }
+
+    template <std::size_t N>
+    int readHeader(const char(&data)[N]) {
+        assert(N >= sizeof(MessageHeader));
+        InputStream is(data);
+        this->setSizeValue(is.readUInt32());
+        this->setInfoValue(is.readUInt32());
+        return ReadResult::Ok;
+    }
+
+    void writeHeader(OutputStream & os) {
+        os.writeUInt32(this->sizeValue());
+        os.writeUInt32(this->infoValue());
+    }
+
+    static
+    void writeHeader(OutputStream & os,
+                     uint32_t sign, uint32_t type,
+                     uint32_t info, uint32_t length) {
+        os.writeUInt32(sign);
+        os.writeUInt32(type);
+        os.writeUInt32(info);
+        os.writeUInt32(length);
+    }
+
+    void writeHeaderAndRestore(OutputStream & os) {
+        char * savePos = os.current();
+        os.reset();
+        os.writeUInt32(this->sizeValue());
+        os.writeUInt32(this->infoValue());
+        os.setCurrent(savePos);
+    }
+
+    static
+    void writeHeaderAndRestore(OutputStream & os,
+                               uint8_t sign, uint16_t opcode,
+                               uint8_t version) {
+        MessageHeader header;
+        uint32_t bodySize = static_cast<uint32_t>(os.length());
+        header.setBodySize(bodySize);
+        header.setSign(sign);
+        header.setOpcode(opcode);
+        header.setVersion(version);
+
+        char * savePos = os.current();
+        os.reset();
+        header.writeHeader(os);
+        os.setCurrent(savePos);
+    }
+
+    static
+    void writeHeaderAndRestore(OutputStream & os,
+                               uint8_t sign, uint16_t opcode,
+                               uint8_t version, uint32_t size) {
+        MessageHeader header;
+        header.setBodySize(size);
+        header.setSign(sign);
+        header.setOpcode(opcode);
+        header.setVersion(version);
+
+        char * savePos = os.current();
+        os.reset();
+        header.writeHeader(os);
+        os.setCurrent(savePos);
     }
 };
 

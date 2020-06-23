@@ -256,7 +256,7 @@ private:
             request_size_ = requestSize;
 
             OutputPacketStream os(request_buf_.data(), requestSize);
-            request.setHeaderTotal(kShortSign, requestSize);
+            request.setHeaderTotal(requestSize);
             request.writeTo(os, false);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
@@ -287,10 +287,9 @@ private:
             size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
             if (readBytes == kMsgHeaderSize) {
                 MessageHeader header;
-                InputPacketStream istream(header_buf);
-                istream.readHeader(header);
+                header.readHeader(header_buf);
                 uint32_t bodySize = header.bodySize();
-                if (header.sign() == kShortSign && bodySize > 0) {
+                if (header.verifySign() && bodySize > 0) {
                     //
                     // Receive the part data of response, if it's not completed, continue to read. 
                     //
@@ -362,13 +361,12 @@ private:
                 HandShakeRequest_v0 request;
                 request.iVersion = 1;
 
-                uint32_t bodyLength = request.prepareBody();
-                uint32_t requestSize = bodyLength + kMsgHeaderSize;
+                uint32_t requestSize = request.prepareAll();
                 request_buf_.reserve(requestSize);
                 request_size_ = requestSize;
 
                 OutputPacketStream os(request_buf_.data(), requestSize);
-                request.setHeader(kShortSign, bodyLength);
+                request.setHeaderTotal(requestSize);
                 request.writeTo(os, false);
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
@@ -395,10 +393,9 @@ private:
             size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
             if (readBytes == kMsgHeaderSize) {
                 MessageHeader header;
-                InputPacketStream istream(header_buf);
-                istream.readHeader(header);
+                header.readHeader(header_buf);
                 uint32_t bodySize = header.bodySize();
-                if (header.sign() == kShortSign && bodySize > 0) {
+                if (header.verifySign() && bodySize > 0) {
                     //
                     // Receive the part data of response, if it's not completed, continue to read. 
                     //
@@ -475,7 +472,7 @@ private:
                 request_size_ = requestSize;
 
                 OutputPacketStream os(request_buf_.data(), requestSize);
-                request.setHeaderTotal(kShortSign, requestSize);
+                request.setHeaderTotal(requestSize);
                 request.writeTo(os, false);
 
                 std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;
