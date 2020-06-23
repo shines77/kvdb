@@ -8,6 +8,7 @@
 
 #include "kvdb/basic/stdint.h"
 
+#include "kvdb/core/MessageType.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
 #include "kvdb/stream/InputPacketStream.h"
@@ -29,22 +30,6 @@ namespace kvdb {
 
 static const uint32_t kDefaultSign = 2019082500;
 static const uint32_t kShortSign = 77;
-
-struct ReadResult {
-    enum Type {
-        Failed = -1,
-        Ok = 0,
-        Last
-    };
-};
-
-struct WriteResult {
-    enum Type {
-        Failed = -1,
-        Ok = 0,
-        Last
-    };
-};
 
 struct VersionInfo {
     uint16_t version;

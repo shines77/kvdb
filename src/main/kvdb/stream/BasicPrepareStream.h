@@ -17,9 +17,9 @@
 #include <type_traits>
 
 #include "kvdb/core/DataType.h"
-#include "kvdb/core/MessageHeader.h"
 #include "kvdb/jstd/StringRef.h"
 
+#include "kvdb/stream/ReadWriteResult.h"
 #include "kvdb/stream/StreamBuffer.h"
 
 namespace kvdb {
@@ -143,10 +143,6 @@ public:
 
     void skip(int offset) {
         next(offset);
-    }
-
-    void skipToHeader() {
-        next(sizeof(MessageHeader));
     }
 
     char get() const {
