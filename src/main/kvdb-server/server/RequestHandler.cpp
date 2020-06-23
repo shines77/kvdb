@@ -46,7 +46,7 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
             if (result == ParseResult::OK) {
                 LoginResponse_v0 response;
                 response.setSign(kShortSign);
-                response.setBodyLength(0);
+                response.setBodySize(0);
                 response.iStatusCode = 0;
                 response.writeTo(os);
                 return ParseStatus::Success;
@@ -68,7 +68,7 @@ int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
     if (result) {
         HandShakeResponse_v0 response;
         response.setSign(kShortSign);
-        response.setBodyLength(0);
+        response.setBodySize(0);
         response.iStatusCode = 0;
         response.writeTo(os);
 
@@ -87,7 +87,7 @@ int RequestHandler::handleConnectRequest(ConnectionContext & context,
     if (result) {
         ConnectResponse_v0 response;
         response.setSign(kShortSign);
-        response.setBodyLength(0);
+        response.setBodySize(0);
         response.iStatusCode = 0;
         response.writeTo(os);
 
@@ -172,10 +172,10 @@ int RequestHandler::handleRequest(ConnectionContext & context,
                                   const IRequest & request,
                                   OutputPacketStream & os)
 {
-    InputPacketStream stream(request.body(), request.length());
+    InputPacketStream stream(request.body(), request.bodySize());
     MessageHeader header = request.header;
 
-    if (header.length() > 0) {
+    if (header.bodySize() > 0) {
         const char * first = stream.current();
         int result = 0;
         switch (header.opcode()) {
@@ -201,7 +201,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
         }
 
         const char * last = stream.current();
-        if ((last - first) == (ptrdiff_t)header.length()) {
+        if ((last - first) == (ptrdiff_t)header.bodySize()) {
             return ParseStatus::Success;
         }
         else {

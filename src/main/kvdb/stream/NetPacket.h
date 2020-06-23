@@ -32,9 +32,9 @@ public:
     virtual ~NetPacket() {}
 
     uint8_t getFlags() const { return this->header.flags(); }
-    uint32_t getLength() const { return this->header.length(); }
+    uint32_t getLength() const { return this->header.bodySize(); }
 
-    uint32_t lenValue() const { return this->header.lenValue(); }
+    uint32_t sizeValue() const { return this->header.sizeValue(); }
 
     uint8_t getSign() const { return this->header.sign(); }
     uint8_t getVersion() const { return this->header.version(); }
@@ -49,11 +49,11 @@ public:
     }
 
     void setLength(uint32_t length) {
-        this->header.setLength(length);
+        this->header.setBodySize(length);
     }
 
-    void setLenValue(uint32_t value) {
-        this->header.setLenValue(value);
+    void setSizeValue(uint32_t value) {
+        this->header.setSizeValue(value);
     }
 
     void setSign(uint8_t sign) {
@@ -166,7 +166,7 @@ public:
         values.clear();
 
         // Read the header info.
-        this->header.setLenValue(stream.readUInt32());
+        this->header.setSizeValue(stream.readUInt32());
         this->header.setInfoValue(stream.readUInt32());
 
         count = valid_count = this->header.args();
@@ -257,9 +257,9 @@ public:
         size_t totalSize = calcRequireSize(valid_count);
 
         // Write the header info.
-        this->header.setLength((uint32_t)totalSize);
+        this->header.setBodySize((uint32_t)totalSize);
         this->header.setArgs((uint32_t)valid_count);
-        stream.writeUInt32(this->header.lenValue());
+        stream.writeUInt32(this->header.sizeValue());
         stream.writeUInt32(this->header.infoValue());
 
         // Write the body info.

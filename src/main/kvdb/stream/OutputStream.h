@@ -41,7 +41,7 @@ public:
     bool isMemoryStream() const { return true; }
 
     void writeHeader(const MessageHeader & header) {
-        this->writeUInt32(header.lenValue());
+        this->writeUInt32(header.sizeValue());
         this->writeUInt32(header.infoValue());
     }
 
@@ -55,7 +55,7 @@ public:
     void writeHeaderAndRestore(const MessageHeader & header) {
         char_type * savePos = this->current();
         this->reset();
-        this->writeUInt32(header.lenValue());
+        this->writeUInt32(header.sizeValue());
         this->writeUInt32(header.infoValue());
         this->setCurrent(savePos);
     }
@@ -63,7 +63,7 @@ public:
     void writeHeaderAndRestore(uint8_t sign, uint16_t opcode, uint8_t version) {
         MessageHeader header;
         uint32_t length = this->getLength();
-        header.setLength(length);
+        header.setBodySize(length);
         header.setSign(sign);
         header.setOpcode(opcode);
         header.setVersion(version);
@@ -77,7 +77,7 @@ public:
 
     void writeHeaderAndRestore(uint8_t sign, uint16_t opcode, uint8_t version, uint32_t length) {
         MessageHeader header;
-        header.setLength(length);
+        header.setBodySize(length);
         header.setSign(sign);
         header.setOpcode(opcode);
         header.setVersion(version);

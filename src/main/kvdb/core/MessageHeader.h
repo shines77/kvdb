@@ -63,27 +63,27 @@ struct VersionInfo {
     }
 };
 
-struct LenField {
+struct SizeField {
     uint8_t flags: 8;
-    uint32_t length: 24;
+    uint32_t size: 24;
 
-    LenField(uint8_t _flags = 0, uint32_t _length = 0)
-        : flags(_flags), length(_length) {
+    SizeField(uint8_t _flags = 0, uint32_t _size = 0)
+        : flags(_flags), size(_size) {
     }
 
     uint32_t value() const { return *((uint32_t *)this); }
 
     void setValue(uint32_t value) {
-        LenField * newValue = reinterpret_cast<LenField *>(&value);
+        SizeField * newValue = reinterpret_cast<SizeField *>(&value);
         flags = newValue->flags;
-        length = newValue->length;
+        size = newValue->size;
     }
 
     uint8_t getFlags() const { return this->flags; }
-    uint32_t getLength() const { return this->length; }
+    uint32_t getSize() const { return this->size; }
 
     void setFlags(uint8_t flags) { this->flags = flags; }
-    void setLength(uint32_t length) { this->length = length; }
+    void setSize(uint32_t size) { this->size = size; }
 };
 
 struct InfoField {
@@ -178,7 +178,7 @@ struct InfoType {
 };
 
 struct MessageHeader {
-    LenField    len;
+    SizeField   size;
     InfoField   info;
 
     MessageHeader() {
@@ -186,17 +186,20 @@ struct MessageHeader {
     }
     ~MessageHeader() {}
 
-    uint8_t flags() const { return this->len.flags; }
-    uint32_t length() const { return this->len.length; }
+    uint8_t flags() const { return this->size.flags; }
+    uint32_t bodySize() const { return this->size.size; }
+    uint32_t totalSize() const { return (this->size.size + sizeof(MessageHeader)); }
 
-    uint32_t totalLength() const { return (this->len.length + sizeof(MessageHeader)); }
+    uint32_t sizeValue() const { return this->size.value(); }
 
-    uint32_t lenValue() const { return this->len.value(); }
+    void setFlags(uint8_t flags) { this->size.setFlags(flags); }
+    void setBodySize(uint32_t size) { this->size.setSize(size); }
+    void setTotalSize(uint32_t size) {
+        assert(size >= sizeof(MessageHeader));
+        this->size.setSize(size - sizeof(MessageHeader));
+    }
 
-    void setFlags(uint8_t flags) { this->len.setFlags(flags); }
-    void setLength(uint32_t length) { this->len.setLength(length); }
-
-    void setLenValue(uint32_t value) { this->len.setValue(value); }
+    void setSizeValue(uint32_t value) { this->size.setValue(value); }
 
     uint8_t sign() const { return this->info.getSign(); }
     uint8_t version() const { return this->info.getVersion(); }

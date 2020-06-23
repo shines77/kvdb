@@ -72,7 +72,7 @@ void Connection::start_read_request()
         MessageHeader header;
         InputPacketStream istream(header_buf);
         istream.readHeader(header);
-        uint32_t requestSize = header.length();
+        uint32_t requestSize = header.bodySize();
         if (header.sign() == kShortSign && requestSize > 0) {
             //
             // Receive the part data of response, if it's not completed, continue to read. 

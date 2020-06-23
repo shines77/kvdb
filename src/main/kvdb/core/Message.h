@@ -43,21 +43,30 @@ public:
 
     virtual ~Message() {}
 
+    static int32_t calcBodySize(uint32_t totalSize) {
+        assert(totalSize >= kMsgHeaderSize);
+        return int32_t(totalSize - kMsgHeaderSize);
+    }
+
+    static int32_t calcTotalSize(uint32_t bodySize) {
+        return int32_t(bodySize + kMsgHeaderSize);
+    }
+
     uint8_t flags() const { return this->header.flags(); }
-    uint32_t length() const { return this->header.length(); }
-    uint32_t totalSize() const { return (this->header.length() + sizeof(MessageHeader)); }
+    uint32_t bodySize() const { return this->header.bodySize(); }
+    uint32_t totalSize() const { return this->header.totalSize(); }
 
     uint8_t sign() const { return this->header.sign(); }
     uint8_t version() const { return this->header.version(); }
     uint16_t opcode() const { return this->header.opcode(); }
     uint32_t args() const { /* Not implemented yet. */ return 0; }
 
-    uint32_t lenValue() const { return this->header.lenValue(); }
-    void setLenValue(uint32_t value) { this->header.setLenValue(value); }
+    uint32_t sizeValue() const { return this->header.sizeValue(); }
+    void setSizeValue(uint32_t value) { this->header.setSizeValue(value); }
 
     void setFlags(uint8_t flags) { this->header.setFlags(flags); }
-    void setLength(uint32_t length) { this->header.setLength(length); }
-    void setBodyLength(uint32_t length) { this->header.setLength(length + sizeof(MessageHeader)); }
+    void setBodySize(uint32_t size) { this->header.setBodySize(size); }
+    void setTotalSize(uint32_t size) { this->header.setTotalSize(size); }
 
     void setSign(uint8_t sign) { this->header.setSign(sign); }
     void setVersion(uint8_t version) { this->header.info.version = version; }
@@ -75,27 +84,32 @@ public:
     MessageHeader & getHeader() { return const_cast<Message *>(this)->header; }
     const MessageHeader & getHeader() const { return const_cast<const Message *>(this)->header; }
 
-    void setHeader(uint8_t sign, uint32_t length) {
-        this->setLength(length);
+    void setHeader(uint8_t sign, uint32_t size) {
+        this->setBodySize(size);
         this->setSign(sign);
     }
 
-    void setHeader(uint8_t sign, uint16_t opcode, uint32_t length) {
-        this->setLength(length);
+    void setHeaderTotal(uint8_t sign, uint32_t totalSize) {
+        this->setTotalSize(totalSize);
+        this->setSign(sign);
+    }
+
+    void setHeader(uint8_t sign, uint16_t opcode, uint32_t size) {
+        this->setBodySize(size);
 
         this->setSign(sign);
         this->setOpcode(opcode);
     }
 
-    void setHeader(uint8_t sign, uint8_t version, uint32_t args, uint32_t length) {
-        this->setLength(length);
+    void setHeader(uint8_t sign, uint8_t version, uint32_t args, uint32_t size) {
+        this->setBodySize(size);
 
         this->setSign(sign);
         this->setVersion(version);
     }
 
-    void setHeader(uint8_t sign, uint16_t opcode, uint8_t version, uint32_t args, uint32_t length) {
-        this->setLength(length);
+    void setHeader(uint8_t sign, uint16_t opcode, uint8_t version, uint32_t args, uint32_t size) {
+        this->setBodySize(size);
 
         this->setSign(sign);
         this->setVersion(version);
@@ -104,13 +118,13 @@ public:
 
     template <typename InputStreamTy>
     void readHeader(InputStreamTy & is) {
-        this->setLenValue(is.readUInt32());
+        this->setSizeValue(is.readUInt32());
         this->setInfoValue(is.readUInt32());
     }
 
     template <typename OutputStreamTy>
     void writeHeader(OutputStreamTy & os) {
-        os.writeUInt32(this->lenValue());
+        os.writeUInt32(this->sizeValue());
         os.writeUInt32(this->infoValue());
     }
 };
@@ -125,25 +139,14 @@ public:
 
     virtual ~BasicMessage() {}
 
-    uint32_t prepare() {
+    uint32_t prepareAll() {
         // Calculate the total require size.
         PrepareOutputPacketStream preOS;
-        preOS.next(kMsgHeaderSize);
+        preOS.skip(kMsgHeaderSize);
         T * pThis = static_cast<T *>(this);
         assert(pThis != nullptr);
         pThis->writeBody(preOS);
         return (uint32_t)preOS.position();
-    }
-
-    template <typename OutputStreamTy>
-    void prepare(OutputStreamTy & os, bool needPrepare) {
-        // Need prepare stream space ?
-        if (needPrepare && os.isMemoryStream()) {
-            uint32_t totalSize = this->prepare();
-            // Setting the message's body length
-            this->header.setLength(totalSize - kMsgHeaderSize);
-            os.inflate(totalSize);
-        }
     }
 
     uint32_t prepareBody() {
@@ -156,12 +159,23 @@ public:
     }
 
     template <typename OutputStreamTy>
+    void prepare(OutputStreamTy & os, bool needPrepare) {
+        // Need prepare stream space ?
+        if (needPrepare && os.isMemoryStream()) {
+            uint32_t totalSize = this->prepareAll();
+            // Setting the message's body length
+            this->header.setBodySize(totalSize - kMsgHeaderSize);
+            os.inflate(totalSize);
+        }
+    }
+
+    template <typename OutputStreamTy>
     void prepareBody(OutputStreamTy & os, bool needPrepare) {
         // Need prepare stream space ?
         if (needPrepare && os.isMemoryStream()) {
             uint32_t bodySize = this->prepareBody();
             // Setting the message's body length
-            this->header.setLength(bodySize);
+            this->header.setBodySize(bodySize);
             os.inflate(bodySize);
         }
     }
