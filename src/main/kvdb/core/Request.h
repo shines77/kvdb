@@ -27,8 +27,8 @@ public:
     virtual ~IRequest() {}
 };
 
-template <typename T>
-class Request : public BasicMessage<T> {
+template <typename T, uint32_t MsgVer = 0>
+class Request : public BasicMessage<T, MsgVer> {
 public:
     //
 

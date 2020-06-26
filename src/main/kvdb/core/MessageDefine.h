@@ -19,7 +19,8 @@
 namespace kvdb {
 
 struct LoginRequest_v0 : public Request<LoginRequest_v0> {
-    static const uint32_t kVerInfo = MAKE_MSG_VERINFO(0, 3);
+    static const uint8_t kMsgVer = 0;
+
     std::string sUsername;
     std::string sPassword;
     std::string sDatabase;
@@ -55,7 +56,8 @@ struct LoginRequest_v0 : public Request<LoginRequest_v0> {
 };
 
 struct LoginResponse_v0 : public Response<LoginResponse_v0> {
-    static const uint32_t kVerInfo = MAKE_MSG_VERINFO(0, 1);
+    static const uint8_t kMsgVer = 0;
+
     int iStatusCode;
 
     LoginResponse_v0(const char * data = nullptr)
@@ -86,7 +88,8 @@ struct LoginResponse_v0 : public Response<LoginResponse_v0> {
 };
 
 struct HandShakeRequest_v0 : public Request<HandShakeRequest_v0> {
-    static const uint32_t kVerInfo = MAKE_MSG_VERINFO(0, 1);
+    static const uint8_t kMsgVer = 0;
+
     uint32_t iVersion;
 
     HandShakeRequest_v0(const char * data = nullptr)
@@ -117,7 +120,8 @@ struct HandShakeRequest_v0 : public Request<HandShakeRequest_v0> {
 };
 
 struct HandShakeResponse_v0 : public Response<HandShakeResponse_v0> {
-    static const uint32_t kVerInfo = MAKE_MSG_VERINFO(0, 1);
+    static const uint8_t kMsgVer = 0;
+
     int iStatusCode;
 
     HandShakeResponse_v0(const char * data = nullptr)
@@ -148,7 +152,8 @@ struct HandShakeResponse_v0 : public Response<HandShakeResponse_v0> {
 };
 
 struct ConnectRequest_v0 : public Request<ConnectRequest_v0> {
-    static const uint32_t kVerInfo = MAKE_MSG_VERINFO(0, 1);
+    static const uint8_t kMsgVer = 0;
+
     uint32_t iVersion;
 
     ConnectRequest_v0(const char * data = nullptr)
@@ -179,7 +184,8 @@ struct ConnectRequest_v0 : public Request<ConnectRequest_v0> {
 };
 
 struct ConnectResponse_v0 : public Response<ConnectResponse_v0> {
-    static const uint32_t kVerInfo = MAKE_MSG_VERINFO(0, 1);
+    static const uint8_t kMsgVer = 0;
+
     int iStatusCode;
 
     ConnectResponse_v0(const char * data = nullptr)

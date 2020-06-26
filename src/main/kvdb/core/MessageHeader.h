@@ -9,10 +9,9 @@
 #include "kvdb/basic/stdint.h"
 
 #include "kvdb/core/MessageType.h"
+#include "kvdb/stream/ReadWriteResult.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"
-#include "kvdb/stream/InputPacketStream.h"
-#include "kvdb/stream/OutputPacketStream.h"
 
 #define USE_INGO_ARGS   0
 
@@ -265,7 +264,8 @@ struct MessageHeader {
                                uint8_t sign, uint16_t opcode,
                                uint8_t version) {
         MessageHeader header;
-        uint32_t bodySize = static_cast<uint32_t>(os.length());
+        assert(os.length() >= sizeof(MessageHeader));
+        uint32_t bodySize = static_cast<uint32_t>(os.length() - sizeof(MessageHeader));
         header.setBodySize(bodySize);
         header.setSign(sign);
         header.setOpcode(opcode);
@@ -280,9 +280,9 @@ struct MessageHeader {
     static
     void writeHeaderAndRestore(OutputStream & os,
                                uint8_t sign, uint16_t opcode,
-                               uint8_t version, uint32_t size) {
+                               uint8_t version, uint32_t bodySize) {
         MessageHeader header;
-        header.setBodySize(size);
+        header.setBodySize(bodySize);
         header.setSign(sign);
         header.setOpcode(opcode);
         header.setVersion(version);

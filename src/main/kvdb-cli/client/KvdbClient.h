@@ -8,6 +8,8 @@
 
 #include <iostream>
 #include <streambuf>
+#include <cstdint>
+#include <cstddef>
 #include <string>
 #include <iostream>
 #include <memory>
@@ -159,7 +161,15 @@ public:
 
     void start(const std::string & address, const std::string & port)
     {
-        std::uint16_t port_num = std::atoi(port.c_str());
+        int n_port = std::atoi(port.c_str());
+        if (n_port < 0 || n_port >= 65536) {
+            std::cout << "KvdbClient::start(address, port): port number ["
+                      << n_port << "] is not in range [0, 65536)."
+                      << std::endl;
+            return;
+        }
+
+        std::uint16_t port_num = static_cast<std::uint16_t>(n_port);
         this->start(address, port_num);
     }
 
@@ -256,7 +266,7 @@ private:
             request_size_ = requestSize;
 
             OutputPacketStream os(request_buf_.data(), requestSize);
-            request.setHeaderTotal(requestSize);
+            request.writeHeaderTotal(os, requestSize);
             request.writeTo(os, false);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
@@ -274,7 +284,7 @@ private:
 
     void handle_stop()
     {
-        stop();
+        this->stop();
     }
 
     void handle_write_request(const boost::system::error_code & err)
@@ -366,7 +376,7 @@ private:
                 request_size_ = requestSize;
 
                 OutputPacketStream os(request_buf_.data(), requestSize);
-                request.setHeaderTotal(requestSize);
+                request.writeHeaderTotal(os, requestSize);
                 request.writeTo(os, false);
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
@@ -472,7 +482,7 @@ private:
                 request_size_ = requestSize;
 
                 OutputPacketStream os(request_buf_.data(), requestSize);
-                request.setHeaderTotal(requestSize);
+                request.writeHeaderTotal(os, requestSize);
                 request.writeTo(os, false);
 
                 std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;

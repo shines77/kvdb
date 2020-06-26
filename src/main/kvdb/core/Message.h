@@ -33,8 +33,14 @@ protected:
     const char * body_;
 
 public:
-    Message(uint32_t opcode = MessageType::Unknown, const char * data = nullptr) : body_(data) {
+    Message(uint16_t opcode = MessageType::Unknown, const char * data = nullptr) : body_(data) {
         this->header.info.sign = kShortSign;
+        this->header.info.opcode = opcode;
+    }
+
+    Message(uint16_t opcode, uint8_t version, const char * data = nullptr) : body_(data) {
+        this->header.info.sign = kShortSign;
+        this->header.info.version = version;
         this->header.info.opcode = opcode;
     }
 
@@ -110,14 +116,31 @@ public:
         os.writeUInt32(this->sizeValue());
         os.writeUInt32(this->infoValue());
     }
+
+    template <typename OutputStreamTy>
+    void writeHeader(OutputStreamTy & os, uint32_t bodySize, uint8_t sign = kShortSign) {
+        this->setHeader(bodySize, kShortSign);
+        this->writeHeader(os);
+    }
+
+    template <typename OutputStreamTy>
+    void writeHeaderTotal(OutputStreamTy & os, uint32_t totalSize, uint8_t sign = kShortSign) {
+        this->setHeaderTotal(totalSize, kShortSign);
+        this->writeHeader(os);
+    }
 };
 
-template <typename T>
+template <typename T, uint32_t MsgVer = 0>
 class BasicMessage : public Message {
 public:
-    BasicMessage(uint32_t opcode = MessageType::Unknown, const char * data = nullptr)
-        : Message(opcode, data) {
-        Message::setVersion(T::kVerInfo);
+    static const uint8_t kMsgVer = MsgVer;
+
+    BasicMessage(uint16_t opcode = MessageType::Unknown, const char * data = nullptr)
+        : Message(opcode, T::kMsgVer, data) {
+    }
+
+    BasicMessage(uint16_t opcode, uint8_t version, const char * data = nullptr)
+        : Message(opcode, version, data) {
     }
 
     virtual ~BasicMessage() {}
