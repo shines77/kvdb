@@ -29,8 +29,9 @@ Connection::Connection(boost::asio::io_service & io_service,
       connection_manager_(manager),
       request_handler_(handler),
       request_size_(0),
-      response_size_(0)
+      response_size_(8192)
 {
+    response_buf_.reserve(response_size_);
 }
 
 Connection::~Connection(void)
@@ -71,19 +72,19 @@ void Connection::start_read_request()
     if (readBytes == kMsgHeaderSize) {
         MessageHeader header;
         header.readHeader(header_buf);
-        uint32_t requestSize = header.bodySize();
-        if (header.verifySign() && requestSize > 0) {
+        uint32_t bodySize = header.bodySize();
+        if (header.verifySign() && bodySize > 0) {
             //
             // Receive the part data of response, if it's not completed, continue to read. 
             //
             request_.header = header;
-            request_buf_.reserve(requestSize);
-            request_size_ = requestSize;
-            socket_.async_read_some(boost::asio::buffer(request_buf_.data(), requestSize),
+            request_buf_.reserve(bodySize);
+            request_size_ = bodySize;
+            socket_.async_read_some(boost::asio::buffer(request_buf_.data(), bodySize),
                 boost::bind(&Connection::handle_read_some, shared_from_this(),
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::bytes_transferred,
-                            requestSize));
+                            bodySize));
         }
         else {
             // The signId is dismatch
@@ -140,7 +141,7 @@ void Connection::handle_read_some(const boost::system::error_code & err,
             this->stop();
         }
         else {
-            OutputPacketStream os(response_buf_.data(), response_size_);
+            OutputStream os(response_buf_.data(), response_size_);
             request_.setBody(request_buf_.data());
             int result = request_handler_.handleRequest(context_, request_, os);
             if (result == ParseStatus::Success) {

@@ -188,24 +188,21 @@ public:
     int readString(StringType & value) {
         size_t length;
         int result = ReadResult::Ok;
-        uint8_t type = base_type::getType();
+        uint8_t type = base_type::readType();
         switch (type) {
         case DataType::String:
-            base_type::nextUInt8();
             length = base_type::readUInt32();
-            base_type::readString(value, length);
+            base_type::readString_Internal(value, length);
             break;
 
         case DataType::String1B:
-            base_type::nextUInt8();
             length = base_type::readUInt8();
-            base_type::readString(value, length);
+            base_type::readString_Internal(value, length);
             break;
 
         case DataType::String2B:
-            base_type::nextUInt8();
             length = base_type::readUInt16();
-            base_type::readString(value, length);
+            base_type::readString_Internal(value, length);
             break;
 
         case DataType::String3B:
@@ -216,7 +213,7 @@ public:
 #else
             length = u32 & 0x00FFFFFFUL;
 #endif
-            base_type::readString(value, length);
+            base_type::readString_Internal(value, length);
             break;
         }
 

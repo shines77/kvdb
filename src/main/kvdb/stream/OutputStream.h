@@ -25,6 +25,8 @@ template <typename T, typename Base = BasicStream<T>>
 class BasicOutputStream : public Base {
 public:
     typedef Base                                base_type;
+    typedef BasicOutputStream<T, Base>          this_type;
+    typedef this_type                           downcast_type;
     typedef typename base_type::char_type       char_type;
     typedef typename base_type::size_type       size_type;
 
@@ -38,6 +40,22 @@ public:
     ~BasicOutputStream() {}
 
     bool isMemoryStream() const { return true; }
+
+protected:
+    template <typename StringType>
+    void writeString_Internal(const StringType & value) {
+        base_type::setString(value);
+        base_type::nextChar(static_cast<int>(value.size()));
+    }
+
+public:
+    downcast_type & downcastTo() {
+        return (*static_cast<downcast_type *>(this));
+    }
+
+    const downcast_type & downcastTo() const {
+        return (*const_cast<const downcast_type *>(static_cast<downcast_type *>(this)));
+    }
 
     void writeType(uint8_t type) {
         this->writeUInt8(type);
@@ -119,8 +137,8 @@ public:
 
     template <typename StringType>
     void writeString(const StringType & value) {
-        base_type::setString(value);
-        base_type::nextChar((int)value.size());
+        this->writeUInt32(static_cast<uint32_t>(value.size()));
+        this->writeString_Internal(value);
     }
 };
 

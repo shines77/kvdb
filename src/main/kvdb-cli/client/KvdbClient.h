@@ -261,13 +261,13 @@ private:
             request.sPassword = config.password;
             request.sDatabase = config.database;
             
-            uint32_t requestSize = request.prepareAll();
+            uint32_t requestSize = request.prepareAll<OutputStream>();
             request_buf_.reserve(requestSize);
             request_size_ = requestSize;
 
-            OutputPacketStream os(request_buf_.data(), requestSize);
+            OutputStream os(request_buf_.data(), requestSize);
             request.writeHeaderTotal(os, requestSize);
-            request.writeTo(os, false);
+            request.writeToBody(os, false);
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
             std::cout << "request_.size() = " << os.length() << std::endl;
@@ -371,13 +371,13 @@ private:
                 HandShakeRequest_v0 request;
                 request.iVersion = 1;
 
-                uint32_t requestSize = request.prepareAll();
+                uint32_t requestSize = request.prepareAll<OutputStream>();
                 request_buf_.reserve(requestSize);
                 request_size_ = requestSize;
 
-                OutputPacketStream os(request_buf_.data(), requestSize);
+                OutputStream os(request_buf_.data(), requestSize);
                 request.writeHeaderTotal(os, requestSize);
-                request.writeTo(os, false);
+                request.writeToBody(os, false);
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
                 std::cout << "request_.size() = " << os.length() << std::endl;
@@ -477,13 +477,13 @@ private:
                 ConnectRequest_v0 request;
                 request.iVersion = 1;
 
-                uint32_t requestSize = request.prepareAll();
+                uint32_t requestSize = request.prepareAll<OutputStream>();
                 request_buf_.reserve(requestSize);
                 request_size_ = requestSize;
 
-                OutputPacketStream os(request_buf_.data(), requestSize);
+                OutputStream os(request_buf_.data(), requestSize);
                 request.writeHeaderTotal(os, requestSize);
-                request.writeTo(os, false);
+                request.writeToBody(os, false);
 
                 std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;
                 std::cout << "request_.size() = " << os.length() << std::endl;

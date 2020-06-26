@@ -56,10 +56,10 @@ struct VersionInfo {
 };
 
 struct SizeField {
-    uint8_t flags: 8;
+    uint32_t flags: 8;
     uint32_t size: 24;
 
-    SizeField(uint8_t _flags = 0, uint32_t _size = 0)
+    SizeField(uint32_t _flags = 0, uint32_t _size = 0)
         : flags(_flags), size(_size) {
     }
 
@@ -71,10 +71,10 @@ struct SizeField {
         size = newValue->size;
     }
 
-    uint8_t getFlags() const { return this->flags; }
+    uint32_t getFlags() const { return this->flags; }
     uint32_t getSize() const { return this->size; }
 
-    void setFlags(uint8_t flags) { this->flags = flags; }
+    void setFlags(uint32_t flags) { this->flags = flags; }
     void setSize(uint32_t size) { this->size = size; }
 };
 

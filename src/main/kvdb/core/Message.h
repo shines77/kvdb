@@ -13,6 +13,8 @@
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
 
+#include <type_traits>
+
 namespace kvdb {
 
 #pragma warning (push)
@@ -79,8 +81,12 @@ public:
     void setSizeValue(uint32_t value) { this->header.setSizeValue(value); }
     void setInfoValue(uint32_t value) { this->header.setInfoValue(value); }
 
-    char * body() { return (char *)this->body_; }
-    const char * body() const { return this->body_; }
+    char * body() {
+        return ((this->body_ == nullptr) ? ((char *)(void *)this + kMsgHeaderSize) : (char *)this->body_);
+    }
+    const char * body() const {
+        return ((this->body_ == nullptr) ? ((const char *)(void *)this + kMsgHeaderSize) : this->body_);
+    }
 
     void setBody(const char * body) { this->body_ = body; }
 
@@ -145,30 +151,71 @@ public:
 
     virtual ~BasicMessage() {}
 
+    template <typename OutputStreamTy = OutputStream>
     uint32_t prepareAll() {
-        // Calculate the total require size.
-        PrepareOutputPacketStream preOS;
-        preOS.skip(kMsgHeaderSize);
-        T * pThis = static_cast<T *>(this);
-        assert(pThis != nullptr);
-        pThis->writeBody(preOS);
-        return (uint32_t)preOS.position();
+        constexpr bool isOutputStream = std::is_same<OutputStreamTy, kvdb::OutputStream>::value;
+        constexpr bool isOutputPacketStream = std::is_same<OutputStreamTy, kvdb::OutputPacketStream>::value;
+        if (isOutputStream || isOutputPacketStream) {
+            if (isOutputStream) {
+                // Calculate the total require size.
+                PrepareOutputStream preOS;
+                preOS.skip(kMsgHeaderSize);
+                T * pThis = static_cast<T *>(this);
+                assert(pThis != nullptr);
+                pThis->writeBody(preOS);
+                return (uint32_t)preOS.position();
+            }
+            else {
+                // Calculate the total require size.
+                PrepareOutputPacketStream preOS;
+                preOS.skip(kMsgHeaderSize);
+                T * pThis = static_cast<T *>(this);
+                assert(pThis != nullptr);
+                pThis->writeBody(preOS);
+                return (uint32_t)preOS.position();
+            }
+        }
+        else {
+            static_assert((isOutputStream || isOutputPacketStream),
+                          "Error OutputStreamTy type.");
+            return 0;
+        }
     }
 
+    template <typename OutputStreamTy = OutputStream>
     uint32_t prepareBody() {
-        // Calculate the body require size.
-        PrepareOutputPacketStream preOS;
-        T * pThis = static_cast<T *>(this);
-        assert(pThis != nullptr);
-        pThis->writeBody(preOS);
-        return (uint32_t)preOS.position();
+        constexpr bool isOutputStream = std::is_same<OutputStreamTy, kvdb::OutputStream>::value;
+        constexpr bool isOutputPacketStream = std::is_same<OutputStreamTy, kvdb::OutputPacketStream>::value;
+        if (isOutputStream || isOutputPacketStream) {
+            if (isOutputStream) {
+                // Calculate the body require size.
+                PrepareOutputStream preOS;
+                T * pThis = static_cast<T *>(this);
+                assert(pThis != nullptr);
+                pThis->writeBody(preOS);
+                return (uint32_t)preOS.position();
+            }
+            else {
+                // Calculate the body require size.
+                PrepareOutputPacketStream preOS;
+                T * pThis = static_cast<T *>(this);
+                assert(pThis != nullptr);
+                pThis->writeBody(preOS);
+                return (uint32_t)preOS.position();
+            }
+        }
+        else {
+            static_assert((isOutputStream || isOutputPacketStream),
+                          "Error OutputStreamTy type.");
+            return 0;
+        }
     }
 
     template <typename OutputStreamTy>
     void prepare(OutputStreamTy & os, bool needPrepare) {
         // Need prepare stream space ?
         if (needPrepare && os.isMemoryStream()) {
-            uint32_t totalSize = this->prepareAll();
+            uint32_t totalSize = this->prepareAll<OutputStreamTy>();
             // Setting the message's body length
             this->header.setBodySize(totalSize - kMsgHeaderSize);
             os.inflate(totalSize);
@@ -179,7 +226,7 @@ public:
     void prepareBody(OutputStreamTy & os, bool needPrepare) {
         // Need prepare stream space ?
         if (needPrepare && os.isMemoryStream()) {
-            uint32_t bodySize = this->prepareBody();
+            uint32_t bodySize = this->prepareBody<OutputStreamTy>();
             // Setting the message's body length
             this->header.setBodySize(bodySize);
             os.inflate(bodySize);
@@ -199,9 +246,22 @@ public:
         return readStatus;
     }
 
+    template <typename InputStreamTy>
+    int readFromBody(InputStreamTy & is) {
+        int readStatus = ReadResult::Ok;
+
+        T * pThis = static_cast<T *>(this);
+        assert(pThis != nullptr);
+        readStatus = pThis->readBody(is);
+        return readStatus;
+    }
+
     template <typename OutputStreamTy>
-    void writeBody(OutputStreamTy & os, bool needPrepare) {
-        this->prepareBody(os, needPrepare);
+    void writeTo(OutputStreamTy & os, bool needPrepare = true) {
+        this->prepare(os, needPrepare);
+
+        typename OutputStreamTy::downcast_type & osb = os.downcastTo();
+        Message::writeHeader(osb);
 
         T * pThis = static_cast<T *>(this);
         assert(pThis != nullptr);
@@ -209,11 +269,8 @@ public:
     }
 
     template <typename OutputStreamTy>
-    void writeTo(OutputStreamTy & os, bool needPrepare = true) {
-        this->prepare(os, needPrepare);
-
-        typename OutputStreamTy::base_type & osb = os.downcastTo();
-        Message::writeHeader(osb);
+    void writeToBody(OutputStreamTy & os, bool needPrepare) {
+        this->prepareBody(os, needPrepare);
 
         T * pThis = static_cast<T *>(this);
         assert(pThis != nullptr);

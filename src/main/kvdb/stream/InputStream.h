@@ -39,6 +39,14 @@ public:
 
     bool isMemoryStream() const { return true; }
 
+protected:
+    template <typename StringType>
+    void readString_Internal(StringType & value, size_t length) {
+        base_type::getString(value, length);
+        base_type::nextChar((int)length);
+    }
+
+public:
     uint8_t readType() {
         return readUInt8();
     }
@@ -128,9 +136,10 @@ public:
     }
 
     template <typename StringType>
-    void readString(StringType & value, size_t length) {
-        base_type::getString(value, length);
-        base_type::nextChar((int)length);
+    int readString(StringType & value) {
+        uint32_t length = this->readUInt32();
+        this->readString_Internal(value, length);
+        return ReadResult::Ok;
     }
 
     template <typename StringType>
@@ -138,24 +147,21 @@ public:
         int result = ReadResult::Ok;
         uint32_t length;
 
-        uint8_t type = base_type::getType();
+        uint8_t type = this->readType();
         switch (type) {
         case DataType::String:
-            base_type::nextUInt8();
-            length = base_type::readUInt32();
-            base_type::readString(value, length);
+            length = this->readUInt32();
+            this->readString_Internal(value, length);
             break;
 
         case DataType::String1B:
-            base_type::nextUInt8();
             length = base_type::readUInt8();
-            base_type::readString(value, length);
+            this->readString_Internal(value, length);
             break;
 
         case DataType::String2B:
-            base_type::nextUInt8();
             length = base_type::readUInt16();
-            base_type::readString(value, length);
+            this->readString_Internal(value, length);
             break;
 
         case DataType::String3B:
@@ -166,7 +172,7 @@ public:
 #else
             length = value32 & 0x00FFFFFFUL;
 #endif
-            base_type::readString(value, length);
+            this->readString_Internal(value, length);
             break;
         }
 

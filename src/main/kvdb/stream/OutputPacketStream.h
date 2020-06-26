@@ -25,6 +25,8 @@ template <typename T, typename Base = BasicStream<T>>
 class BasicOutputPacketStream : public BasicOutputStream<T, Base> {
 public:
     typedef BasicOutputStream<T, Base>          base_type;
+    typedef BasicOutputPacketStream<T, Base>    this_type;
+    typedef base_type                           downcast_type;
     typedef typename base_type::char_type       char_type;
     typedef typename base_type::size_type       size_type;
 
@@ -39,12 +41,12 @@ public:
 
     bool isMemoryStream() const { return true; }
 
-    base_type & downcastTo() {
-        return (*static_cast<base_type *>(this));
+    downcast_type & downcastTo() {
+        return (*static_cast<downcast_type *>(this));
     }
 
-    const base_type & downcastTo() const {
-        return (*const_cast<const base_type *>(static_cast<base_type *>(this)));
+    const downcast_type & downcastTo() const {
+        return (*const_cast<const downcast_type *>(static_cast<downcast_type *>(this)));
     }
 
     void writeType(uint8_t type) {
@@ -132,12 +134,12 @@ public:
         if (length < 256) {
             base_type::writeType(DataType::String1B);
             base_type::writeUInt8((uint8_t)length);
-            base_type::writeString(value);
+            base_type::writeString_Internal(value);
         }
         else if (length < 65536) {
             base_type::writeType(DataType::String2B);
             base_type::writeUInt16((uint16_t)length);
-            base_type::writeString(value);
+            base_type::writeString_Internal(value);
         }
         else if (length < 16777216) {
 #if IS_BIG_ENDIAN
@@ -147,12 +149,12 @@ public:
             uint32_t value32 = (DataType::String3B << 24) | (length & 0x00FFFFFFUL);
             base_type::writeUInt32(value32);
 #endif
-            base_type::writeString(value);
+            base_type::writeString_Internal(value);
         }
         else {
             base_type::writeType(DataType::String);
             base_type::writeUInt32((uint32_t)length);
-            base_type::writeString(value);
+            base_type::writeString_Internal(value);
         }
     }
 
