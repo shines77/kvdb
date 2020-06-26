@@ -145,29 +145,29 @@
     <OutDir>$(SolutionDir)lib\vc2015\$(PlatformShortName)\</OutDir>
     <IntDir>$(SolutionDir)obj\vc2015\$(PlatformShortName)-$(Configuration)\main\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
-    <LibraryPath>C:\dev\boost\boost_1_72_0\bin\vc14_x86\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\dev\boost\boost_1_72_0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost\boost_1_59_0\bin\vc14_x86\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\dev\boost\boost_1_59_0\include;C:\Project\Windows\WTL\wtl-git\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)lib\vc2015\$(PlatformShortName)\</OutDir>
     <IntDir>$(SolutionDir)obj\vc2015\$(PlatformShortName)-$(Configuration)\main\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
-    <LibraryPath>C:\dev\boost\boost_1_72_0\bin\vc14_x86\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\dev\boost\boost_1_72_0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost\boost_1_59_0\bin\vc14_x86\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\dev\boost\boost_1_59_0\include;C:\Project\Windows\WTL\wtl-git\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)lib\vc2015\$(PlatformShortName)\</OutDir>
     <IntDir>$(SolutionDir)obj\vc2015\$(PlatformShortName)-$(Configuration)\main\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
-    <LibraryPath>C:\dev\boost\boost_1_72_0\bin\vc14_x64\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\dev\boost\boost_1_72_0\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost\boost_1_59_0\bin\vc14_x86\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\dev\boost\boost_1_59_0\include;C:\Project\Windows\WTL\wtl-git\Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)lib\vc2015\$(PlatformShortName)\</OutDir>
     <IntDir>$(SolutionDir)obj\vc2015\$(PlatformShortName)-$(Configuration)\main\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
-    <IncludePath>C:\dev\boost\boost_1_72_0\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\dev\boost\boost_1_72_0\bin\vc14_x64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\dev\boost\boost_1_59_0\include;C:\Project\Windows\WTL\wtl-git\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\dev\boost\boost_1_59_0\bin\vc14_x86\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
