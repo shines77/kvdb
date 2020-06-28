@@ -177,7 +177,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
 
     if (header.bodySize() > 0) {
         const char * first = is.current();
-        int result = 0;
+        int result;
         switch (header.opcode()) {
         case MessageType::LoginRequest:
             result = handleLoginRequest(context, is, os);
@@ -197,8 +197,12 @@ int RequestHandler::handleRequest(ConnectionContext & context,
 
         default:
             // Unknown opcode message
+            result = ParseStatus::Failed;
             break;
         }
+
+        if (result < 0)
+            return result;
 
         const char * last = is.current();
         if ((last - first) == (ptrdiff_t)header.bodySize()) {
@@ -222,7 +226,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
 
     if (header.bodySize() > 0) {
         const char * first = is.current();
-        int result = 0;
+        int result;
         switch (header.opcode()) {
             case MessageType::LoginRequest:
                 result = handleLoginRequest(context, is, os);
@@ -242,8 +246,12 @@ int RequestHandler::handleRequest(ConnectionContext & context,
 
             default:
                 // Unknown opcode message
+                result = ParseStatus::Failed;
                 break;
         }
+
+        if (result < 0)
+            return result;
 
         const char * last = is.current();
         if ((last - first) == (ptrdiff_t)header.bodySize()) {
