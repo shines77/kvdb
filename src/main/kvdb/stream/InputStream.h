@@ -16,6 +16,7 @@
 #include <string>
 #include <type_traits>
 
+#include "kvdb/core/DataType.h"
 #include "kvdb/stream/BasicStream.h"
 #include "kvdb/stream/BasicPrepareStream.h"
 

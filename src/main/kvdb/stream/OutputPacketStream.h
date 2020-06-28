@@ -17,6 +17,7 @@
 #include <type_traits>
 
 #include "kvdb/core/Variant.h"
+#include "kvdb/core/DataType.h"
 #include "kvdb/stream/OutputStream.h"
 
 namespace kvdb {

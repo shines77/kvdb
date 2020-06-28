@@ -163,7 +163,7 @@ public:
                 preOS.skip(kMsgHeaderSize);
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
-                pThis->writeBody(preOS);
+                pThis->write(preOS);
                 return (uint32_t)preOS.position();
             }
             else {
@@ -172,7 +172,7 @@ public:
                 preOS.skip(kMsgHeaderSize);
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
-                pThis->writeBody(preOS);
+                pThis->write(preOS);
                 return (uint32_t)preOS.position();
             }
         }
@@ -193,7 +193,7 @@ public:
                 PrepareOutputStream preOS;
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
-                pThis->writeBody(preOS);
+                pThis->write(preOS);
                 return (uint32_t)preOS.position();
             }
             else {
@@ -201,7 +201,7 @@ public:
                 PrepareOutputPacketStream preOS;
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
-                pThis->writeBody(preOS);
+                pThis->write(preOS);
                 return (uint32_t)preOS.position();
             }
         }
@@ -243,7 +243,7 @@ public:
 
         T * pThis = static_cast<T *>(this);
         assert(pThis != nullptr);
-        readStatus = pThis->readBody(is);
+        readStatus = pThis->read(is);
         return readStatus;
     }
 
@@ -253,7 +253,7 @@ public:
 
         T * pThis = static_cast<T *>(this);
         assert(pThis != nullptr);
-        readStatus = pThis->readBody(is);
+        readStatus = pThis->read(is);
         return readStatus;
     }
 
@@ -266,16 +266,16 @@ public:
 
         T * pThis = static_cast<T *>(this);
         assert(pThis != nullptr);
-        pThis->writeBody(os);
+        pThis->write(os);
     }
 
     template <typename OutputStreamTy>
-    void writeToBody(OutputStreamTy & os, bool needPrepare) {
+    void writeBody(OutputStreamTy & os, bool needPrepare) {
         this->prepareBody(os, needPrepare);
 
         T * pThis = static_cast<T *>(this);
         assert(pThis != nullptr);
-        pThis->writeBody(os);
+        pThis->write(os);
     }
 
     template <typename OutputStreamTy = OutputStream>
@@ -285,7 +285,7 @@ public:
 
         OutputStreamTy os(buffer.data(), totalSize);
         this->writeHeaderTotal(os, totalSize);
-        this->writeToBody(os, false);
+        this->writeBody(os, false);
 
         return totalSize;
     }

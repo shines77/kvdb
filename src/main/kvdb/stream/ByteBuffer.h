@@ -17,8 +17,8 @@
 #include <string>
 #include <type_traits>
 
-#include "kvdb/core/DataType.h"
-#include "kvdb/stream/StreamBuffer.h"
+#include "kvdb/stream/Allocator.h"
+#include "kvdb/stream/MemoryBuffer.h"
 #include "kvdb/jstd/StringRef.h"
 #include "kvdb/support/Power2.h"
 #include "kvdb/support/PowerOf2.h"
@@ -26,23 +26,20 @@
 namespace kvdb {
 
 template <typename T, typename Allocator = GenericAllocator<T>>
-class BasicByteBuffer {
+class BasicByteBuffer : public BasicMemoryBuffer<T> {
 public:
-    typedef typename std::remove_pointer<
-                typename std::remove_reference<
-                    typename std::remove_cv<T>::type
-                >::type
-            >::type     char_type;
+    typedef BasicMemoryBuffer<T>                base_type;
+    typedef BasicByteBuffer<T, Allocator>       this_type;
 
-    typedef std::size_t                     size_type;
+    typedef typename base_type::char_type       char_type;
+    typedef typename base_type::size_type       size_type;
 
-    typedef Allocator                       allocator_type;
-    typedef std::basic_string<char_type>    string_type;
-    typedef jstd::BasicStringRef<char_type> stringref_type;
+    typedef typename base_type::string_type     string_type;
+    typedef typename base_type::stringref_type  stringref_type;
+
+    typedef Allocator                           allocator_type;
 
 protected:
-    char_type *     data_;
-    size_type       size_;
     size_type       capacity_;
     allocator_type  allocator_;
 
@@ -51,50 +48,33 @@ protected:
     }
 
 public:
-    BasicByteBuffer() : data_(nullptr), size_(0), capacity_(0) {}
+    BasicByteBuffer() : base_type(nullptr, 0), capacity_(0) {}
     BasicByteBuffer(const char_type * data, size_type size)
-        : data_(const_cast<char_type *>(data)),
-          size_(size),
-          capacity_(calc_capacity(size)) {
+        : base_type(nullptr, 0), capacity_(0) {
+        this->copy(data, size);
     }
     template <size_type N>
     BasicByteBuffer(const char_type(&data)[N])
-        : data_(data), size_(N), capacity_(compile_time::round_up_to_power2<N>::value) {
+        : base_type(nullptr, 0), capacity_(0) {
+        this->internal_copy<N>(data);
     }
     ~BasicByteBuffer() {
         this->destroy();
     }
 
-    char_type * data() const { return this->data_; }
-    size_type   size() const { return this->size_; }
-    size_type   capacity() const { return this->capacity_; }
+    size_type capacity() const { return this->capacity_; }
 
-    void setData(char_type * data) { this->data_ = data; }
-    void setSize(size_type size) { this->size_ = size; this->setCapacity(size); }
-    void setCapacity(size_type capacity) { this->capacity_ = calc_capacity(capacity); }
+    void setCapacity(size_type capacity) {
+        this->capacity_ = calc_capacity(capacity);
+    }
 
     size_type remain() const   {
         assert(this->capacity_ >= this->data_);
         return size_type(this->capacity_ - this->data_);
     }
 
-    bool isValid() const { return (this->data_ != nullptr); }
-
     bool isUnderflow() const { return (this->size_ < 0); }
     bool isOverflow()  const { return (this->size_ > this->capacity_); }
-
-    void attach(const char_type * data, size_type size) {
-        this->data_ = (char_type *)data;
-        this->size_ = size;
-        this->capacity_ = calc_capacity(size);
-    }
-
-    template <size_t N>
-    void attach(const char_type(&data)[N]) {
-        this->data_ = (char_type *)data;
-        this->size_ = N;
-        this->capacity_ = calc_capacity(N);
-    }
 
     void setAllocator(const allocator_type & allocator) {
         this->allocator_ = allocator;
@@ -106,6 +86,18 @@ protected:
             if (this->data_ != nullptr) {
                 allocator_.deallocate(this->data_);
             }
+        }
+    }
+
+    template <size_type Size>
+    void internal_copy(const char_type * data) {
+        assert(data != nullptr);
+        assert(data != this->data());
+        const size_type n_capacity = compile_time::round_up_to_power2<Size>::value;
+        this->reserve(n_capacity);
+        if (size <= this->capacity()) {
+            ::memmove((void *)this->data(), (const void *)data, Size * sizeof(char_type));
+            this->size_ = Size;
         }
     }
 
@@ -121,6 +113,22 @@ public:
         }
     }
 
+    void copy(const char_type * data, size_type size) {
+        assert(data != nullptr);
+        assert(data != this->data());
+        size_type n_capacity = calc_capacity(size);
+        this->reserve(n_capacity);
+        if (size <= this->capacity()) {
+            ::memmove((void *)this->data(), (const void *)data, size * sizeof(char_type));
+            this->size_ = size;
+        }
+    }
+
+    template <size_type N>
+    void copy(const char_type(&data)[N]) {
+        this->internal_copy<N>(data);
+    }
+
     void clean(char_type initVal = 0) {
         assert(this->data() != nullptr);
         ::memset((void *)this->data(), initVal, this->size() * sizeof(char_type));
@@ -131,7 +139,6 @@ public:
     }
 
     void reserve(size_type newCapacity) {
-        newCapacity = calc_capacity(newCapacity);
         if (newCapacity > this->capacity()) {
             char_type * newData = allocator_.reallocate(newCapacity);
             if (newData != nullptr) {
@@ -147,7 +154,6 @@ public:
     }
 
     void reserve(size_type newCapacity, char_type initVal) {
-        newCapacity = calc_capacity(newCapacity);
         if (newCapacity > this->capacity()) {
             char_type * newData = allocator_.reallocate(newCapacity);
             if (newData != nullptr) {

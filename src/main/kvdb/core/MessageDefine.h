@@ -39,7 +39,7 @@ struct LoginRequest_v0 : public Request<LoginRequest_v0> {
     }
 
     template <typename InputStreamTy>
-    int readBody(InputStreamTy & is) {
+    int read(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
         readStatus |= is.readString(sUsername);
         readStatus |= is.readString(sPassword);
@@ -48,7 +48,7 @@ struct LoginRequest_v0 : public Request<LoginRequest_v0> {
     }
 
     template <typename OutputStreamTy>
-    void writeBody(OutputStreamTy & os) {
+    void write(OutputStreamTy & os) {
         os.writeString(sUsername);
         os.writeString(sPassword);
         os.writeString(sDatabase);
@@ -75,14 +75,14 @@ struct LoginResponse_v0 : public Response<LoginResponse_v0> {
     }
 
     template <typename InputStreamTy>
-    int readBody(InputStreamTy & is) {
+    int read(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
         readStatus |= is.readInt32(iStatusCode);
         return readStatus;
     }
 
     template <typename OutputStreamTy>
-    void writeBody(OutputStreamTy & os) {
+    void write(OutputStreamTy & os) {
         os.writeInt32(iStatusCode);
     }
 };
@@ -107,14 +107,14 @@ struct HandShakeRequest_v0 : public Request<HandShakeRequest_v0> {
     }
 
     template <typename InputStreamTy>
-    int readBody(InputStreamTy & is) {
+    int read(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
         readStatus |= is.readUInt32(iVersion);
         return readStatus;
     }
 
     template <typename OutputStreamTy>
-    void writeBody(OutputStreamTy & os) {
+    void write(OutputStreamTy & os) {
         os.writeUInt32(iVersion);
     }
 };
@@ -139,14 +139,14 @@ struct HandShakeResponse_v0 : public Response<HandShakeResponse_v0> {
     }
 
     template <typename InputStreamTy>
-    int readBody(InputStreamTy & is) {
+    int read(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
         readStatus |= is.readInt32(iStatusCode);
         return readStatus;
     }
 
     template <typename OutputStreamTy>
-    void writeBody(OutputStreamTy & os) {
+    void write(OutputStreamTy & os) {
         os.writeInt32(iStatusCode);
     }
 };
@@ -171,14 +171,14 @@ struct ConnectRequest_v0 : public Request<ConnectRequest_v0> {
     }
 
     template <typename InputStreamTy>
-    int readBody(InputStreamTy & is) {
+    int read(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
         readStatus |= is.readUInt32(iVersion);
         return readStatus;
     }
 
     template <typename OutputStreamTy>
-    void writeBody(OutputStreamTy & os) {
+    void write(OutputStreamTy & os) {
         os.writeUInt32(iVersion);
     }
 };
@@ -203,14 +203,14 @@ struct ConnectResponse_v0 : public Response<ConnectResponse_v0> {
     }
 
     template <typename InputStreamTy>
-    int readBody(InputStreamTy & is) {
+    int read(InputStreamTy & is) {
         int readStatus = ReadResult::Ok;
         readStatus |= is.readInt32(iStatusCode);
         return readStatus;
     }
 
     template <typename OutputStreamTy>
-    void writeBody(OutputStreamTy & os) {
+    void write(OutputStreamTy & os) {
         os.writeInt32(iStatusCode);
     }
 };

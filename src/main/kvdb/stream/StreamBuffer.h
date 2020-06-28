@@ -18,46 +18,10 @@
 
 #include "kvdb/core/DataType.h"
 #include "kvdb/core/MessageHeader.h"
+#include "kvdb/stream/Allocator.h"
 #include "kvdb/jstd/StringRef.h"
 
 namespace kvdb {
-
-template <typename T>
-struct IAllocator {
-    typedef T *         pointer;
-    typedef const T *   const_pointer;
-
-    virtual pointer allocate(std::size_t size) = 0;
-    virtual pointer reallocate(std::size_t size) = 0;
-    virtual void deallocate(pointer ptr) = 0;
-    virtual void deallocate(void * ptr) = 0;
-};
-
-template <typename T>
-struct GenericAllocator {
-    typedef T *         pointer;
-    typedef const T *   const_pointer;
-
-    pointer allocate(std::size_t size) {
-        return new T[size];
-    }
-
-    pointer reallocate(std::size_t size) {
-        return new T[size];
-    }
-
-    void deallocate(pointer ptr) {
-        assert(ptr != nullptr);
-        delete[] ptr;
-    }
-
-    void deallocate(void * ptr) {
-        assert(ptr != nullptr);
-        delete[] (pointer)ptr;
-    }
-
-    bool isAutoRelease() { return true; }
-};
 
 template <typename T, typename Allocator = GenericAllocator<T>>
 class BasicStreamBuffer {

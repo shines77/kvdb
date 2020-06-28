@@ -391,7 +391,7 @@ private:
 
                 OutputStream os(request_buf_.data(), requestSize);
                 request.writeHeaderTotal(os, requestSize);
-                request.writeToBody(os, false);
+                request.writeBody(os, false);
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
                 std::cout << "request_.size() = " << os.length() << std::endl;
@@ -497,7 +497,7 @@ private:
 
                 OutputStream os(request_buf_.data(), requestSize);
                 request.writeHeaderTotal(os, requestSize);
-                request.writeToBody(os, false);
+                request.writeBody(os, false);
 
                 std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;
                 std::cout << "request_.size() = " << os.length() << std::endl;

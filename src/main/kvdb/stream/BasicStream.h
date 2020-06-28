@@ -16,7 +16,6 @@
 #include <string>
 #include <type_traits>
 
-#include "kvdb/core/DataType.h"
 #include "kvdb/jstd/StringRef.h"
 
 #include "kvdb/stream/ReadWriteResult.h"
