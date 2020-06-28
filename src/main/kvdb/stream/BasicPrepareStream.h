@@ -45,24 +45,24 @@ public:
         this->cur_ = (char_type *)((char *)this->cur_ - sizeof(char));
     }
 
-    void back(int skip) {
-        this->cur_ = (char_type *)((char *)this->cur_ - skip * sizeof(char));
+    void back(int offset) {
+        this->cur_ = (char_type *)((char *)this->cur_ - offset * sizeof(char));
     }
 
     void backByte() {
         backUInt8();
     }
 
-    void backByte(int skip) {
-        back(skip);
+    void backByte(int offset) {
+        back(offset);
     }
 
     void backChar() {
         this->cur_ = (char_type *)((char *)this->cur_ - sizeof(char_type));
     }
 
-    void backChar(int skip) {
-        this->cur_ = (char_type *)((char *)this->cur_ - skip * sizeof(char_type));
+    void backChar(int offset) {
+        this->cur_ = (char_type *)((char *)this->cur_ - offset * sizeof(char_type));
     }
 
     void backBool() {
@@ -117,8 +117,8 @@ public:
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(char));
     }
 
-    void skip(int skip) {
-        this->cur_ = (char_type *)((char *)this->cur_ + skip * sizeof(char));
+    void skip(int offset) {
+        this->cur_ = (char_type *)((char *)this->cur_ + offset * sizeof(char));
     }
 
     void next() {
@@ -133,16 +133,16 @@ public:
         skipUInt8();
     }
 
-    void skipByte(int skip) {
-        skip(skip);
+    void skipByte(int offset) {
+        skip(offset);
     }
 
     void skipChar() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(char_type));
     }
 
-    void skipChar(int skip) {
-        this->cur_ = (char_type *)((char *)this->cur_ + skip * sizeof(char_type));
+    void skipChar(int offset) {
+        this->cur_ = (char_type *)((char *)this->cur_ + offset * sizeof(char_type));
     }
 
     void skipBool() {
