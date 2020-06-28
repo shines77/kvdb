@@ -135,12 +135,12 @@ public:
         if (length < 256) {
             base_type::writeType(DataType::String1B);
             base_type::writeUInt8((uint8_t)length);
-            base_type::writeString_Internal(value);
+            base_type::internalWriteString(value);
         }
         else if (length < 65536) {
             base_type::writeType(DataType::String2B);
             base_type::writeUInt16((uint16_t)length);
-            base_type::writeString_Internal(value);
+            base_type::internalWriteString(value);
         }
         else if (length < 16777216) {
 #if IS_BIG_ENDIAN
@@ -150,12 +150,12 @@ public:
             uint32_t value32 = (DataType::String3B << 24) | (length & 0x00FFFFFFUL);
             base_type::writeUInt32(value32);
 #endif
-            base_type::writeString_Internal(value);
+            base_type::internalWriteString(value);
         }
         else {
             base_type::writeType(DataType::String);
             base_type::writeUInt32((uint32_t)length);
-            base_type::writeString_Internal(value);
+            base_type::internalWriteString(value);
         }
     }
 

@@ -50,7 +50,7 @@ public:
     }
 
     void backByte() {
-        back();
+        backUInt8();
     }
 
     void backByte(int skip) {
@@ -65,84 +65,132 @@ public:
         this->cur_ = (char_type *)((char *)this->cur_ - skip * sizeof(char_type));
     }
 
-    void next() {
+    void backBool() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(bool));
+    }
+
+    void backInt8() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(int8_t));
+    }
+
+    void backInt16() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(int16_t));
+    }
+
+    void backInt32() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(int32_t));
+    }
+
+    void backInt64() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(int64_t));
+    }
+
+    void backUInt8() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(uint8_t));
+    }
+
+    void backUInt16() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(uint16_t));
+    }
+
+    void backUInt32() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(uint32_t));
+    }
+
+    void backUInt64() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(uint64_t));
+    }
+
+    void backPointer() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(void *));
+    }
+
+    void backFloat() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(float));
+    }
+
+    void backDouble() {
+        this->cur_ = (char_type *)((char *)this->cur_ - sizeof(double));
+    }
+
+    void skip() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(char));
     }
 
-    void next(int skip) {
-        this->cur_ = (char_type *)((char *)this->cur_ + skip);
+    void skip(int skip) {
+        this->cur_ = (char_type *)((char *)this->cur_ + skip * sizeof(char));
     }
 
-    void nextType() {
-        next();
+    void next() {
+        skip();
     }
 
-    void nextByte() {
-        next();
+    void next(int offset) {
+        skip(offset);
     }
 
-    void nextByte(int skip) {
-        next(skip);
+    void skipByte() {
+        skipUInt8();
     }
 
-    void nextChar() {
+    void skipByte(int skip) {
+        skip(skip);
+    }
+
+    void skipChar() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(char_type));
     }
 
-    void nextChar(int skip) {
+    void skipChar(int skip) {
         this->cur_ = (char_type *)((char *)this->cur_ + skip * sizeof(char_type));
     }
 
-    void nextBool() {
+    void skipBool() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(bool));
     }
 
-    void nextInt8() {
+    void skipInt8() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int8_t));
     }
 
-    void nextInt16() {
+    void skipInt16() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int16_t));
     }
 
-    void nextInt32() {
+    void skipInt32() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int32_t));
     }
 
-    void nextInt64() {
+    void skipInt64() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(int64_t));
     }
 
-    void nextUInt8() {
+    void skipUInt8() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint8_t));
     }
 
-    void nextUInt16() {
+    void skipUInt16() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint16_t));
     }
 
-    void nextUInt32() {
+    void skipUInt32() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint32_t));
     }
 
-    void nextUInt64() {
+    void skipUInt64() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(uint64_t));
     }
 
-    void nextPointer() {
+    void skipPointer() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(void *));
     }
 
-    void nextFloat() {
+    void skipFloat() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(float));
     }
 
-    void nextDouble() {
+    void skipDouble() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(double));
-    }
-
-    void skip(int offset) {
-        next(offset);
     }
 
     char get() const {
@@ -150,10 +198,6 @@ public:
     }
 
     unsigned char getu() const {
-        return getUInt8();
-    }
-
-    uint8_t getType() const {
         return getUInt8();
     }
 

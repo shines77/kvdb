@@ -145,11 +145,10 @@ int RequestHandler::handleRequestData(const char * data, size_t size)
     InputStream stream(data, size);
     bool isEndOf = false;
     while (!isEndOf) {
-        uint8_t type = stream.getType();
+        uint8_t type = stream.readType();
         switch (type) {
         case DataType::EndOf:
             {
-                stream.next();
                 uint8_t endOfMark = stream.getUInt8();
                 if (endOfMark == '\0') {
                     isEndOf = true;

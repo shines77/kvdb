@@ -83,10 +83,10 @@ public:
     void setInfoValue(uint32_t value) { this->header.setInfoValue(value); }
 
     char * body() {
-        return ((this->body_ == nullptr) ? ((char *)(void *)this + kMsgHeaderSize) : (char *)this->body_);
+        return ((this->body_ == nullptr) ? ((char *)(void *)&(this->body_) + sizeof(const char *)) : (char *)this->body_);
     }
     const char * body() const {
-        return ((this->body_ == nullptr) ? ((const char *)(void *)this + kMsgHeaderSize) : this->body_);
+        return ((this->body_ == nullptr) ? ((const char *)(void *)(&this->body_) + sizeof(const char *)) : this->body_);
     }
 
     void setBody(const char * body) { this->body_ = body; }

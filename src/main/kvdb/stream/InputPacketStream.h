@@ -192,17 +192,17 @@ public:
         switch (type) {
         case DataType::String:
             length = base_type::readUInt32();
-            base_type::readString_Internal(value, length);
+            base_type::iternalReadString(value, length);
             break;
 
         case DataType::String1B:
             length = base_type::readUInt8();
-            base_type::readString_Internal(value, length);
+            base_type::iternalWriteString(value, length);
             break;
 
         case DataType::String2B:
             length = base_type::readUInt16();
-            base_type::readString_Internal(value, length);
+            base_type::iternalWriteString(value, length);
             break;
 
         case DataType::String3B:
@@ -213,7 +213,7 @@ public:
 #else
             length = u32 & 0x00FFFFFFUL;
 #endif
-            base_type::readString_Internal(value, length);
+            base_type::iternalWriteString(value, length);
             break;
         }
 
