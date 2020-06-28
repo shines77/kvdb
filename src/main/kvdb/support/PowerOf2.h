@@ -155,91 +155,145 @@ inline int64_t round_up_to_pow2(int64_t n) {
 
 namespace compile_time {
 
+//////////////////////////////////////////////////////////////////////////////////
+
 //
 // is_pow_of_2 = (N && ((N & (N - 1)) == 0);  // here, N must is unsigned number
 //
 template <size_t N>
-struct is_pow2 {
+struct is_power2 {
     enum { value = detail::boolean_if<((N & (N - 1)) == 0)>::value };
 };
 
 template <>
-struct is_pow2<0> {
+struct is_power2<0> {
     enum { value = detail::true_value };
-};
-
-//
-// round_up_to_pow2<N> and next_is_pow2<N>
-//
-template <size_t N>
-struct next_is_pow2 {
-    enum { value = detail::boolean_if<((N & (N + 1)) == 0)>::value };
-};
-
-template <bool IsPow2, size_t N>
-struct round_up_to_pow2_impl {
-    enum {
-        isPow2 = is_pow2<N>::value,
-        nextIsPow2 = next_is_pow2<N>::value
-    };
-    static const size_t value = (isPow2 == 1) ? N
-        : round_up_to_pow2_impl<(nextIsPow2 == detail::true_value), N + 1>::value;
-};
-
-template <size_t N>
-struct round_up_to_pow2_impl<true, N> {
-    static const size_t value = N;
-};
-
-template <size_t N>
-struct round_up_to_pow2 {
-    static const size_t value = round_up_to_pow2_impl<(is_pow2<N>::value == detail::true_value), N>::value;
-};
-
-//
-// round_down_to_pow2<N> and front_is_pow2<N>
-//
-template <size_t N>
-struct front_is_pow2 {
-    enum { value = detail::boolean_if<(((N - 1) & (N - 2)) == 0)>::value };
-};
-
-template <bool IsPow2, size_t N>
-struct round_down_to_pow2_impl {
-    enum {
-        isPow2 = is_pow2<N>::value,
-        frontIsPow2 = front_is_pow2<N>::value
-    };
-    static const size_t value = ((isPow2 == detail::true_value) ? N
-        : round_down_to_pow2_impl<(frontIsPow2 == detail::true_value), N - 1>::value);
-};
-
-template <size_t N>
-struct round_down_to_pow2_impl<true, N> {
-    static const size_t value = N;
-};
-
-template <size_t N>
-struct round_down_to_pow2 {
-    static const size_t value = round_down_to_pow2_impl<(is_pow2<N>::value == detail::true_value), N>::value;
 };
 
 #if defined(_WIN64) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_IA64) \
  || defined(__amd64__) || defined(__x86_64__)
 
+struct size_t_utils {
+    // UINT64_MAX_POW2 = 0x8000000000000000ULL;
+    static const size_t max_power2 = 1ULL << (63 - 1);
+    // UINT64_MAX = 0xFFFFFFFFFFFFFFFFULL;
+    static const size_t max_num = 0xFFFFFFFFFFFFFFFFULL;
+};
+
+#else
+
+struct size_t_utils {
+    // UINT32_MAX_POW2 = 0x80000000UL;
+    static const size_t max_power2 = 1UL << (31 - 1);
+    // UINT32_MAX = 0xFFFFFFFFUL;
+    static const size_t max_num = 0xFFFFFFFFUL;
+};
+
+#endif // _WIN64 || _M_X64 || _M_AMD64
+
+//////////////////////////////////////////////////////////////////////////////////
+
+//
+// round_up_to_pow2<N>
+//
+
+template <size_t N>
+struct round_up_to_pow2_impl {
+    static const size_t value = (is_power2<N>::value ? N :
+        round_up_to_pow2_impl<N + 1>::value);
+};
+
+template <size_t N>
+struct round_up_to_pow2 {
+    static const size_t value = round_up_to_pow2_impl<N>::value;
+};
+
+//////////////////////////////////////////////////////////////////////////////////
+
+#if defined(_WIN64) || defined(_M_X64) || defined(_M_AMD64) || defined(_M_IA64) \
+ || defined(__amd64__) || defined(__x86_64__)
+
+template <>
+struct round_up_to_pow2_impl<18446744073709551615ULL> {
+    enum { value = 18446744073709551615ULL };
+};
+
 template <>
 struct round_up_to_pow2<18446744073709551615ULL> {
-    enum { value = detail::false_value };
+    enum { value = 18446744073709551615ULL };
 };
 
 #else
 
 template <>
+struct round_up_to_pow2_impl<4294967295UL> {
+    enum { value = 4294967295UL };
+};
+
+template <>
 struct round_up_to_pow2<4294967295UL> {
-    enum { value = detail::false_value };
+    enum { value = 4294967295UL };
 };
 
 #endif // _WIN64 || _M_X64 || _M_AMD64
+
+//////////////////////////////////////////////////////////////////////////////////
+
+template <size_t N, size_t Power2>
+struct round_up_to_power2_impl {
+    enum {
+        nextPower2 = Power2 * 2
+    };
+    static const bool is_too_large = (N >= size_t_utils::max_power2);
+    static const bool reach_limit = (Power2 == size_t_utils::max_power2);
+    static const size_t value = (is_too_large ? size_t_utils::max_num :
+           ((reach_limit || Power2 > N) ? Power2 :
+            round_up_to_power2_impl<N, nextPower2>::value));
+};
+
+template <size_t N>
+struct round_up_to_power2 {
+    static const size_t value = (is_power2<N>::value ? N : round_up_to_power2_impl<N, 1>::value);
+};
+
+//////////////////////////////////////////////////////////////////////////////////
+
+//
+// round_down_to_pow2<N>
+//
+
+template <size_t N>
+struct round_down_to_pow2_impl {
+    static const size_t value = (is_power2<N>::value ? N :
+        round_down_to_pow2_impl<N - 1>::value);
+};
+
+template <size_t N>
+struct round_down_to_pow2 {
+    static const size_t value = round_down_to_pow2_impl<N>::value;
+};
+
+//////////////////////////////////////////////////////////////////////////////////
+
+template <size_t N, size_t Power2>
+struct round_down_to_power2_impl {
+    enum {
+        nextPower2 = Power2 * 2
+    };
+    static const bool is_too_large = (N >= size_t_utils::max_power2);
+    static const bool reach_limit = (Power2 == size_t_utils::max_power2);
+    static const size_t value = (is_too_large ? size_t_utils::max_power2 :
+           ((N == Power2) ? N :
+            ((reach_limit || Power2 > N) ? (Power2 / 2) :
+             round_down_to_power2_impl<N, nextPower2>::value)));
+};
+
+template <size_t N>
+struct round_down_to_power2 {
+    static const size_t value = (is_power2<N>::value ? N : round_down_to_power2_impl<N, 1>::value);
+};
+
+//////////////////////////////////////////////////////////////////////////////////
 
 } // namespace compile_time
 } // namespace kvdb

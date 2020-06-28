@@ -41,7 +41,7 @@ public:
     typedef jstd::BasicStringRef<char_type> stringref_type;
 
 protected:
-    char_type     * data_;
+    char_type *     data_;
     size_type       size_;
     size_type       capacity_;
     allocator_type  allocator_;
@@ -59,7 +59,7 @@ public:
     }
     template <size_type N>
     BasicByteBuffer(const char_type(&data)[N])
-        : data_(data), size_(N), capacity_(compile_time::round_up_to_pow2<N>::value) {
+        : data_(data), size_(N), capacity_(compile_time::round_up_to_power2<N>::value) {
     }
     ~BasicByteBuffer() {
         this->destroy();
@@ -80,7 +80,7 @@ public:
 
     bool isValid() const { return (this->data_ != nullptr); }
 
-    bool isUnderflow() const { return (this->size_ <  0); }
+    bool isUnderflow() const { return (this->size_ < 0); }
     bool isOverflow()  const { return (this->size_ > this->capacity_); }
 
     void attach(const char_type * data, size_type size) {
