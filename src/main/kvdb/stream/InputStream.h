@@ -156,18 +156,18 @@ public:
             break;
 
         case DataType::String1B:
-            length = base_type::readUInt8();
+            length = this->readUInt8();
             this->internalReadString(value, length);
             break;
 
         case DataType::String2B:
-            length = base_type::readUInt16();
+            length = this->readUInt16();
             this->internalReadString(value, length);
             break;
 
         case DataType::String3B:
         {
-            uint32_t value32 = base_type::readUInt32();
+            uint32_t value32 = this->readUInt32();
 #if NOT_IS_LITTLE_ENDIAN
             length = (value32 & 0xFFFFFF00UL) >> 8;
 #else
