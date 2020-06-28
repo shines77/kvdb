@@ -260,7 +260,20 @@ private:
             request.sUsername = config.username;
             request.sPassword = config.password;
             request.sDatabase = config.database;
-            
+#if 1
+            ByteBuffer buffer;
+            uint32_t totalSize = request.writeTo<OutputStream>(request_buf_);
+            request_size_ = totalSize;
+            buffer.reserve(totalSize);
+
+            std::cout << "KvdbClient::handle_connect()" << std::endl;
+            std::cout << "request_.size() = " << totalSize << std::endl;
+            std::cout << std::endl;
+
+            boost::asio::async_write(socket_, boost::asio::buffer(request_buf_.data(), totalSize),
+                                     boost::bind(&KvdbClient::handle_write_request, this,
+                                                 boost::asio::placeholders::error));
+#else
             uint32_t requestSize = request.prepareAll<OutputStream>();
             request_buf_.reserve(requestSize);
             request_size_ = requestSize;
@@ -276,6 +289,7 @@ private:
             boost::asio::async_write(socket_, boost::asio::buffer(os.head(), os.length()),
                 boost::bind(&KvdbClient::handle_write_request, this,
                             boost::asio::placeholders::error));
+#endif
         }
         else {
             std::cout << "KvdbClient::handle_connect() Error: " << err.message() << "\n";

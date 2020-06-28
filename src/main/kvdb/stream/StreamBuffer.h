@@ -63,7 +63,9 @@ template <typename T, typename Allocator = GenericAllocator<T>>
 class BasicStreamBuffer {
 public:
     typedef typename std::remove_pointer<
-                typename std::remove_cv<T>::type
+                typename std::remove_reference<
+                    typename std::remove_cv<T>::type
+                >::type
             >::type     char_type;
 
     typedef std::size_t                     size_type;
@@ -85,10 +87,12 @@ public:
         : cur_(const_cast<char_type *>(data)),
           head_(const_cast<char_type *>(data)),
           tail_(const_cast<char_type *>(data + size)),
-          autoRelease_(false) {}
-    template <size_t N>
+          autoRelease_(false) {
+    }
+    template <size_type N>
     BasicStreamBuffer(const char_type(&data)[N])
-        : cur_(data), head_(data), tail_(data + N), autoRelease_(false) {}
+        : cur_(data), head_(data), tail_(data + N), autoRelease_(false) {
+    }
     ~BasicStreamBuffer() {
         this->destroy();
     }
@@ -176,13 +180,13 @@ public:
     }
 
     void clean() {
-        this->cur_ = nullptr;
-        this->head_ = nullptr;
-        this->tail_ = nullptr;
+        ::memset((void *)this->cur_, 0, this->capacity() * sizeof(char_type));
     }
 
     void clear() {
-        ::memset((void *)this->cur_, 0, this->capacity() * sizeof(char_type));
+        this->cur_ = nullptr;
+        this->head_ = nullptr;
+        this->tail_ = nullptr;
     }
 
     void reserve(size_type newCapacity, bool needClear = false) {

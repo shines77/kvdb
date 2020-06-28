@@ -36,7 +36,7 @@ std::size_t round_to_pow2(std::size_t n)
 }
 
 static inline
-std::size_t round_up_pow2(std::size_t n)
+std::size_t round_up_to_pow2(std::size_t n)
 {
     assert(n >= 1);
     if (likely((n & (n - 1)) == 0)) return n;

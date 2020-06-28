@@ -21,6 +21,7 @@
 
 #include "kvdb/stream/ReadWriteResult.h"
 #include "kvdb/stream/StreamBuffer.h"
+#include "kvdb/stream/ByteBuffer.h"
 
 namespace kvdb {
 

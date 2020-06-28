@@ -13,6 +13,7 @@
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
 
+#include <vector>
 #include <type_traits>
 
 namespace kvdb {
@@ -275,6 +276,18 @@ public:
         T * pThis = static_cast<T *>(this);
         assert(pThis != nullptr);
         pThis->writeBody(os);
+    }
+
+    template <typename OutputStreamTy = OutputStream>
+    uint32_t writeTo(std::vector<char> & buffer) {
+        uint32_t totalSize = this->prepareAll<OutputStreamTy>();
+        buffer.reserve(totalSize);
+
+        OutputStreamTy os(buffer.data(), totalSize);
+        this->writeHeaderTotal(os, totalSize);
+        this->writeToBody(os, false);
+
+        return totalSize;
     }
 };
 

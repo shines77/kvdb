@@ -247,6 +247,12 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ReadWriteResult.h">
       <Filter>src\stream</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ByteBuffer.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\support\PowerOf2.h">
+      <Filter>src\support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\main\kvdb\all.cpp">
