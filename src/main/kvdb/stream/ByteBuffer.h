@@ -95,7 +95,7 @@ protected:
         assert(data != this->data());
         const size_type n_capacity = compile_time::round_up_to_power2<Size>::value;
         this->reserve(n_capacity);
-        if (size <= this->capacity()) {
+        if (Size <= this->capacity()) {
             ::memmove((void *)this->data(), (const void *)data, Size * sizeof(char_type));
             this->size_ = Size;
         }
