@@ -55,11 +55,11 @@ using namespace kvdb::client;
         } \
     } while (0)
 
-#define ROUND_TO_POWER2_TEST(name, N) \
-    printf("Test: [%s<%" PRIuSIZE ">] == %" PRIuSIZE ", %" PRIuSIZE ", ", #name, size_t(N), \
-           kvdb::compile_time::##name##<N>::value, \
+#define ROUND_TO_POWER2_TEST(clsName, N) \
+    printf("Test: [%s<%" PRIuSIZE ">] == %" PRIuSIZE ", %" PRIuSIZE ", ", #clsName, size_t(N), \
+           kvdb::compile_time::##clsName##<N>::value, \
            kvdb::run_time::round_up_to_pow2(size_t(N))); \
-    KV_TEST_EQUAL(kvdb::compile_time::##name##<N>::value, \
+    KV_TEST_EQUAL(kvdb::compile_time::##clsName##<N>::value, \
                   kvdb::run_time::round_up_to_pow2(size_t(N)))
 
 #if defined(_WIN32) || defined(__cygwin__)
