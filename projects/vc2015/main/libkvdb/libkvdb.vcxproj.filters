@@ -44,6 +44,9 @@
     <Filter Include="src\utils">
       <UniqueIdentifier>{ba0cc2fe-899c-4e75-85e5-b776c3f18a32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\system">
+      <UniqueIdentifier>{295070c5-158f-4280-be37-b622a12c0515}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb\all.h">
@@ -261,6 +264,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\Allocator.h">
       <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\system\Console.h">
+      <Filter>src\system</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

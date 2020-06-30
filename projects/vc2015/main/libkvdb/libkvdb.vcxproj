@@ -90,6 +90,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\PowerOf2.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\SSEHelper.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\StopWatch.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\system\Console.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\utils\Optional.h" />
   </ItemGroup>
   <ItemGroup>
