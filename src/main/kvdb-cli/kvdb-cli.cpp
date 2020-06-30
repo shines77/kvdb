@@ -57,17 +57,10 @@ using namespace kvdb::client;
 
 #define ROUND_TO_POWER2_TEST(name, N) \
     printf("Test: [%s<%" PRIuSIZE ">] == %" PRIuSIZE ", %" PRIuSIZE ", ", #name, size_t(N), \
-           kvdb::compile_time::##name##<##N##>::value, \
-           kvdb::run_time::round_up_to_pow2(size_t(##N##))); \
-    KV_TEST_EQUAL(kvdb::compile_time::##name##<##N##>::value, \
-                  kvdb::run_time::round_up_to_pow2(size_t(##N##)))
-
-#define ROUND_TO_POWER2_TEST_1(name, N) \
-    printf("Test: [%s<%" PRIuSIZE ">] == %" PRIuSIZE ", %" PRIuSIZE ", ", name, size_t(N), \
-           kvdb::compile_time::round_up_to_power2<##N##>::value, \
-           kvdb::run_time::round_up_to_pow2(size_t(##N##))); \
-    KV_TEST_EQUAL(kvdb::compile_time::round_up_to_power2<##N##>::value, \
-                  kvdb::run_time::round_up_to_pow2(size_t(##N##)))
+           kvdb::compile_time::name##<N##>::value, \
+           kvdb::run_time::round_up_to_pow2(size_t(N##))); \
+    KV_TEST_EQUAL(kvdb::compile_time::name##<N##>::value, \
+                  kvdb::run_time::round_up_to_pow2(size_t(N##)))
 
 void print_passed()
 {
