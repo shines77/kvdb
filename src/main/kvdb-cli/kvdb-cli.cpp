@@ -56,7 +56,7 @@ using namespace kvdb::client;
     } while (0)
 
 #define CONTACT_CLASS(clsName, N) \
-    kvdb::compile_time::##clsName##<N>::value
+    kvdb::compile_time::clsName<N>::value
 
 #define ROUND_TO_POWER2_TEST(clsName, N) \
     printf("Test: [%s<%" PRIuSIZE ">] == %" PRIuSIZE ", %" PRIuSIZE ", ", #clsName, size_t(N), \
