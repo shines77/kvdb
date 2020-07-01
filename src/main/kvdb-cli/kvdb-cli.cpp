@@ -20,108 +20,27 @@
 
 #include <kvdb/common/boost_asio_msvc.h>
 
+#include <kvdb/basic/inttypes.h>
+#include <kvdb/test/Test.h>
 #include <kvdb/support/PowerOf2.h>
 #include <kvdb/system/Console.h>
 #include "client/KvdbClientApp.h"
 
-#include <inttypes.h>   // PRIu64
-
 using namespace kvdb;
 using namespace kvdb::client;
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-#ifndef PRIuSIZE
-#define PRIuSIZE  "zu"
-#endif
-#ifndef PRIsSIZE
-#define PRIsSIZE  "z"
-#endif
-#else
-#ifndef PRIuSIZE
-#define PRIuSIZE  PRIuPTR
-#endif
-#ifndef PRIsSIZE
-#define PRIsSIZE  PRIdPTR
-#endif
-#endif
-
-#define KV_TEST_EQUAL(L, R) \
-    do { \
-        if ((L) == (R)) { \
-            print_passed_ln(); \
-        } \
-        else { \
-            print_failed_ln(); \
-        } \
-    } while (0)
+//
+// About marco # and ##
+// See: https://www.cnblogs.com/wb-DarkHorse/p/3588787.html
+//
 
 #define ROUND_TO_POWER2_TEST(clsName, N) \
     printf("Test: [%s<%" PRIuSIZE ">] == %" PRIuSIZE ", %" PRIuSIZE ", ", \
            #clsName, size_t(N), \
            kvdb::compile_time::clsName<N>::value, \
            kvdb::run_time::round_up_to_pow2(size_t(N))); \
-    KV_TEST_EQUAL(kvdb::compile_time::clsName<N>::value, \
-                  kvdb::run_time::round_up_to_pow2(size_t(N)))
-
-#if defined(_WIN32) || defined(__cygwin__)
-
-void print_passed()
-{
-    SetConsoleTextFgColor(FgColor::Green);
-    printf("Passed");
-    RecoverConsoleTextColor();
-}
-
-void print_failed()
-{
-    SetConsoleTextFgColor(FgColor::Red);
-    printf("Failed");
-    RecoverConsoleTextColor();
-}
-
-#elif defined(__linux__) || defined(__GNUC__) || defined(__clang__)
-
-//
-// See: https://blog.csdn.net/hejinjing_tom_com/article/details/12162491
-//
-// \033[30m Black \033[0m
-//
-
-void print_passed()
-{
-    printf("\033[32mPassed\033[0m");
-}
-
-void print_failed()
-{
-    printf("\033[31mFailed\033[0m");
-}
-
-#else
-
-void print_passed()
-{
-    printf("Passed");
-}
-
-void print_failed()
-{
-    printf("Failed");
-}
-
-#endif // _WIN32
-
-void print_passed_ln()
-{
-    print_passed();
-    printf(".\n");
-}
-
-void print_failed_ln()
-{
-    print_failed();
-    printf(".\n");
-}
+    KVTEST_EXPECT_EQ(kvdb::compile_time::clsName<N>::value, \
+                     kvdb::run_time::round_up_to_pow2(size_t(N)))
 
 void round_to_power2_test_1()
 {
@@ -241,10 +160,10 @@ void round_to_power2_test_2()
 
 void integral_utils_test()
 {
-    printf("integral_utils<size_t>::bits       = %" PRIuPTR "\n", detail::integral_utils<size_t>::bits);
-    printf("integral_utils<size_t>::max_shift  = %" PRIuPTR "\n", detail::integral_utils<size_t>::max_shift);
-    printf("integral_utils<size_t>::max_power2 = %" PRIuPTR "\n", detail::integral_utils<size_t>::max_power2);
-    printf("integral_utils<size_t>::max_num    = %" PRIuPTR "\n", detail::integral_utils<size_t>::max_num);
+    printf("integral_utils<size_t>::bits       = %" PRIuSIZE "\n", detail::integral_utils<size_t>::bits);
+    printf("integral_utils<size_t>::max_shift  = %" PRIuSIZE "\n", detail::integral_utils<size_t>::max_shift);
+    printf("integral_utils<size_t>::max_power2 = %" PRIuSIZE "\n", detail::integral_utils<size_t>::max_power2);
+    printf("integral_utils<size_t>::max_num    = %" PRIuSIZE "\n", detail::integral_utils<size_t>::max_num);
     printf("\n");
 }
 

@@ -47,6 +47,9 @@
     <Filter Include="src\system">
       <UniqueIdentifier>{295070c5-158f-4280-be37-b622a12c0515}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\test">
+      <UniqueIdentifier>{a51ac9e1-fdf1-4065-9af4-2592f5b454d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb\all.h">
@@ -267,6 +270,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\system\Console.h">
       <Filter>src\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\test\Expert.h">
+      <Filter>src\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\test\Assert.h">
+      <Filter>src\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\test\Test.h">
+      <Filter>src\test</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

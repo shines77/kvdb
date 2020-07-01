@@ -171,6 +171,11 @@ struct round_up_to_pow2<0> {
 
 //////////////////////////////////////////////////////////////////////////////////
 
+#if defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable: 4307)
+#endif
+
 template <size_t N>
 struct round_up_to_power2_impl {
     static const size_t max_num = detail::integral_utils<size_t>::max_num;
@@ -195,6 +200,10 @@ template <>
 struct round_up_to_power2<0> {
     static const size_t value = 1;
 };
+
+#if defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 //////////////////////////////////////////////////////////////////////////////////
 
