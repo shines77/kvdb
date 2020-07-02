@@ -50,7 +50,7 @@ public:
         : base_type(src.data(), src.size()) {
     }
     BasicConstBuffer(this_type && right)
-        : base_type(nullptr, 0), capacity_(0) {
+        : base_type(nullptr, 0) {
         this->swap(std::forward<this_type>(right));
     }
     ~BasicConstBuffer() {
