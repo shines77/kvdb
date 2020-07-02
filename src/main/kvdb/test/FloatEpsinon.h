@@ -41,8 +41,8 @@ static inline int float32_is_equal(float x, float y) {
     val_x.f32 = x;
     val_y.f32 = y;
     return ((x == y) || (
-        (((val_x.u32 ^ val_x.u32) <= 2) &&
-        ((val_x.u32 & 0x7F800000UL) != 0x7F800000UL))));
+        ((val_x.u32 ^ val_y.u32) <= 2) &&
+        ((val_x.u32 & 0x7F800000UL) != 0x7F800000UL)));
 }
 
 static inline int float64_is_equal(double x, double y) {
