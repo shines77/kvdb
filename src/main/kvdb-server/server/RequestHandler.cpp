@@ -173,7 +173,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
                                   OutputStream & os)
 {
     InputStream is(request.body(), request.bodySize());
-    MessageHeader header = request.header;
+    const MessageHeader & header = request.header;
 
     if (header.bodySize() > 0) {
         const char * first = is.current();

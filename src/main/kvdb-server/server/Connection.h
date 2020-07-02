@@ -14,6 +14,7 @@
 
 #include <kvdb/core/Request.h>
 #include <kvdb/core/Response.h>
+#include <kvdb/stream/ByteBuffer.h>
 
 #include "server/ConnectionContext.h"
 #include "server/RequestHandler.h"
@@ -51,7 +52,8 @@ private:
 
     /// Buffer for incoming or outgoing data.
     std::vector<char>               request_buf_;
-    std::vector<char>               response_buf_;
+    std::vector<char>               response_buf__;
+    ByteBuffer                      response_buf_;
     std::size_t                     request_size_;
     std::size_t                     response_size_;
 

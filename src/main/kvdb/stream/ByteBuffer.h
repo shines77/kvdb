@@ -25,7 +25,7 @@
 
 namespace kvdb {
 
-template <typename T, typename Allocator = GenericAllocator<T>>
+template < typename T, typename Allocator = GenericAllocator<T> >
 class BasicByteBuffer : public BasicMemoryBuffer<T> {
 public:
     typedef BasicMemoryBuffer<T>                base_type;
@@ -49,6 +49,10 @@ protected:
 
 public:
     BasicByteBuffer() : base_type(nullptr, 0), capacity_(0) {}
+    explicit BasicByteBuffer(size_type capacity)
+        : base_type(nullptr, 0), capacity_(0) {
+        this->reserve(capacity);
+    }
     BasicByteBuffer(const char_type * data, size_type size)
         : base_type(nullptr, 0), capacity_(0) {
         this->copy(data, size);
@@ -113,6 +117,19 @@ public:
         }
     }
 
+    void attach(const char_type * data, size_type size) {
+        // Not implemented yet, std::logic_error, std::runtime_error
+        std::runtime_error not_supported("BasicByteBuffer<T>: This interface is not supported.");
+        throw not_supported;
+    }
+
+    template <size_type N>
+    void attach(const char_type(&data)[N]) {
+        // Not implemented yet
+        std::runtime_error not_supported("BasicByteBuffer<T>: This interface is not supported.");
+        throw not_supported;
+    }
+
     void copy(const char_type * data, size_type size) {
         assert(data != nullptr);
         assert(data != this->data());
@@ -136,6 +153,37 @@ public:
 
     void clear() {
         this->size_ = 0;
+    }
+
+    void allocate(size_type initSize) {
+        if (initSize > this->capacity()) {
+            char_type * newData = allocator_.reallocate(initSize);
+            if (newData != nullptr) {
+                if (newData != this->data()) {
+                    this->internal_destroy();
+                    this->data_ = newData;
+                }
+
+                this->size_ = initSize;
+                this->capacity_ = initSize;
+            }
+        }
+    }
+
+    void allocate(size_type initSize, char_type initVal) {
+        if (initSize > this->capacity()) {
+            char_type * newData = allocator_.reallocate(initSize);
+            if (newData != nullptr) {
+                if (newData != this->data()) {
+                    ::memset((void *)newData, initVal, size * sizeof(char_type));
+                    this->internal_destroy();
+                    this->data_ = newData;
+                }
+
+                this->size_ = initSize;
+                this->capacity_ = initSize;
+            }
+        }
     }
 
     void reserve(size_type newCapacity) {

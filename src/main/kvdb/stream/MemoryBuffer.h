@@ -53,7 +53,8 @@ public:
     ~BasicMemoryBuffer() {
     }
    
-    char_type * data() const { return this->data_; }
+    char_type * data() { return this->data_; }
+    const char_type * data() const { return this->data_; }
     size_type   size() const { return this->size_; }
 
     void setData(char_type * data) { this->data_ = data; }

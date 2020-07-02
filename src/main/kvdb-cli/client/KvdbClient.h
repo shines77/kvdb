@@ -385,8 +385,8 @@ private:
                 HandShakeRequest_v0 request;
                 request.iVersion = 1;
 
-                OutputStream os;
-                uint32_t totalSize = request.writeTo(os, request_buf_);
+                OutputStream os(request_buf_);
+                uint32_t totalSize = request.writeTo(os);
                 request_size_ = totalSize;
 
                 std::cout << "KvdbClient::handle_read_some()" << std::endl;
@@ -487,8 +487,8 @@ private:
                 ConnectRequest_v0 request;
                 request.iVersion = 1;
 
-                OutputStream os;
-                uint32_t totalSize = request.writeTo(os, request_buf_);
+                OutputStream os(request_buf_);
+                uint32_t totalSize = request.writeTo(os);
                 request_size_ = totalSize;
 
                 std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;

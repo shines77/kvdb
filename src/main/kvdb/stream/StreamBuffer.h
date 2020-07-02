@@ -16,8 +16,6 @@
 #include <string>
 #include <type_traits>
 
-#include "kvdb/core/DataType.h"
-#include "kvdb/core/MessageHeader.h"
 #include "kvdb/stream/Allocator.h"
 #include "kvdb/jstd/StringRef.h"
 
@@ -34,9 +32,10 @@ public:
 
     typedef std::size_t                     size_type;
 
-    typedef Allocator                       allocator_type;
     typedef std::basic_string<char_type>    string_type;
     typedef jstd::BasicStringRef<char_type> stringref_type;
+
+    typedef Allocator                       allocator_type;
 
 protected:
     char_type *      cur_;
@@ -118,7 +117,7 @@ public:
 
     bool isMemoryStream() const { return true; }
 
-private:
+protected:
     void internal_destroy() {
         if (this->autoRelease_) {
             if (this->head_ != nullptr) {
@@ -214,16 +213,16 @@ public:
         this->cur_ = (char_type *)((char *)this->cur_ - sizeof(char));
     }
 
-    void _back(int skip) {
-        this->cur_ = (char_type *)((char *)this->cur_ - skip * sizeof(char));
+    void _back(int offset) {
+        this->cur_ = (char_type *)((char *)this->cur_ - offset * sizeof(char));
     }
 
-    void _next() {
+    void _skip() {
         this->cur_ = (char_type *)((char *)this->cur_ + sizeof(char));
     }
 
-    void _next(int skip) {
-        this->cur_ = (char_type *)((char *)this->cur_ + skip * sizeof(char));
+    void _skip(int offset) {
+        this->cur_ = (char_type *)((char *)this->cur_ + offset * sizeof(char));
     }
 };
 

@@ -196,14 +196,20 @@ struct MessageHeader {
     uint8_t sign() const { return this->info.getSign(); }
     uint8_t version() const { return this->info.getVersion(); }
     uint16_t opcode() const { return this->info.getOpcode(); }
-    uint16_t args() const { return 0; }
+    uint16_t args() const {
+        /* Not implemented yet. */
+        return this->info.getSign();
+    }
 
     uint32_t infoValue() const { return this->info.value(); }
 
     void setSign(uint32_t sign) { this->info.setSign(sign); }
     void setVersion(uint32_t version) { this->info.setVersion(version); }
     void setOpcode(uint32_t opcode) { this->info.setOpcode(opcode); }
-    void setArgs(uint32_t args) { /* Not implemented yet. */ }
+    void setArgs(uint32_t args) {
+        /* Not implemented yet. */
+        this->info.setSign(args);
+    }
 
     void setInfoValue(uint32_t value) { this->info.setValue(value); }
 

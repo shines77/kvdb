@@ -164,7 +164,8 @@ public:
         return msgLength;
     }
 
-    int readFrom(InputStream & stream) {
+    template <typename InputStreamTy>
+    int readFrom(InputStreamTy & stream) {
         size_t valid_count = 0;
         size_t count;
 
@@ -255,14 +256,18 @@ public:
         return (int)valid_count;
     }
 
-    int writeTo(OutputStream & stream) {
+    template <typename OutputStreamTy>
+    int writeTo(OutputStreamTy & stream, bool needPrepare = true) {
         size_t count = values.size();
 
         size_t valid_count;
-        size_t totalSize = calcRequireSize(valid_count);
+        size_t bodySize = calcRequireSize(valid_count);
+        if (needPrepare) {
+            stream.allocate(kMsgHeaderSize + bodySize);
+        }
 
         // Write the header info.
-        this->header.setBodySize((uint32_t)totalSize);
+        this->header.setBodySize((uint32_t)bodySize);
         this->header.setArgs((uint32_t)valid_count);
         stream.writeUInt32(this->header.sizeValue());
         stream.writeUInt32(this->header.infoValue());

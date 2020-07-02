@@ -154,13 +154,13 @@ public:
     virtual ~BasicMessage() {}
 
     template <typename OutputStreamTy = OutputStream>
-    uint32_t prepareAll() {
+    uint32_t calculateAll() {
         constexpr bool isOutputStream = std::is_same<OutputStreamTy, kvdb::OutputStream>::value;
         constexpr bool isOutputPacketStream = std::is_same<OutputStreamTy, kvdb::OutputPacketStream>::value;
         if (isOutputStream || isOutputPacketStream) {
             if (isOutputStream) {
                 // Calculate the total require size.
-                PrepareOutputStream preOS;
+                PrepareOutputStream preOS(s_dummyStorage);
                 preOS.skip(kMsgHeaderSize);
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
@@ -169,7 +169,7 @@ public:
             }
             else {
                 // Calculate the total require size.
-                PrepareOutputPacketStream preOS;
+                PrepareOutputPacketStream preOS(s_dummyStorage);
                 preOS.skip(kMsgHeaderSize);
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
@@ -185,13 +185,13 @@ public:
     }
 
     template <typename OutputStreamTy = OutputStream>
-    uint32_t prepareBody() {
+    uint32_t calculateBody() {
         constexpr bool isOutputStream = std::is_same<OutputStreamTy, kvdb::OutputStream>::value;
         constexpr bool isOutputPacketStream = std::is_same<OutputStreamTy, kvdb::OutputPacketStream>::value;
         if (isOutputStream || isOutputPacketStream) {
             if (isOutputStream) {
                 // Calculate the body require size.
-                PrepareOutputStream preOS;
+                PrepareOutputStream preOS(s_dummyStorage);
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
                 pThis->write(preOS);
@@ -199,7 +199,7 @@ public:
             }
             else {
                 // Calculate the body require size.
-                PrepareOutputPacketStream preOS;
+                PrepareOutputPacketStream preOS(s_dummyStorage);
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
                 pThis->write(preOS);
@@ -214,25 +214,29 @@ public:
     }
 
     template <typename OutputStreamTy>
-    void prepare(OutputStreamTy & os, bool needPrepare) {
+    uint32_t prepareAll(OutputStreamTy & os, bool needPrepare) {
         // Need prepare stream space ?
         if (needPrepare && os.isMemoryStream()) {
-            uint32_t totalSize = this->prepareAll<OutputStreamTy>();
+            uint32_t totalSize = this->calculateAll<OutputStreamTy>();
             // Setting the message's body length
             this->header.setBodySize(totalSize - kMsgHeaderSize);
             os.inflate(totalSize);
+            return totalSize;
         }
+        return 0;
     }
 
     template <typename OutputStreamTy>
-    void prepareBody(OutputStreamTy & os, bool needPrepare) {
+    uint32_t prepareBody(OutputStreamTy & os, bool needPrepare) {
         // Need prepare stream space ?
         if (needPrepare && os.isMemoryStream()) {
-            uint32_t bodySize = this->prepareBody<OutputStreamTy>();
+            uint32_t bodySize = this->calculateBody<OutputStreamTy>();
             // Setting the message's body length
             this->header.setBodySize(bodySize);
             os.inflate(bodySize);
+            return bodySize;
         }
+        return 0;
     }
 
     template <typename InputStreamTy>
@@ -259,8 +263,25 @@ public:
     }
 
     template <typename OutputStreamTy>
-    void writeTo(OutputStreamTy & os, bool needPrepare = true) {
-        this->prepare(os, needPrepare);
+    uint32_t writeBody(OutputStreamTy & os, bool needPrepare = true) {
+        uint32_t bodySize = this->prepareBody(os, needPrepare);
+
+        T * pThis = static_cast<T *>(this);
+        assert(pThis != nullptr);
+        pThis->write(os);
+
+        if (needPrepare) {
+            os.setStorageSize(bodySize);
+            return bodySize;
+        }
+        else {
+            return static_cast<uint32_t>(os.position());
+        }
+    }
+
+    template <typename OutputStreamTy>
+    uint32_t writeTo(OutputStreamTy & os, bool needPrepare = true) {
+        uint32_t totalSize = this->prepareAll(os, needPrepare);
 
         typename OutputStreamTy::downcast_type & osb = os.downcastTo();
         Message::writeHeader(osb);
@@ -268,20 +289,19 @@ public:
         T * pThis = static_cast<T *>(this);
         assert(pThis != nullptr);
         pThis->write(os);
-    }
 
-    template <typename OutputStreamTy>
-    void writeBody(OutputStreamTy & os, bool needPrepare = true) {
-        this->prepareBody(os, needPrepare);
-
-        T * pThis = static_cast<T *>(this);
-        assert(pThis != nullptr);
-        pThis->write(os);
+        if (needPrepare) {
+            os.setStorageSize(totalSize);
+            return totalSize;
+        }
+        else {
+            return static_cast<uint32_t>(os.position());
+        }
     }
 
     template <typename OutputStreamTy = OutputStream>
     uint32_t writeTo(std::vector<char> & buffer) {
-        uint32_t totalSize = this->prepareAll<OutputStreamTy>();
+        uint32_t totalSize = this->calculateAll<OutputStreamTy>();
         buffer.reserve(totalSize);
 
         OutputStreamTy os(buffer.data(), totalSize);
@@ -293,24 +313,10 @@ public:
 
     template <typename OutputStreamTy = OutputStream>
     uint32_t writeTo(ByteBuffer & buffer) {
-        uint32_t totalSize = this->prepareAll<OutputStreamTy>();
-        buffer.reserve(totalSize);
-        buffer.setSize(totalSize);
+        uint32_t totalSize = this->calculateAll<OutputStreamTy>();
+        buffer.allocate(totalSize);
 
-        OutputStreamTy os(buffer.data(), totalSize);
-        this->writeHeaderTotal(os, totalSize);
-        this->writeBody(os, false);
-
-        return totalSize;
-    }
-
-    template <typename OutputStreamTy = OutputStream>
-    uint32_t writeTo(OutputStreamTy & os, ByteBuffer & buffer) {
-        uint32_t totalSize = this->prepareAll<OutputStreamTy>();
-        buffer.reserve(totalSize);
-        buffer.setSize(totalSize);
-
-        os.setBuffer(buffer.data(), buffer.size());
+        OutputStreamTy os(buffer);
         this->writeHeaderTotal(os, totalSize);
         this->writeBody(os, false);
 

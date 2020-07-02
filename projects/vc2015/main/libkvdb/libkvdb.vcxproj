@@ -83,6 +83,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ParseStatus.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\ReadWriteResult.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\StreamBuffer.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\StreamStorage.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_forward.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\bitscan_reverse.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\support\popcnt.h" />

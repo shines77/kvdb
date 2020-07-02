@@ -27,6 +27,28 @@ struct IAllocator {
 };
 
 template <typename T>
+struct DummyAllocator {
+    typedef T *         pointer;
+    typedef const T *   const_pointer;
+
+    pointer allocate(std::size_t size) {
+        return nullptr;
+    }
+
+    pointer reallocate(std::size_t size) {
+        return nullptr;
+    }
+
+    void deallocate(pointer ptr) {
+    }
+
+    void deallocate(void * ptr) {
+    }
+
+    bool isAutoRelease() { return false; }
+};
+
+template <typename T>
 struct GenericAllocator {
     typedef T *         pointer;
     typedef const T *   const_pointer;

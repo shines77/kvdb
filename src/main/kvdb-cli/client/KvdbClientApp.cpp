@@ -189,14 +189,23 @@ void KvdbClientApp::net_packet_test()
     char packetBuf[4096];
 
     NetPacket packet;
-    OutputStream ostream(packetBuf);
-    ostream.setBuffer(packetBuf);
-    packet.writeTo(ostream);
+    ByteBuffer outBuf;
 
-    ptrdiff_t length = ostream.size();
+    OutputStream os(outBuf);
+    packet.writeTo(os);
 
-    InputStream istream(packetBuf);
-    int count = packet.readFrom(istream);
+    InputStream is(outBuf);
+    int count = packet.readFrom(is);
+
+    ptrdiff_t totalSize = os.size();
+
+    InputStream is2(packetBuf);
+    is2.attach(packetBuf);
+    count = packet.readFrom(is2);
+
+    ConstInputStream cis(packetBuf);
+    cis.attach(packetBuf);
+    count = packet.readFrom(cis);
 }
 
 void KvdbClientApp::run_client(const std::string & address, uint16_t port)
@@ -337,7 +346,7 @@ int KvdbClientApp::main(int argc, char * argv[])
     printf("\n");
 
     if (result == EXIT_SUCCESS) {
-        this->net_packet_test();
+        //this->net_packet_test();
         this->run_client(client_config.address, client_config.port);
 
         result = this->run_shell(argc, argv);

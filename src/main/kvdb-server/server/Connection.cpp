@@ -67,6 +67,9 @@ void Connection::stop()
 
 void Connection::start_read_request()
 {
+    std::cout << "Connection::start_read_request()" << std::endl;
+    std::cout << std::endl;
+
     char header_buf[kMsgHeaderSize];
     size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
     if (readBytes == kMsgHeaderSize) {
@@ -141,7 +144,7 @@ void Connection::handle_read_some(const boost::system::error_code & err,
             this->stop();
         }
         else {
-            OutputStream os(response_buf_.data(), response_size_);
+            OutputStream os(response_buf_);
             request_.setBody(request_buf_.data());
             int result = request_handler_.handleRequest(context_, request_, os);
             if (result == ParseStatus::Success) {

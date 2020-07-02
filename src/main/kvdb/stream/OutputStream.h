@@ -21,26 +21,23 @@
 
 namespace kvdb {
 
-template <typename T, typename Base = BasicStream<T>>
+template < typename StorageTy, typename Base = BasicStream<StorageTy> >
 class BasicOutputStream : public Base {
 public:
     typedef Base                                base_type;
-    typedef BasicOutputStream<T, Base>          this_type;
+    typedef BasicOutputStream<StorageTy, Base>  this_type;
     typedef this_type                           downcast_type;
 
     typedef typename base_type::char_type       char_type;
     typedef typename base_type::size_type       size_type;
+    typedef typename base_type::storage_type    storage_type;
+    typedef typename base_type::allocator_type  allocator_type;
 
     typedef typename base_type::string_type     string_type;
     typedef typename base_type::stringref_type  stringref_type;
-    typedef BasicByteBuffer<char_type>          byte_buffer_t;
 
-    BasicOutputStream() : base_type() {}
-    BasicOutputStream(const char_type * data, size_type size) : base_type(data, size) {}
-    template <size_type N>
-    BasicOutputStream(const char_type(&data)[N]) : base_type(data, N) {}
-    BasicOutputStream(const byte_buffer_t & src) : base_type(src) {}
-    BasicOutputStream(const this_type & src) : base_type(src.data(), src.capacity()) {}
+    BasicOutputStream(storage_type & storage) : base_type(storage) {}
+    BasicOutputStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
 
     ~BasicOutputStream() {}
 
@@ -147,11 +144,14 @@ public:
     }
 };
 
-typedef BasicOutputStream<char, BasicStream<char>>          OutputStream;
-typedef BasicOutputStream<wchar_t, BasicStream<wchar_t>>    OutputStreamW;
+typedef BasicOutputStream< BasicByteBuffer<char>, BasicStream<BasicByteBuffer<char>> >          OutputStream;
+typedef BasicOutputStream< BasicByteBuffer<wchar_t>, BasicStream<BasicByteBuffer<wchar_t>> >    OutputStreamW;
 
-typedef BasicOutputStream<char, BasicPrepareStream<char>>          PrepareOutputStream;
-typedef BasicOutputStream<wchar_t, BasicPrepareStream<wchar_t>>    PrepareOutputStreamW;
+typedef BasicOutputStream< BasicByteBuffer<char>, BasicPrepareStream<BasicByteBuffer<char>> >       PrepareOutputStream;
+typedef BasicOutputStream< BasicByteBuffer<wchar_t>, BasicPrepareStream<BasicByteBuffer<wchar_t>> > PrepareOutputStreamW;
+
+static BasicByteBuffer<char>    s_dummyStorage;
+static BasicByteBuffer<wchar_t> s_dummyStorageW;
 
 } // namespace kvdb
 

@@ -17,8 +17,7 @@
 #include <string>
 #include <type_traits>
 
-#include "kvdb/core/DataType.h"
-#include "kvdb/stream/StreamBuffer.h"
+#include "kvdb/stream/Allocator.h"
 #include "kvdb/stream/MemoryBuffer.h"
 #include "kvdb/jstd/StringRef.h"
 
@@ -36,8 +35,13 @@ public:
     typedef typename base_type::string_type     string_type;
     typedef typename base_type::stringref_type  stringref_type;
 
+    typedef DummyAllocator<T>                   allocator_type;
+
 public:
     BasicConstBuffer() : base_type() {}
+    BasicConstBuffer(const this_type & src)
+        : base_type(src.data(), src.size()) {
+    }
     BasicConstBuffer(const char_type * data, size_type size)
         : base_type(data, size) {
     }

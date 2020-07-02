@@ -19,30 +19,32 @@
 #include "kvdb/jstd/StringRef.h"
 
 #include "kvdb/stream/ReadWriteResult.h"
-#include "kvdb/stream/StreamBuffer.h"
+#include "kvdb/stream/StreamStorage.h"
 #include "kvdb/stream/ByteBuffer.h"
 
 namespace kvdb {
 
-template <typename T>
-class BasicStream : public BasicStreamBuffer<T> {
+template <typename StorageTy>
+class BasicStream : public BasicStreamStorage<StorageTy> {
 public:
-    typedef BasicStreamBuffer<T>                base_type;
-    typedef BasicStream<T>                      this_type;
-    typedef BasicByteBuffer<char_type>          byte_buffer_t;
+    typedef BasicStreamStorage<StorageTy>       base_type;
+    typedef BasicStream<StorageTy>              this_type;
 
     typedef typename base_type::char_type       char_type;
     typedef typename base_type::size_type       size_type;
+    typedef typename base_type::storage_type    storage_type;
+    typedef typename base_type::allocator_type  allocator_type;
 
     typedef typename base_type::string_type     string_type;
     typedef typename base_type::stringref_type  stringref_type;
 
-    BasicStream() : base_type() {}
+    BasicStream(storage_type & storage) : base_type(storage) {}
+    BasicStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
     BasicStream(const char_type * data, size_type size) : base_type(data, size) {}
-    template <size_t N>
-    BasicStream(const char_type(&data)[N]) : base_type(data, N) {}
-    BasicStream(const byte_buffer_t & src) : base_type(src.data(), src.size()) {}
-    BasicStream(const this_type & src) : base_type(src.data(), src.capacity()) {}
+    template <size_type N>
+    BasicStream(const char_type(&data)[N])
+        : base_type(data, N) {
+    }
 
     ~BasicStream() {}
 
@@ -329,8 +331,8 @@ public:
     }
 };
 
-typedef BasicStream<char>      Stream;
-typedef BasicStream<wchar_t>   StreamW;
+typedef BasicStream< BasicByteBuffer<char> >      Stream;
+typedef BasicStream< BasicByteBuffer<wchar_t> >   StreamW;
 
 } // namespace kvdb
 

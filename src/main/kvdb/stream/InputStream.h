@@ -17,28 +17,47 @@
 #include <type_traits>
 
 #include "kvdb/core/DataType.h"
+#include "kvdb/stream/ConstBuffer.h"
 #include "kvdb/stream/BasicStream.h"
 #include "kvdb/stream/BasicPrepareStream.h"
 
 namespace kvdb {
 
-template <typename T, typename Base = BasicStream<T>>
+template < typename StorageTy, typename Base = BasicStream<StorageTy> >
 class BasicInputStream : public Base {
 public:
     typedef Base                                base_type;
+    typedef BasicInputStream<StorageTy, Base>   this_type;
+    typedef this_type                           downcast_type;
+
     typedef typename base_type::char_type       char_type;
     typedef typename base_type::size_type       size_type;
+    typedef typename base_type::storage_type    storage_type;
+    typedef typename base_type::allocator_type  allocator_type;
 
     typedef typename base_type::string_type     string_type;
     typedef typename base_type::stringref_type  stringref_type;
 
-    BasicInputStream() : base_type(nullptr) {}
+    BasicInputStream(storage_type & storage) : base_type(storage) {}
+    BasicInputStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
     BasicInputStream(const char_type * data, size_type size) : base_type(data, size) {}
     template <size_type N>
-    BasicInputStream(const char_type(&data)[N]) : base_type(data, N) {}
+    BasicInputStream(const char_type(&data)[N])
+        : base_type(data, N) {
+    }
+
     ~BasicInputStream() {}
 
     bool isMemoryStream() const { return true; }
+
+    void attach(const char_type * data, size_type size) {
+        this->storage_.attach(data, size);
+    }
+
+    template <size_type N>
+    void attach(const char_type(&data)[N]) {
+        this->storage_.attach(data, N);
+    }
 
 protected:
     template <typename StringType>
@@ -186,11 +205,17 @@ public:
     }
 };
 
-typedef BasicInputStream<char, BasicStream<char>>       InputStream;
-typedef BasicInputStream<wchar_t, BasicStream<wchar_t>> InputStreamW;
+typedef BasicInputStream< BasicByteBuffer<char>, BasicStream<BasicByteBuffer<char>> >           InputStream;
+typedef BasicInputStream< BasicByteBuffer<wchar_t>, BasicStream<BasicByteBuffer<wchar_t>> >     InputStreamW;
 
-typedef BasicInputStream<char, BasicPrepareStream<char>>        PrepareInputStream;
-typedef BasicInputStream<wchar_t, BasicPrepareStream<wchar_t>>  PrepareInputStreamW;
+typedef BasicInputStream< BasicByteBuffer<char>, BasicPrepareStream<BasicByteBuffer<char>> >        PrepareInputStream;
+typedef BasicInputStream< BasicByteBuffer<wchar_t>, BasicPrepareStream<BasicByteBuffer<wchar_t>> >  PrepareInputStreamW;
+
+typedef BasicInputStream< BasicConstBuffer<char>, BasicStream<BasicConstBuffer<char>> >           ConstInputStream;
+typedef BasicInputStream< BasicConstBuffer<wchar_t>, BasicStream<BasicConstBuffer<wchar_t>> >     ConstInputStreamW;
+
+typedef BasicInputStream< BasicConstBuffer<char>, BasicPrepareStream<BasicConstBuffer<char>> >        PrepareConstInputStream;
+typedef BasicInputStream< BasicConstBuffer<wchar_t>, BasicPrepareStream<BasicConstBuffer<wchar_t>> >  PrepareConstInputStreamW;
 
 } // namespace kvdb
 

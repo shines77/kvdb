@@ -21,20 +21,24 @@
 
 namespace kvdb {
 
-template <typename T, typename Base = BasicStream<T>>
-class BasicInputPacketStream : public BasicInputStream<T, Base> {
+template < typename StorageTy, typename Base = BasicStream<StorageTy> >
+class BasicInputPacketStream : public BasicInputStream<StorageTy, Base> {
 public:
-    typedef BasicInputStream<T, Base>           base_type;
-    typedef typename base_type::char_type       char_type;
-    typedef typename base_type::size_type       size_type;
+    typedef BasicInputStream<StorageTy, Base>       base_type;
+    typedef BasicInputPacketStream<StorageTy, Base> this_type;
+    typedef base_type                               downcast_type;
 
-    typedef typename base_type::string_type     string_type;
-    typedef typename base_type::stringref_type  stringref_type;
+    typedef typename base_type::char_type           char_type;
+    typedef typename base_type::size_type           size_type;
+    typedef typename base_type::storage_type        storage_type;
+    typedef typename base_type::allocator_type      allocator_type;
 
-    BasicInputPacketStream() : base_type() {}
-    BasicInputPacketStream(const char_type * data, size_type size) : base_type(data, size) {}
-    template <size_type N>
-    BasicInputPacketStream(const char_type(&data)[N]) : base_type(data, N) {}
+    typedef typename base_type::string_type         string_type;
+    typedef typename base_type::stringref_type      stringref_type;
+
+    BasicInputPacketStream(const storage_type & storage) : base_type(storage) {}
+    BasicInputPacketStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
+
     ~BasicInputPacketStream() {}
 
     base_type & downcastTo() {
@@ -225,11 +229,11 @@ public:
     }
 };
 
-typedef BasicInputPacketStream<char, BasicStream<char>>         InputPacketStream;
-typedef BasicInputPacketStream<wchar_t, BasicStream<wchar_t>>   InputPacketStreamW;
+typedef BasicInputPacketStream< BasicByteBuffer<char>, BasicStream<BasicByteBuffer<char>> >         InputPacketStream;
+typedef BasicInputPacketStream< BasicByteBuffer<wchar_t>, BasicStream<BasicByteBuffer<wchar_t>> >   InputPacketStreamW;
 
-typedef BasicInputPacketStream<char, BasicPrepareStream<char>>         PrepareInputPacketStream;
-typedef BasicInputPacketStream<wchar_t, BasicPrepareStream<wchar_t>>   PrepareInputPacketStreamW;
+typedef BasicInputPacketStream< BasicByteBuffer<char>, BasicPrepareStream<BasicByteBuffer<char>> >         PrepareInputPacketStream;
+typedef BasicInputPacketStream< BasicByteBuffer<wchar_t>, BasicPrepareStream<BasicByteBuffer<wchar_t>> >   PrepareInputPacketStreamW;
 
 } // namespace kvdb
 
