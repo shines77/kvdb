@@ -28,6 +28,9 @@ template <typename T>
 class BasicStream : public BasicStreamBuffer<T> {
 public:
     typedef BasicStreamBuffer<T>                base_type;
+    typedef BasicStream<T>                      this_type;
+    typedef BasicByteBuffer<char_type>          byte_buffer_t;
+
     typedef typename base_type::char_type       char_type;
     typedef typename base_type::size_type       size_type;
 
@@ -38,6 +41,9 @@ public:
     BasicStream(const char_type * data, size_type size) : base_type(data, size) {}
     template <size_t N>
     BasicStream(const char_type(&data)[N]) : base_type(data, N) {}
+    BasicStream(const byte_buffer_t & src) : base_type(src.data(), src.size()) {}
+    BasicStream(const this_type & src) : base_type(src.data(), src.capacity()) {}
+
     ~BasicStream() {}
 
     void back() {

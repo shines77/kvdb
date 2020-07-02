@@ -264,8 +264,8 @@ struct MessageHeader {
                                uint8_t sign, uint16_t opcode,
                                uint8_t version) {
         MessageHeader header;
-        assert(os.length() >= sizeof(MessageHeader));
-        uint32_t bodySize = static_cast<uint32_t>(os.length() - sizeof(MessageHeader));
+        assert(os.size() >= sizeof(MessageHeader));
+        uint32_t bodySize = static_cast<uint32_t>(os.size() - sizeof(MessageHeader));
         header.setBodySize(bodySize);
         header.setSign(sign);
         header.setOpcode(opcode);

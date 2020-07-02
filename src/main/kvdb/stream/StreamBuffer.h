@@ -94,11 +94,11 @@ public:
 
     void setAutoRelease(bool needRelease) { this->autoRelease_ = needRelease; }
 
-    size_type length() const   {
+    size_type size() const   {
         assert(this->cur_ >= this->head_);
         return size_type(this->cur_ - this->head_);
     }
-    size_type position() const { return this->length(); }
+    size_type position() const { return this->size(); }
 
     size_type remain() const   {
         assert(this->tail_ >= this->cur_);

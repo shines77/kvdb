@@ -9,6 +9,7 @@
 #include "kvdb/basic/stdint.h"
 #include "kvdb/core/MessageType.h"
 #include "kvdb/core/MessageHeader.h"
+#include "kvdb/stream/ByteBuffer.h"
 #include "kvdb/stream/BasicStream.h"
 #include "kvdb/stream/InputPacketStream.h"
 #include "kvdb/stream/OutputPacketStream.h"
@@ -270,7 +271,7 @@ public:
     }
 
     template <typename OutputStreamTy>
-    void writeBody(OutputStreamTy & os, bool needPrepare) {
+    void writeBody(OutputStreamTy & os, bool needPrepare = true) {
         this->prepareBody(os, needPrepare);
 
         T * pThis = static_cast<T *>(this);
@@ -284,6 +285,32 @@ public:
         buffer.reserve(totalSize);
 
         OutputStreamTy os(buffer.data(), totalSize);
+        this->writeHeaderTotal(os, totalSize);
+        this->writeBody(os, false);
+
+        return totalSize;
+    }
+
+    template <typename OutputStreamTy = OutputStream>
+    uint32_t writeTo(ByteBuffer & buffer) {
+        uint32_t totalSize = this->prepareAll<OutputStreamTy>();
+        buffer.reserve(totalSize);
+        buffer.setSize(totalSize);
+
+        OutputStreamTy os(buffer.data(), totalSize);
+        this->writeHeaderTotal(os, totalSize);
+        this->writeBody(os, false);
+
+        return totalSize;
+    }
+
+    template <typename OutputStreamTy = OutputStream>
+    uint32_t writeTo(OutputStreamTy & os, ByteBuffer & buffer) {
+        uint32_t totalSize = this->prepareAll<OutputStreamTy>();
+        buffer.reserve(totalSize);
+        buffer.setSize(totalSize);
+
+        os.setBuffer(buffer.data(), buffer.size());
         this->writeHeaderTotal(os, totalSize);
         this->writeBody(os, false);
 

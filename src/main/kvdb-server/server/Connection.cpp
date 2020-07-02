@@ -146,7 +146,7 @@ void Connection::handle_read_some(const boost::system::error_code & err,
             int result = request_handler_.handleRequest(context_, request_, os);
             if (result == ParseStatus::Success) {
                 if (os.data() != nullptr) {
-                    boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.length()),
+                    boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.size()),
                         boost::bind(&Connection::handle_write, this->shared_from_this(),
                                     boost::asio::placeholders::error)
                     );

@@ -193,7 +193,7 @@ void KvdbClientApp::net_packet_test()
     ostream.setBuffer(packetBuf);
     packet.writeTo(ostream);
 
-    ptrdiff_t length = ostream.length();
+    ptrdiff_t length = ostream.size();
 
     InputStream istream(packetBuf);
     int count = packet.readFrom(istream);

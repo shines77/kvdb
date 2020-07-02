@@ -169,13 +169,15 @@ void integral_utils_test()
 
 int main(int argc, char * argv[])
 {
+#if 0
     integral_utils_test();
 
     round_to_power2_test_1();
     round_to_power2_test_2();
     return 0;
-
-    //KvdbClientApp app(argc, argv);
-    //int result = app.run();
-    //return result;
+#else
+    KvdbClientApp app(argc, argv);
+    int result = app.run();
+    return result;
+#endif
 }

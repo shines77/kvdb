@@ -27,16 +27,21 @@ public:
     typedef Base                                base_type;
     typedef BasicOutputStream<T, Base>          this_type;
     typedef this_type                           downcast_type;
+
     typedef typename base_type::char_type       char_type;
     typedef typename base_type::size_type       size_type;
 
     typedef typename base_type::string_type     string_type;
     typedef typename base_type::stringref_type  stringref_type;
+    typedef BasicByteBuffer<char_type>          byte_buffer_t;
 
     BasicOutputStream() : base_type() {}
     BasicOutputStream(const char_type * data, size_type size) : base_type(data, size) {}
     template <size_type N>
     BasicOutputStream(const char_type(&data)[N]) : base_type(data, N) {}
+    BasicOutputStream(const byte_buffer_t & src) : base_type(src) {}
+    BasicOutputStream(const this_type & src) : base_type(src.data(), src.capacity()) {}
+
     ~BasicOutputStream() {}
 
     bool isMemoryStream() const { return true; }
