@@ -32,16 +32,30 @@ namespace kvdb {
 // See: https://my.oschina.net/2bit/blog/3065096
 //
 
-static inline int is_float32_eq(float x, float y) {
+static inline int float32_is_equal(float x, float y) {
+    union float32_t {
+        float    f32;
+        uint32_t u32;
+    };
+    float32_t val_x, val_y;
+    val_x.f32 = x;
+    val_y.f32 = y;
     return ((x == y) || (
-        ((*(uint32_t *)&x ^ *(uint32_t *)&y) == 1) &&
-        ((*(uint32_t *)&x & 0x7F800000UL) != 0x7F800000UL)));
+        (((val_x.u32 ^ val_x.u32) <= 2) &&
+        ((val_x.u32 & 0x7F800000UL) != 0x7F800000UL))));
 }
 
-static inline int is_float64_eq(double x, double y) {
+static inline int float64_is_equal(double x, double y) {
+    union float64_t {
+        double   f64;
+        uint64_t u64;
+    };
+    float64_t val_x, val_y;
+    val_x.f64 = x;
+    val_y.f64 = y;
     return ((x == y) || (
-        ((*(uint64_t *)&x ^ *(uint64_t *)&y) == 1) &&
-        ((*(uint64_t *)&x & 0x7FF0000000000000ULL) != 0x7FF0000000000000ULL)));
+        ((val_x.u64 ^ val_y.u64) <= 2) &&
+        ((val_x.u64 & 0x7FF0000000000000ULL) != 0x7FF0000000000000ULL)));
 }
 
 } // namespace kvdb
