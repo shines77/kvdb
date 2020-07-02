@@ -43,8 +43,8 @@ protected:
 
 public:
     BasicStreamStorage(storage_type & storage) : cur_(storage.data()), storage_(storage) {}
-    BasicStreamStorage(storage_type && storage) : cur_(storage.data()), storage_(std::move(storage)) {}
-    BasicStreamStorage(const char_type * data, size_type size) : cur_(data), storage_(storage_type(data, size)) {}
+    BasicStreamStorage(storage_type && storage) : cur_(storage.data()), storage_(std::forward<storage_type>(storage)) {}
+    BasicStreamStorage(const char_type * data, size_type size) : cur_(data), storage_(std::move(*(new storage_type(data, size)))) {}
     template <size_type N>
     BasicStreamStorage(const char_type(&data)[N])
         : cur_(data), storage_(data, N) {
