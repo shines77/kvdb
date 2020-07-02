@@ -175,7 +175,7 @@ public:
             char_type * newData = allocator_.reallocate(initSize);
             if (newData != nullptr) {
                 if (newData != this->data()) {
-                    ::memset((void *)newData, initVal, size * sizeof(char_type));
+                    ::memset((void *)newData, initVal, initSize * sizeof(char_type));
                     this->internal_destroy();
                     this->data_ = newData;
                 }
