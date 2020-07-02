@@ -62,6 +62,14 @@ public:
         : base_type(nullptr, 0), capacity_(0) {
         this->internal_copy<N>(data);
     }
+    BasicByteBuffer(const this_type & src)
+        : base_type(nullptr, 0), capacity_(0) {
+        this->copy(src.data(), src.size());
+    }
+    BasicByteBuffer(this_type && right)
+        : base_type(nullptr, 0), capacity_(0) {
+        this->swap(std::forward<this_type>(right));
+    }
     ~BasicByteBuffer() {
         this->destroy();
     }
@@ -115,6 +123,14 @@ public:
                 this->capacity_ = 0;
             }
         }
+    }
+
+    void swap(this_type & right) {
+        base_type::swap(*static_cast<base_type *>(&right));
+
+        size_type tmpCapacity = this->capacity_;
+        this->capacity_ = right.capacity();
+        right.setCapacity(tmpCapacity);
     }
 
     void attach(const char_type * data, size_type size) {
@@ -268,5 +284,12 @@ typedef BasicByteBuffer<char>      ByteBuffer;
 typedef BasicByteBuffer<wchar_t>   ByteBufferW;
 
 } // namespace kvdb
+
+template <typename T>
+inline
+void swap(kvdb::BasicByteBuffer<T> & left, kvdb::BasicByteBuffer<T> & right)
+{
+    left.swap(right);
+}
 
 #endif // KVDB_STREAM_BYTEBUFFER_H

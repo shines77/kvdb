@@ -33,6 +33,7 @@ public:
 
     typedef std::size_t                     size_type;
 
+    typedef BasicMemoryBuffer<T>            this_type;
     typedef std::basic_string<char_type>    string_type;
     typedef jstd::BasicStringRef<char_type> stringref_type;
 
@@ -50,6 +51,13 @@ public:
     BasicMemoryBuffer(const char_type(&data)[N])
         : data_(data), size_(N) {
     }
+    BasicMemoryBuffer(const this_type & src)
+        : data_(src.data()), size_(src.size()) {
+    }
+    BasicMemoryBuffer(this_type && right)
+        : data_(nullptr), size_(0) {
+        this->swap(std::forward<this_type>(right));
+    }
     ~BasicMemoryBuffer() {
     }
    
@@ -61,11 +69,28 @@ public:
     void setSize(size_type size) { this->size_ = size; }
 
     bool isValid() const { return (this->data_ != nullptr); }
+
+    void swap(this_type & right) {
+        char_type * tmpData = this->data_;
+        this->data_ = right.data();
+        right.setData(tmpData);
+
+        size_type tmpSize = this->size_;
+        this->size_ = right.size();
+        right.setSize(tmpSize);
+    }
 };
 
 typedef BasicMemoryBuffer<char>      MemoryBuffer;
 typedef BasicMemoryBuffer<wchar_t>   MemoryBufferW;
 
 } // namespace kvdb
+
+template <typename T>
+inline
+void swap(kvdb::BasicMemoryBuffer<T> & left, kvdb::BasicMemoryBuffer<T> & right)
+{
+    left.swap(right);
+}
 
 #endif // KVDB_STREAM_MEMORYBUFFER_H
