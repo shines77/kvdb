@@ -8,9 +8,10 @@
 
 #include "kvdb/basic/stdint.h"
 #include "kvdb/basic/stdsize.h"
-#include <kvdb/test/Expert.h>
-#include <kvdb/test/Assert.h>
-#include <kvdb/system/Console.h>
+
+#include "kvdb/test/Expert.h"
+#include "kvdb/test/Assert.h"
+#include "kvdb/system/Console.h"
 
 #include <stdio.h>
 #include <stdint.h>

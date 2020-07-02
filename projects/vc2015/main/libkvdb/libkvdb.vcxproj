@@ -93,6 +93,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\system\Console.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\test\Assert.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\test\Expert.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\test\FloatEpsinon.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\test\Test.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\utils\Optional.h" />
   </ItemGroup>

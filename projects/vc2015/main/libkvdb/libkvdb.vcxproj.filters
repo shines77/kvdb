@@ -280,6 +280,9 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\test\Test.h">
       <Filter>src\test</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\test\FloatEpsinon.h">
+      <Filter>src\test</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\main\kvdb\all.cpp">
