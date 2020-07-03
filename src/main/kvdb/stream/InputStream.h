@@ -42,9 +42,15 @@ protected:
     StorageTy istorage_;
 
 public:
-    BasicInputStream(storage_type & storage) : base_type(storage) {}
-    BasicInputStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
-    BasicInputStream(const char_type * data, size_type size) : base_type(istorage_) {
+    BasicInputStream(storage_type & storage)
+        : base_type(storage), istorage_(nullptr, 0) {
+    }
+    BasicInputStream(storage_type && storage)
+        : base_type(std::forward<storage_type>(storage)),
+          istorage_(nullptr, 0) {
+    }
+    BasicInputStream(const char_type * data, size_type size)
+        : base_type(istorage_), istorage_(data, size) {
         this->attach(data, size);
     }
     template <size_type N>
@@ -216,17 +222,22 @@ public:
     }
 };
 
-typedef BasicInputStream< BasicByteBuffer<char>, BasicStream<BasicByteBuffer<char>> >           InputStream;
-typedef BasicInputStream< BasicByteBuffer<wchar_t>, BasicStream<BasicByteBuffer<wchar_t>> >     InputStreamW;
+typedef BasicInputStream< BasicByteBuffer<char>, BasicStream<BasicByteBuffer<char>> >           ByteInputStream;
+typedef BasicInputStream< BasicByteBuffer<wchar_t>, BasicStream<BasicByteBuffer<wchar_t>> >     InputByteStreamW;
 
-typedef BasicInputStream< BasicByteBuffer<char>, BasicPrepareStream<BasicByteBuffer<char>> >        PrepareInputStream;
-typedef BasicInputStream< BasicByteBuffer<wchar_t>, BasicPrepareStream<BasicByteBuffer<wchar_t>> >  PrepareInputStreamW;
+typedef BasicInputStream< BasicByteBuffer<char>, BasicPrepareStream<BasicByteBuffer<char>> >        PrepareByteInputStream;
+typedef BasicInputStream< BasicByteBuffer<wchar_t>, BasicPrepareStream<BasicByteBuffer<wchar_t>> >  PrepareByteInputStreamW;
 
-typedef BasicInputStream< BasicConstBuffer<char>, BasicStream<BasicConstBuffer<char>> >           ConstInputStream;
-typedef BasicInputStream< BasicConstBuffer<wchar_t>, BasicStream<BasicConstBuffer<wchar_t>> >     ConstInputStreamW;
+typedef BasicInputStream< BasicConstBuffer<char>, BasicStream<BasicConstBuffer<char>> >         ConstInputStream;
+typedef BasicInputStream< BasicConstBuffer<wchar_t>, BasicStream<BasicConstBuffer<wchar_t>> >   ConstInputStreamW;
 
 typedef BasicInputStream< BasicConstBuffer<char>, BasicPrepareStream<BasicConstBuffer<char>> >        PrepareConstInputStream;
 typedef BasicInputStream< BasicConstBuffer<wchar_t>, BasicPrepareStream<BasicConstBuffer<wchar_t>> >  PrepareConstInputStreamW;
+
+typedef ConstInputStream            InputStream;
+typedef ConstInputStreamW           InputStreamW;
+typedef PrepareConstInputStream     PrepareInputStream;
+typedef PrepareConstInputStreamW    PrepareInputStreamW;
 
 } // namespace kvdb
 

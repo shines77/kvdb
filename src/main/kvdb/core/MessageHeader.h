@@ -227,7 +227,7 @@ struct MessageHeader {
 
     int readHeader(const char * data, std::size_t size) {
         assert(size >= sizeof(MessageHeader));
-        ConstInputStream is(data, size);
+        InputStream is(data, size);
         this->setSizeValue(is.readUInt32());
         this->setInfoValue(is.readUInt32());
         return ReadResult::Ok;
@@ -236,7 +236,7 @@ struct MessageHeader {
     template <std::size_t N>
     int readHeader(const char(&data)[N]) {
         assert(N >= sizeof(MessageHeader));
-        ConstInputStream is(data);
+        InputStream is(data);
         this->setSizeValue(is.readUInt32());
         this->setInfoValue(is.readUInt32());
         return ReadResult::Ok;

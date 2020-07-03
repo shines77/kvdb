@@ -191,12 +191,13 @@ void KvdbClientApp::net_packet_test()
 
     try {    
         NetPacket packet;
-        ByteBuffer outBuf;
+        ByteBuffer outBuf, inBuf;
+        ConstBuffer constBuf(readBuf);
 
         OutputStream os(outBuf);
         packet.writeTo(os);
 
-        InputStream is(outBuf);
+        InputStream is(constBuf);
         int count = packet.readFrom(is);
 
         ptrdiff_t totalSize = os.size();
@@ -205,8 +206,12 @@ void KvdbClientApp::net_packet_test()
         ::memcpy((void *)readBuf, (const void *)outBuf.data(), outBuf.capacity() * sizeof(char));
 
         InputStream is2(readBuf);
-        //is2.attach(readBuf);
+        is2.attach(readBuf);
         count = packet.readFrom(is2);
+
+        ByteInputStream bis(inBuf);
+        bis.attach(readBuf);
+        count = packet.readFrom(bis);
 
         ConstInputStream cis(readBuf);
         cis.attach(readBuf);

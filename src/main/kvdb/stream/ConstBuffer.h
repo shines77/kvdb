@@ -38,7 +38,6 @@ public:
     typedef DummyAllocator<T>                   allocator_type;
 
 public:
-    BasicConstBuffer() : base_type() {}
     BasicConstBuffer(const char_type * data, size_type size)
         : base_type(data, size) {
     }
