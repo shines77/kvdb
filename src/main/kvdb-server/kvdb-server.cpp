@@ -9,6 +9,7 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <exception>
 
 #include "kvdb/common/boost_asio_msvc.h"
 #include <boost/asio.hpp>
@@ -95,7 +96,7 @@ void run_kvdb_server(const std::string & address, const std::string & port,
         server.wait();
     }
     catch (const std::exception & ex) {
-        std::cerr << "Exception: " << ex.what() << std::endl;
+        std::cerr << "Exception: " << ex.what() << std::endl << std::endl;
     }
 
     WorkerThread workerThread;

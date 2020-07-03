@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <string>
+#include <exception>
 #include <type_traits>
 
 #include "kvdb/stream/Allocator.h"
@@ -135,14 +136,14 @@ public:
 
     void attach(const char_type * data, size_type size) {
         // Not implemented yet, std::logic_error, std::runtime_error
-        std::runtime_error not_supported("BasicByteBuffer<T>: This interface is not supported.");
+        std::runtime_error not_supported("BasicByteBuffer<T>::attach(): This interface is not supported.");
         throw not_supported;
     }
 
     template <size_type N>
     void attach(const char_type(&data)[N]) {
         // Not implemented yet
-        std::runtime_error not_supported("BasicByteBuffer<T>: This interface is not supported.");
+        std::runtime_error not_supported("BasicByteBuffer<T>::attach(): This interface is not supported.");
         throw not_supported;
     }
 

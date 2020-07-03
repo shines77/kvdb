@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <exception>
 
 #include "client/common.h"
 #include "client/KvdbClient.h"
@@ -186,26 +187,34 @@ int KvdbClientApp::parse_args()
 
 void KvdbClientApp::net_packet_test()
 {
-    char packetBuf[4096];
+    char readBuf[4096];
 
-    NetPacket packet;
-    ByteBuffer outBuf;
+    try {    
+        NetPacket packet;
+        ByteBuffer outBuf;
 
-    OutputStream os(outBuf);
-    packet.writeTo(os);
+        OutputStream os(outBuf);
+        packet.writeTo(os);
 
-    InputStream is(outBuf);
-    int count = packet.readFrom(is);
+        InputStream is(outBuf);
+        int count = packet.readFrom(is);
 
-    ptrdiff_t totalSize = os.size();
+        ptrdiff_t totalSize = os.size();
 
-    InputStream is2(packetBuf);
-    is2.attach(packetBuf);
-    count = packet.readFrom(is2);
+        // Copy outBuf data to readBuf
+        ::memcpy((void *)readBuf, (const void *)outBuf.data(), outBuf.capacity() * sizeof(char));
 
-    ConstInputStream cis(packetBuf);
-    cis.attach(packetBuf);
-    count = packet.readFrom(cis);
+        //InputStream is2(readBuf);
+        //is2.attach(readBuf);
+        //count = packet.readFrom(is2);
+
+        ConstInputStream cis(readBuf);
+        cis.attach(readBuf);
+        count = packet.readFrom(cis);
+    }
+    catch (const std::exception & ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl << std::endl;;
+    }
 }
 
 void KvdbClientApp::run_client(const std::string & address, uint16_t port)
@@ -249,7 +258,7 @@ void KvdbClientApp::run_client(const std::string & address, uint16_t port)
         client.wait();
     }
     catch (const std::exception & ex) {
-        std::cerr << "Exception: " << ex.what() << std::endl;
+        std::cerr << "Exception: " << ex.what() << std::endl << std::endl;
     }
 }
 
@@ -346,7 +355,7 @@ int KvdbClientApp::main(int argc, char * argv[])
     printf("\n");
 
     if (result == EXIT_SUCCESS) {
-        //this->net_packet_test();
+        this->net_packet_test();
         this->run_client(client_config.address, client_config.port);
 
         result = this->run_shell(argc, argv);

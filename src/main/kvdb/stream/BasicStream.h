@@ -40,12 +40,6 @@ public:
 
     BasicStream(storage_type & storage) : base_type(storage) {}
     BasicStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
-    BasicStream(const char_type * data, size_type size) : base_type(data, size) {}
-    template <size_type N>
-    BasicStream(const char_type(&data)[N])
-        : base_type(data, N) {
-    }
-
     ~BasicStream() {}
 
     void back() {

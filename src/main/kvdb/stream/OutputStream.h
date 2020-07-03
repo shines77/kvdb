@@ -38,7 +38,6 @@ public:
 
     BasicOutputStream(storage_type & storage) : base_type(storage) {}
     BasicOutputStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
-
     ~BasicOutputStream() {}
 
     bool isMemoryStream() const { return true; }

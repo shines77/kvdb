@@ -36,9 +36,17 @@ public:
     typedef typename base_type::string_type         string_type;
     typedef typename base_type::stringref_type      stringref_type;
 
+protected:
+    StorageTy istorage_;
+
+public:
     BasicInputPacketStream(const storage_type & storage) : base_type(storage) {}
     BasicInputPacketStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
-
+    BasicInputPacketStream(const char_type * data, size_type size) : base_type(data, size) {}
+    template <size_type N>
+    BasicInputPacketStream(const char_type(&data)[N])
+        : base_type(data, N) {
+    }
     ~BasicInputPacketStream() {}
 
     base_type & downcastTo() {

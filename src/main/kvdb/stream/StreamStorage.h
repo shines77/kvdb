@@ -44,15 +44,6 @@ protected:
 public:
     BasicStreamStorage(storage_type & storage) : cur_(storage.data()), storage_(storage) {}
     BasicStreamStorage(storage_type && storage) : cur_(storage.data()), storage_(std::forward<storage_type>(storage)) {}
-    BasicStreamStorage(const char_type * data, size_type size)
-        : cur_(data),
-          storage_(*const_cast<storage_type *>(new storage_type(data, size))) {
-    }
-    template <size_type N>
-    BasicStreamStorage(const char_type(&data)[N])
-        : cur_(data), storage_(data, N) {
-    }
-
     ~BasicStreamStorage() {
     }
 
@@ -70,9 +61,6 @@ public:
     size_type size() const { return static_cast<size_type>(this->position()); }
     size_type remain() const { return (this->capacity() - this->storage_size()); }
 
-    storage_type & storage() { return this->storage_; }
-    const storage_type & storage() const { return this->storage_; }
-
     size_type storage_size() const { return this->storage_.size(); }
     size_type storage_capacity() const { return this->storage_.capacity(); }
 
@@ -80,6 +68,14 @@ public:
 
     void setStorageData(char_type * newData) { this->storage_.setData(newData); }
     void setStorageSize(size_type newSize) { this->storage_.setSize(newSize); }
+
+    storage_type & storage() { return this->storage_; }
+    const storage_type & storage() const { return this->storage_; }
+
+    storage_type & setStorage(storage_type & storage) {
+        this->storage_ = storage;
+        return this->storage_;
+    }
 
     void setAllocator(const allocator_type & allocator) {
         this->storage_.setAllocator(allocator);

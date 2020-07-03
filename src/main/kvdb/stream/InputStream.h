@@ -38,12 +38,19 @@ public:
     typedef typename base_type::string_type     string_type;
     typedef typename base_type::stringref_type  stringref_type;
 
+protected:
+    StorageTy istorage_;
+
+public:
     BasicInputStream(storage_type & storage) : base_type(storage) {}
     BasicInputStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
-    BasicInputStream(const char_type * data, size_type size) : base_type(data, size) {}
+    BasicInputStream(const char_type * data, size_type size) : base_type(istorage_) {
+        this->attach(data, size);
+    }
     template <size_type N>
     BasicInputStream(const char_type(&data)[N])
-        : base_type(data, N) {
+        : base_type(istorage_), istorage_(data, N) {
+        this->attach(data, N);
     }
 
     ~BasicInputStream() {}
@@ -52,11 +59,13 @@ public:
 
     void attach(const char_type * data, size_type size) {
         this->storage_.attach(data, size);
+        this->setCurrent(data);
     }
 
     template <size_type N>
     void attach(const char_type(&data)[N]) {
         this->storage_.attach(data, N);
+        this->setCurrent(data);
     }
 
 protected:
