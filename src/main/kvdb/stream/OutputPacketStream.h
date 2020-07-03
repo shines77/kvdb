@@ -41,8 +41,6 @@ public:
     BasicOutputPacketStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
     ~BasicOutputPacketStream() {}
 
-    bool isMemoryStream() const { return true; }
-
     downcast_type & downcastTo() {
         return (*static_cast<downcast_type *>(this));
     }

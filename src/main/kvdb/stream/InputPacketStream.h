@@ -36,9 +36,6 @@ public:
     typedef typename base_type::string_type         string_type;
     typedef typename base_type::stringref_type      stringref_type;
 
-protected:
-    StorageTy istorage_;
-
 public:
     BasicInputPacketStream(const storage_type & storage) : base_type(storage) {}
     BasicInputPacketStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}

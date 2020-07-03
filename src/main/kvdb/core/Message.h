@@ -216,7 +216,7 @@ public:
     template <typename OutputStreamTy>
     uint32_t prepareAll(OutputStreamTy & os, bool needPrepare) {
         // Need prepare stream space ?
-        if (needPrepare && os.isMemoryStream()) {
+        if (needPrepare) {
             uint32_t totalSize = this->calculateAll<OutputStreamTy>();
             // Setting the message's body length
             this->header.setBodySize(totalSize - kMsgHeaderSize);
@@ -229,7 +229,7 @@ public:
     template <typename OutputStreamTy>
     uint32_t prepareBody(OutputStreamTy & os, bool needPrepare) {
         // Need prepare stream space ?
-        if (needPrepare && os.isMemoryStream()) {
+        if (needPrepare) {
             uint32_t bodySize = this->calculateBody<OutputStreamTy>();
             // Setting the message's body length
             this->header.setBodySize(bodySize);

@@ -56,6 +56,8 @@ public:
     ~BasicConstBuffer() {
     }
 
+    bool isConstBuffer() const { return true; }
+
     void swap(this_type & right) {
         base_type::swap(*static_cast<base_type *>(&right));
     }
@@ -69,6 +71,19 @@ public:
     void attach(const char_type(&data)[N]) {
         this->data_ = (char_type *)data;
         this->size_ = N;
+    }
+
+    void copy(const char_type * data, size_type size) {
+        // Not implemented yet, std::logic_error, std::runtime_error
+        std::runtime_error not_supported("BasicConstBuffer<T>::copy(): This interface is not supported.");
+        throw not_supported;
+    }
+
+    template <size_type N>
+    void copy(const char_type(&data)[N]) {
+        // Not implemented yet
+        std::runtime_error not_supported("BasicConstBuffer<T>::copy(): This interface is not supported.");
+        throw not_supported;
     }
 
     void clean() {

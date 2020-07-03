@@ -204,9 +204,9 @@ void KvdbClientApp::net_packet_test()
         // Copy outBuf data to readBuf
         ::memcpy((void *)readBuf, (const void *)outBuf.data(), outBuf.capacity() * sizeof(char));
 
-        //InputStream is2(readBuf);
+        InputStream is2(readBuf);
         //is2.attach(readBuf);
-        //count = packet.readFrom(is2);
+        count = packet.readFrom(is2);
 
         ConstInputStream cis(readBuf);
         cis.attach(readBuf);

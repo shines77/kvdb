@@ -40,8 +40,6 @@ public:
     BasicOutputStream(storage_type && storage) : base_type(std::forward<storage_type>(storage)) {}
     ~BasicOutputStream() {}
 
-    bool isMemoryStream() const { return true; }
-
 protected:
     template <typename StringType>
     void internalWriteString(const StringType & value) {

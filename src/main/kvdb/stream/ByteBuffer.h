@@ -75,6 +75,8 @@ public:
         this->destroy();
     }
 
+    bool isConstBuffer() const { return false; }
+
     size_type capacity() const { return this->capacity_; }
 
     void setCapacity(size_type capacity) {

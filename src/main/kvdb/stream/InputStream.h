@@ -52,20 +52,22 @@ public:
         : base_type(istorage_), istorage_(data, N) {
         this->attach(data, N);
     }
-
     ~BasicInputStream() {}
 
-    bool isMemoryStream() const { return true; }
-
     void attach(const char_type * data, size_type size) {
-        this->storage_.attach(data, size);
-        this->setCurrent(data);
+        if (this->isConstBuffer()) {
+            this->storage_.attach(data, size);
+            this->setCurrent(data);
+        }
+        else {
+            this->storage_.copy(data, size);
+            this->setCurrent(this->storage_.data());
+        }
     }
 
     template <size_type N>
     void attach(const char_type(&data)[N]) {
-        this->storage_.attach(data, N);
-        this->setCurrent(data);
+        this->attach(data, N);
     }
 
 protected:

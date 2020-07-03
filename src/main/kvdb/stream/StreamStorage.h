@@ -64,6 +64,8 @@ public:
     size_type storage_size() const { return this->storage_.size(); }
     size_type storage_capacity() const { return this->storage_.capacity(); }
 
+    bool isConstBuffer() const { return this->storage_.isConstBuffer(); }
+
     void setCurrent(const char_type * cur) { this->cur_ = cur; }
 
     void setStorageData(char_type * newData) { this->storage_.setData(newData); }
