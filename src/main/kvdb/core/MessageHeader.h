@@ -8,7 +8,7 @@
 
 #include "kvdb/basic/stdint.h"
 
-#include "kvdb/core/MessageType.h"
+#include "kvdb/core/Opcode.h"
 #include "kvdb/stream/ReadWriteResult.h"
 #include "kvdb/stream/InputStream.h"
 #include "kvdb/stream/OutputStream.h"

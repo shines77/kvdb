@@ -12,7 +12,7 @@
 
 #include "kvdb/core/Request.h"
 #include "kvdb/core/Response.h"
-#include "kvdb/core/MessageDefine.h"
+#include "kvdb/core/Messages.h"
 #include "kvdb/stream/ParseStatus.h"
 
 namespace kvdb {

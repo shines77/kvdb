@@ -30,7 +30,7 @@
 
 #include "kvdb/stream/ByteBuffer.h"
 #include "kvdb/stream/ConstBuffer.h"
-#include "kvdb/core/MessageDefine.h"
+#include "kvdb/core/Messages.h"
 
 namespace kvdb {
 namespace client {
@@ -259,34 +259,18 @@ private:
             request.sUsername = config.username;
             request.sPassword = config.password;
             request.sDatabase = config.database;
-#if 1
-            uint32_t totalSize = request.writeTo<OutputStream>(request_buf_);
+
+            OutputStream os(request_buf_);
+            uint32_t totalSize = request.writeTo(os);
             request_size_ = totalSize;
 
             std::cout << "KvdbClient::handle_connect()" << std::endl;
             std::cout << "request_.size() = " << totalSize << std::endl;
             std::cout << std::endl;
 
-            boost::asio::async_write(socket_, boost::asio::buffer(request_buf_.data(), request_buf_.size()),
+            boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.size()),
                                      boost::bind(&KvdbClient::handle_write_request, this,
                                                  boost::asio::placeholders::error));
-#else
-            uint32_t requestSize = request.prepareAll<OutputStream>();
-            request_buf_.reserve(requestSize);
-            request_size_ = requestSize;
-
-            OutputStream os(request_buf_.data(), requestSize);
-            request.writeHeaderTotal(os, requestSize);
-            request.writeToBody(os, false);
-
-            std::cout << "KvdbClient::handle_connect()" << std::endl;
-            std::cout << "request_.size() = " << os.length() << std::endl;
-            std::cout << std::endl;
-
-            boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.length()),
-                boost::bind(&KvdbClient::handle_write_request, this,
-                            boost::asio::placeholders::error));
-#endif
         }
         else {
             std::cout << "KvdbClient::handle_connect() Error: " << err.message() << "\n";
@@ -323,13 +307,13 @@ private:
                                     bodySize));
                 }
                 else {
-                    // The signId is dismatch
-                    std::cout << "KvdbClient::handle_write_request() Error: The signId is dismatch.\n" << std::endl;
+                    // The sign is dismatch
+                    std::cout << "KvdbClient::handle_write_request() Error: The sign is dismatch.\n" << std::endl;
                 }
             }
             else {
-                // Read packet header error.
-                std::cout << "KvdbClient::handle_write_request() Error: Read packet header error.\n" << std::endl;
+                // Read message header error.
+                std::cout << "KvdbClient::handle_write_request() Error: Read message header error.\n" << std::endl;
             }
         }
         else {
@@ -481,7 +465,7 @@ private:
                 //
 
                 KvdbClientConfig & config = KvdbClientApp::client_config;
-                ConnectRequest_v0 request;
+                LogoutRequest_v0 request;
                 request.iVersion = 1;
 
                 OutputStream os(request_buf_);

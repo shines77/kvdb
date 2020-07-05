@@ -10,7 +10,7 @@
 #include <kvdb/core/Message.h>
 #include <kvdb/core/Request.h>
 #include <kvdb/core/Response.h>
-#include <kvdb/core/MessageDefine.h>
+#include <kvdb/core/Messages.h>
 
 #include <kvdb/server/ServerStatus.h>
 #include <kvdb/stream/ParseResult.h>
@@ -27,6 +27,23 @@ RequestHandler::RequestHandler(const std::string & doc_root)
 
 RequestHandler::~RequestHandler()
 {
+}
+
+template <typename OutputStreamTy>
+int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
+                                           InputStream & is,
+                                           OutputStreamTy & os)
+{
+    uint32_t iVersion = is.readUInt32();
+    if (iVersion >= 0) {
+        HandShakeResponse_v0 response;
+        response.iStatusCode = 0;
+        response.writeTo(os);
+
+        return ParseStatus::Success;
+    }
+    
+    return ParseStatus::Failed;
 }
 
 template <typename OutputStreamTy>
@@ -55,34 +72,13 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
 }
 
 template <typename OutputStreamTy>
-int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
-                                           InputStream & is,
-                                           OutputStreamTy & os)
+int RequestHandler::handleLogoutRequest(ConnectionContext & context,
+                                        InputStream & is,
+                                        OutputStreamTy & os)
 {
     uint32_t iVersion = is.readUInt32();
     if (iVersion >= 0) {
-        HandShakeResponse_v0 response;
-        response.setSign(kShortSign);
-        response.setBodySize(0);
-        response.iStatusCode = 0;
-        response.writeTo(os);
-
-        return ParseStatus::Success;
-    }
-    
-    return ParseStatus::Failed;
-}
-
-template <typename OutputStreamTy>
-int RequestHandler::handleConnectRequest(ConnectionContext & context,
-                                         InputStream & is,
-                                         OutputStreamTy & os)
-{
-    uint32_t iVersion = is.readUInt32();
-    if (iVersion >= 0) {
-        ConnectResponse_v0 response;
-        response.setSign(kShortSign);
-        response.setBodySize(0);
+        LogoutResponse_v0 response;
         response.iStatusCode = 0;
         response.writeTo(os);
 
@@ -175,26 +171,26 @@ int RequestHandler::handleRequest(ConnectionContext & context,
         const char * first = is.current();
         int result;
         switch (header.opcode()) {
-        case MessageType::LoginRequest:
-            result = handleLoginRequest(context, is, os);
-            break;
+            case Opcode::HandShakeRequest:
+                result = handleHandshakeRequest(context, is, os);
+                break;
 
-        case MessageType::HandShakeRequest:
-            result = handleHandshakeRequest(context, is, os);
-            break;
+            case Opcode::LoginRequest:
+                result = handleLoginRequest(context, is, os);
+                break;
 
-        case MessageType::ConnectRequest:
-            result = handleConnectRequest(context, is, os);
-            break;
+            case Opcode::LogoutRequest:
+                result = handleLogoutRequest(context, is, os);
+                break;
 
-        case MessageType::QueryRequest:
-            result = handleQueryRequest(context, is, os);
-            break;
+            case Opcode::QueryRequest:
+                result = handleQueryRequest(context, is, os);
+                break;
 
-        default:
-            // Unknown opcode message
-            result = ParseStatus::Failed;
-            break;
+            default:
+                // Unknown opcode message
+                result = ParseStatus::Failed;
+                break;
         }
 
         if (result < 0)
@@ -218,25 +214,25 @@ int RequestHandler::handleRequest(ConnectionContext & context,
                                   PackagedOutputStream & os)
 {
     InputStream is(request.body(), request.bodySize());
-    MessageHeader header = request.header;
+    const MessageHeader & header = request.header;
 
     if (header.bodySize() > 0) {
         const char * first = is.current();
         int result;
         switch (header.opcode()) {
-            case MessageType::LoginRequest:
-                result = handleLoginRequest(context, is, os);
-                break;
-
-            case MessageType::HandShakeRequest:
+            case Opcode::HandShakeRequest:
                 result = handleHandshakeRequest(context, is, os);
                 break;
 
-            case MessageType::ConnectRequest:
-                result = handleConnectRequest(context, is, os);
+            case Opcode::LoginRequest:
+                result = handleLoginRequest(context, is, os);
                 break;
 
-            case MessageType::QueryRequest:
+            case Opcode::LogoutRequest:
+                result = handleLogoutRequest(context, is, os);
+                break;
+
+            case Opcode::QueryRequest:
                 result = handleQueryRequest(context, is, os);
                 break;
 

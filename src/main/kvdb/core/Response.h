@@ -19,7 +19,7 @@ protected:
     //
 
 public:
-    IResponse(uint32_t type = MessageType::Unknown, const char * data = nullptr)
+    IResponse(uint32_t type = Opcode::Unknown, const char * data = nullptr)
         : Message(type, data) {
         //
     }
@@ -36,7 +36,7 @@ protected:
     //
 
 public:
-    Response(uint32_t type = MessageType::Unknown, const char * data = nullptr)
+    Response(uint32_t type = Opcode::Unknown, const char * data = nullptr)
         : BasicMessage<T>(type, data) {
         //
     }

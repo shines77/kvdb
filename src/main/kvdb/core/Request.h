@@ -19,7 +19,7 @@ protected:
     //
 
 public:
-    IRequest(uint32_t type = MessageType::Unknown, const char * data = nullptr)
+    IRequest(uint32_t type = Opcode::Unknown, const char * data = nullptr)
         : Message(type, data) {
         //
     }
@@ -36,7 +36,7 @@ protected:
     //
 
 public:
-    Request(uint32_t type = MessageType::Unknown, const char * data = nullptr)
+    Request(uint32_t type = Opcode::Unknown, const char * data = nullptr)
         : BasicMessage<T>(type, data) {
         //
     }

@@ -40,13 +40,13 @@ public:
 
 private:
     template <typename OutputStreamTy>
-    int handleLoginRequest(ConnectionContext & context, InputStream & is, OutputStreamTy & os);
-
-    template <typename OutputStreamTy>
     int handleHandshakeRequest(ConnectionContext & context, InputStream & is, OutputStreamTy & os);
 
     template <typename OutputStreamTy>
-    int handleConnectRequest(ConnectionContext & context, InputStream & is, OutputStreamTy & os);
+    int handleLoginRequest(ConnectionContext & context, InputStream & is, OutputStreamTy & os);
+
+    template <typename OutputStreamTy>
+    int handleLogoutRequest(ConnectionContext & context, InputStream & is, OutputStreamTy & os);
 
     template <typename OutputStreamTy>
     int handleQueryRequest(ConnectionContext & context, InputStream & is, OutputStreamTy & os);

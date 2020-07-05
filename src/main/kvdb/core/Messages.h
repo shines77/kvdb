@@ -1,15 +1,24 @@
 
-#ifndef KVDB_CORE_MESSAGE_DEFINE_H
-#define KVDB_CORE_MESSAGE_DEFINE_H
+#ifndef KVDB_CORE_MESSAGES_H
+#define KVDB_CORE_MESSAGES_H
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1020)
 #pragma once
 #endif
 
+#include <stdint.h>
+#include <stddef.h>
+
+#include <cstdint>
+#include <cstddef>
+#include <string>
+
 #include "kvdb/basic/stdint.h"
+#include "kvdb/basic/stdsize.h"
 #include "kvdb/core/Request.h"
 #include "kvdb/core/Response.h"
 #include "kvdb/core/StatusCode.h"
+#include "kvdb/stream/ReadWriteResult.h"
 #include "kvdb/stream/BasicStream.h"
 #include "kvdb/stream/PackagedInputStream.h"
 #include "kvdb/stream/PackagedOutputStream.h"
@@ -26,11 +35,11 @@ struct LoginRequest_v0 : public Request<LoginRequest_v0> {
     std::string sDatabase;
 
     LoginRequest_v0(const char * data = nullptr)
-        : Request(MessageType::LoginRequest, data) {
+        : Request(Opcode::LoginRequest, data) {
         init();
     }
     LoginRequest_v0(std::string username, std::string password, std::string database)
-        : Request(MessageType::LoginRequest, nullptr),
+        : Request(Opcode::LoginRequest, nullptr),
           sUsername(username), sPassword(password), sDatabase(database) {
     }
     virtual ~LoginRequest_v0() {}
@@ -61,11 +70,11 @@ struct LoginResponse_v0 : public Response<LoginResponse_v0> {
     int iStatusCode;
 
     LoginResponse_v0(const char * data = nullptr)
-        : Response(MessageType::LoginResponse, data) {
+        : Response(Opcode::LoginResponse, data) {
         init();
     }
     LoginResponse_v0(int statusCode)
-        : Response(MessageType::LoginResponse, nullptr),
+        : Response(Opcode::LoginResponse, nullptr),
           iStatusCode(statusCode) {
     }
     virtual ~LoginResponse_v0() {}
@@ -93,11 +102,11 @@ struct HandShakeRequest_v0 : public Request<HandShakeRequest_v0> {
     uint32_t iVersion;
 
     HandShakeRequest_v0(const char * data = nullptr)
-        : Request(MessageType::HandShakeRequest, data) {
+        : Request(Opcode::HandShakeRequest, data) {
         init();
     }
     HandShakeRequest_v0(uint32_t version)
-        : Request(MessageType::HandShakeRequest, nullptr),
+        : Request(Opcode::HandShakeRequest, nullptr),
           iVersion(version) {
     }
     virtual ~HandShakeRequest_v0() {}
@@ -125,11 +134,11 @@ struct HandShakeResponse_v0 : public Response<HandShakeResponse_v0> {
     int iStatusCode;
 
     HandShakeResponse_v0(const char * data = nullptr)
-        : Response(MessageType::HandShakeResponse, data) {
+        : Response(Opcode::HandShakeResponse, data) {
         init();
     }
     HandShakeResponse_v0(int statusCode)
-        : Response(MessageType::HandShakeResponse, nullptr),
+        : Response(Opcode::HandShakeResponse, nullptr),
           iStatusCode(statusCode) {
     }
     virtual ~HandShakeResponse_v0() {}
@@ -151,20 +160,20 @@ struct HandShakeResponse_v0 : public Response<HandShakeResponse_v0> {
     }
 };
 
-struct ConnectRequest_v0 : public Request<ConnectRequest_v0> {
+struct LogoutRequest_v0 : public Request<LogoutRequest_v0> {
     static const uint8_t kMsgVer = 0;
 
     uint32_t iVersion;
 
-    ConnectRequest_v0(const char * data = nullptr)
-        : Request(MessageType::ConnectRequest, data) {
+    LogoutRequest_v0(const char * data = nullptr)
+        : Request(Opcode::LogoutRequest, data) {
         init();
     }
-    ConnectRequest_v0(uint32_t version)
-        : Request(MessageType::ConnectRequest, nullptr),
+    LogoutRequest_v0(uint32_t version)
+        : Request(Opcode::LogoutRequest, nullptr),
           iVersion(version) {
     }
-    virtual ~ConnectRequest_v0() {}
+    virtual ~LogoutRequest_v0() {}
 
     void init() {
         iVersion = 0;
@@ -183,20 +192,20 @@ struct ConnectRequest_v0 : public Request<ConnectRequest_v0> {
     }
 };
 
-struct ConnectResponse_v0 : public Response<ConnectResponse_v0> {
+struct LogoutResponse_v0 : public Response<LogoutResponse_v0> {
     static const uint8_t kMsgVer = 0;
 
     int iStatusCode;
 
-    ConnectResponse_v0(const char * data = nullptr)
-        : Response(MessageType::ConnectResponse, data) {
+    LogoutResponse_v0(const char * data = nullptr)
+        : Response(Opcode::LogoutResponse, data) {
         init();
     }
-    ConnectResponse_v0(int statusCode)
-        : Response(MessageType::ConnectResponse, nullptr),
+    LogoutResponse_v0(int statusCode)
+        : Response(Opcode::LogoutResponse, nullptr),
           iStatusCode(statusCode) {
     }
-    virtual ~ConnectResponse_v0() {}
+    virtual ~LogoutResponse_v0() {}
 
     void init() {
         iStatusCode = StatusCode::Unknown;
@@ -217,4 +226,4 @@ struct ConnectResponse_v0 : public Response<ConnectResponse_v0> {
 
 } // namespace kvdb
 
-#endif // KVDB_CORE_MESSAGE_DEFINE_H
+#endif // KVDB_CORE_MESSAGES_H

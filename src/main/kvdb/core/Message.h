@@ -7,7 +7,7 @@
 #endif
 
 #include "kvdb/basic/stdint.h"
-#include "kvdb/core/MessageType.h"
+#include "kvdb/core/Opcode.h"
 #include "kvdb/core/MessageHeader.h"
 #include "kvdb/stream/ByteBuffer.h"
 #include "kvdb/stream/BasicStream.h"
@@ -37,7 +37,7 @@ protected:
     const char * body_;
 
 public:
-    Message(uint16_t opcode = MessageType::Unknown, const char * data = nullptr) : body_(data) {
+    Message(uint16_t opcode = Opcode::Unknown, const char * data = nullptr) : body_(data) {
         this->header.info.sign = kShortSign;
         this->header.info.opcode = opcode;
     }
@@ -143,7 +143,7 @@ class BasicMessage : public Message {
 public:
     static const uint8_t kMsgVer = MsgVer;
 
-    BasicMessage(uint16_t opcode = MessageType::Unknown, const char * data = nullptr)
+    BasicMessage(uint16_t opcode = Opcode::Unknown, const char * data = nullptr)
         : Message(opcode, T::kMsgVer, data) {
     }
 

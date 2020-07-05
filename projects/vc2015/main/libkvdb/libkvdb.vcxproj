@@ -44,8 +44,8 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Message.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\DataType.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageHeader.h" />
-    <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageDefine.h" />
-    <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageType.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\Messages.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb\core\Opcode.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Packet.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Request.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Response.h" />
