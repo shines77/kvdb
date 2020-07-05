@@ -14,10 +14,6 @@
 #include "kvdb/core/Response.h"
 #include "kvdb/core/MessageDefine.h"
 #include "kvdb/stream/ParseStatus.h"
-#include "kvdb/stream/InputStream.h"
-#include "kvdb/stream/OutputStream.h"
-#include "kvdb/stream/InputPacketStream.h"
-#include "kvdb/stream/OutputPacketStream.h"
 
 namespace kvdb {
 namespace server {

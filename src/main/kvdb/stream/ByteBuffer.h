@@ -7,10 +7,12 @@
 #endif
 
 #include "kvdb/basic/stdint.h"
+#include "kvdb/basic/inttypes.h"
 
 #include <string.h>
 #include <memory.h>
 #include <assert.h>
+#include <inttypes.h>
 
 #include <cstdint>
 #include <cstddef>
@@ -150,13 +152,19 @@ public:
     }
 
     void copy(const char_type * data, size_type size) {
-        assert(data != nullptr);
-        assert(data != this->data());
-        size_type n_capacity = calc_capacity(size);
-        this->reserve(n_capacity);
-        if (size <= this->capacity()) {
-            ::memmove((void *)this->data(), (const void *)data, size * sizeof(char_type));
-            this->size_ = size;
+        if (data != nullptr && size != 0) {
+            size_type n_capacity = calc_capacity(size);
+            this->reserve(n_capacity);
+            if (size <= this->capacity()) {
+                assert(data != this->data());
+                ::memmove((void *)this->data(), (const void *)data, size * sizeof(char_type));
+                this->size_ = size;
+            }
+        }
+        else {
+            //assert(data != nullptr);
+            //assert(size != 0);
+            printf("ByteBuffer<T>::copy(): data == nullptr or size = %" PRIuSIZE "\n\n", size);
         }
     }
 

@@ -184,12 +184,6 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Variant.h">
       <Filter>src\core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\InputPacketStream.h">
-      <Filter>src\stream</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\OutputPacketStream.h">
-      <Filter>src\stream</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Message.h">
       <Filter>src\core</Filter>
     </ClInclude>
@@ -207,9 +201,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\Response.h">
       <Filter>src\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\StreamBuffer.h">
-      <Filter>src\stream</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\core\MessageHeader.h">
       <Filter>src\core</Filter>
@@ -284,6 +275,12 @@
       <Filter>src\test</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb\stream\StreamStorage.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\PackagedInputStream.h">
+      <Filter>src\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb\stream\PackagedOutputStream.h">
       <Filter>src\stream</Filter>
     </ClInclude>
   </ItemGroup>

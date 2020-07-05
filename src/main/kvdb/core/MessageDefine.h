@@ -11,8 +11,8 @@
 #include "kvdb/core/Response.h"
 #include "kvdb/core/StatusCode.h"
 #include "kvdb/stream/BasicStream.h"
-#include "kvdb/stream/InputPacketStream.h"
-#include "kvdb/stream/OutputPacketStream.h"
+#include "kvdb/stream/PackagedInputStream.h"
+#include "kvdb/stream/PackagedOutputStream.h"
 
 #include <string>
 

@@ -28,12 +28,9 @@
 #include "client/common.h"
 #include "client/KvdbClientApp.h"
 
-#include "kvdb/core/MessageDefine.h"
 #include "kvdb/stream/ByteBuffer.h"
-#include "kvdb/stream/InputStream.h"
-#include "kvdb/stream/OutputStream.h"
-#include "kvdb/stream/InputPacketStream.h"
-#include "kvdb/stream/OutputPacketStream.h"
+#include "kvdb/stream/ConstBuffer.h"
+#include "kvdb/core/MessageDefine.h"
 
 namespace kvdb {
 namespace client {

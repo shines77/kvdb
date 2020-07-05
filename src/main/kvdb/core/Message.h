@@ -11,8 +11,8 @@
 #include "kvdb/core/MessageHeader.h"
 #include "kvdb/stream/ByteBuffer.h"
 #include "kvdb/stream/BasicStream.h"
-#include "kvdb/stream/InputPacketStream.h"
-#include "kvdb/stream/OutputPacketStream.h"
+#include "kvdb/stream/PackagedInputStream.h"
+#include "kvdb/stream/PackagedOutputStream.h"
 
 #include <vector>
 #include <type_traits>
@@ -156,8 +156,8 @@ public:
     template <typename OutputStreamTy = OutputStream>
     uint32_t calculateAll() {
         constexpr bool isOutputStream = std::is_same<OutputStreamTy, kvdb::OutputStream>::value;
-        constexpr bool isOutputPacketStream = std::is_same<OutputStreamTy, kvdb::OutputPacketStream>::value;
-        if (isOutputStream || isOutputPacketStream) {
+        constexpr bool isPackagedOutputStream = std::is_same<OutputStreamTy, kvdb::PackagedOutputStream>::value;
+        if (isOutputStream || isPackagedOutputStream) {
             if (isOutputStream) {
                 // Calculate the total require size.
                 PrepareOutputStream preOS(s_dummyStorage);
@@ -169,7 +169,7 @@ public:
             }
             else {
                 // Calculate the total require size.
-                PrepareOutputPacketStream preOS(s_dummyStorage);
+                PreparePackagedOutputStream preOS(s_dummyStorage);
                 preOS.skip(kMsgHeaderSize);
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
@@ -178,7 +178,7 @@ public:
             }
         }
         else {
-            static_assert((isOutputStream || isOutputPacketStream),
+            static_assert((isOutputStream || isPackagedOutputStream),
                           "Error OutputStreamTy type.");
             return 0;
         }
@@ -187,8 +187,8 @@ public:
     template <typename OutputStreamTy = OutputStream>
     uint32_t calculateBody() {
         constexpr bool isOutputStream = std::is_same<OutputStreamTy, kvdb::OutputStream>::value;
-        constexpr bool isOutputPacketStream = std::is_same<OutputStreamTy, kvdb::OutputPacketStream>::value;
-        if (isOutputStream || isOutputPacketStream) {
+        constexpr bool isPackagedOutputStream = std::is_same<OutputStreamTy, kvdb::PackagedOutputStream>::value;
+        if (isOutputStream || isPackagedOutputStream) {
             if (isOutputStream) {
                 // Calculate the body require size.
                 PrepareOutputStream preOS(s_dummyStorage);
@@ -199,7 +199,7 @@ public:
             }
             else {
                 // Calculate the body require size.
-                PrepareOutputPacketStream preOS(s_dummyStorage);
+                PreparePackagedOutputStream preOS(s_dummyStorage);
                 T * pThis = static_cast<T *>(this);
                 assert(pThis != nullptr);
                 pThis->write(preOS);
@@ -207,7 +207,7 @@ public:
             }
         }
         else {
-            static_assert((isOutputStream || isOutputPacketStream),
+            static_assert((isOutputStream || isPackagedOutputStream),
                           "Error OutputStreamTy type.");
             return 0;
         }

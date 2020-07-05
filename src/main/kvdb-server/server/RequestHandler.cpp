@@ -15,10 +15,6 @@
 #include <kvdb/server/ServerStatus.h>
 #include <kvdb/stream/ParseResult.h>
 #include <kvdb/stream/ParseStatus.h>
-#include <kvdb/stream/InputStream.h>
-#include <kvdb/stream/InputPacketStream.h>
-#include <kvdb/stream/OutputStream.h>
-#include <kvdb/stream/OutputPacketStream.h>
 
 using namespace kvdb;
 
@@ -219,7 +215,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
 
 int RequestHandler::handleRequest(ConnectionContext & context,
                                   const IRequest & request,
-                                  OutputPacketStream & os)
+                                  PackagedOutputStream & os)
 {
     InputStream is(request.body(), request.bodySize());
     MessageHeader header = request.header;

@@ -14,7 +14,9 @@
 #include <kvdb/core/Request.h>
 #include <kvdb/core/Response.h>
 #include <kvdb/stream/InputStream.h>
-#include <kvdb/stream/InputPacketStream.h>
+#include <kvdb/stream/OutputStream.h>
+#include <kvdb/stream/PackagedInputStream.h>
+#include <kvdb/stream/PackagedOutputStream.h>
 
 #include "server/ConnectionContext.h"
 
@@ -34,7 +36,7 @@ public:
     /// Handle a request and produce a response.
     
     int handleRequest(ConnectionContext & context, const IRequest & request, OutputStream & os);
-    int handleRequest(ConnectionContext & context, const IRequest & request, OutputPacketStream & os);
+    int handleRequest(ConnectionContext & context, const IRequest & request, PackagedOutputStream & os);
 
 private:
     template <typename OutputStreamTy>
