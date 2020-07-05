@@ -10,7 +10,9 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <assert.h>
 
+#include <cassert>
 #include <type_traits>
 
 namespace kvdb {

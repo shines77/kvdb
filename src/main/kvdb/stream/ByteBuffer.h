@@ -184,7 +184,7 @@ public:
 
     void allocate(size_type initSize) {
         if (initSize > this->capacity()) {
-            char_type * newData = allocator_.reallocate(initSize);
+            char_type * newData = allocator_.reallocate(this->data(), initSize);
             if (newData != nullptr) {
                 if (newData != this->data()) {
                     this->internal_destroy();
@@ -199,7 +199,7 @@ public:
 
     void allocate(size_type initSize, char_type initVal) {
         if (initSize > this->capacity()) {
-            char_type * newData = allocator_.reallocate(initSize);
+            char_type * newData = allocator_.reallocate(this->data(), initSize);
             if (newData != nullptr) {
                 if (newData != this->data()) {
                     ::memset((void *)newData, initVal, initSize * sizeof(char_type));
@@ -215,7 +215,7 @@ public:
 
     void reserve(size_type newCapacity) {
         if (newCapacity > this->capacity()) {
-            char_type * newData = allocator_.reallocate(newCapacity);
+            char_type * newData = allocator_.reallocate(this->data(), newCapacity);
             if (newData != nullptr) {
                 if (newData != this->data()) {
                     this->internal_destroy();
@@ -230,7 +230,7 @@ public:
 
     void reserve(size_type newCapacity, char_type initVal) {
         if (newCapacity > this->capacity()) {
-            char_type * newData = allocator_.reallocate(newCapacity);
+            char_type * newData = allocator_.reallocate(this->data(), newCapacity);
             if (newData != nullptr) {
                 if (newData != this->data()) {
                     ::memset((void *)newData, initVal, newCapacity * sizeof(char_type));
@@ -257,7 +257,7 @@ public:
     void resize(size_type newSize) {
         if (newSize > this->capacity()) {
             size_type newCapacity = calc_capacity(newSize);
-            char_type * newData = allocator_.reallocate(newCapacity * sizeof(char_type));
+            char_type * newData = allocator_.reallocate(this->data(), newCapacity * sizeof(char_type));
             if (newData != nullptr) {
                 if (newData != this->data()) {
                     ::memmove((void *)newData, (const void *)this->data(), this->size() * sizeof(char_type));
@@ -274,7 +274,7 @@ public:
     void resize(size_type newSize, char_type initVal) {
         if (newSize > this->capacity()) {
             size_type newCapacity = calc_capacity(newSize);
-            char_type * newData = allocator_.reallocate(newCapacity * sizeof(char_type));
+            char_type * newData = allocator_.reallocate(this->data(), newCapacity * sizeof(char_type));
             if (newData != nullptr) {
                 if (newData != this->data()) {
                     ::memmove((void *)newData, (const void *)this->data(), this->size() * sizeof(char_type));

@@ -302,7 +302,8 @@ public:
     template <typename OutputStreamTy = OutputStream>
     uint32_t writeTo(std::vector<char> & buffer) {
         uint32_t totalSize = this->calculateAll<OutputStreamTy>();
-        buffer.reserve(totalSize);
+        // TODO: buffer.reserve(totalSize);
+        buffer.resize(totalSize);
 
         OutputStreamTy os(buffer.data(), totalSize);
         this->writeHeaderTotal(os, totalSize);
