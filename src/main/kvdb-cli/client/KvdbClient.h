@@ -384,11 +384,13 @@ private:
                 // response_buf_.commit(request_size_);
                 //
 
+                context_.request_buf.clear();
+
                 OutputStream os(context_.request_buf);
                 context_.response.setBody(context_.response_buf.data());
                 int result = handleClientResponse(context_, context_.response, os);
                 if (result == ParseStatus::Success) {
-                    start_read_response();
+                    //start_read_response();
                 }
                 else if (result == ParseStatus::Failed) {
                     //

@@ -140,6 +140,7 @@ void Connection::handle_read_some(const boost::system::error_code & err,
             this->stop();
         }
         else {
+            response_buf_.clear();
             OutputStream os(response_buf_);
             request_.setBody(request_buf_.data());
             int result = request_handler_.handleRequest(context_, request_, os);
