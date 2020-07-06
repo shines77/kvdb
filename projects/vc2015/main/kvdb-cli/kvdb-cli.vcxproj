@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\src\main\kvdb-cli\client\HandleClientResponse.cpp" />
     <ClCompile Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClientApp.cpp" />
     <ClCompile Include="..\..\..\..\src\main\kvdb-cli\kvdb-cli.cpp" />
   </ItemGroup>

@@ -16,6 +16,9 @@
     <ClCompile Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClientApp.cpp">
       <Filter>src\client</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\main\kvdb-cli\client\HandleClientResponse.cpp">
+      <Filter>src\client</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClient.h">

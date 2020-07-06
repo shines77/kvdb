@@ -49,7 +49,10 @@ using namespace boost::asio;
 namespace kvdb {
 namespace client {
 
+int stopKvdbClient(ClientContext & context);
+
 template <typename OutputStreamTy>
+static inline
 int handleHandShakeResponse(ClientContext & context,
                             InputStream & is,
                             OutputStreamTy & os)
@@ -67,6 +70,7 @@ int handleHandShakeResponse(ClientContext & context,
 }
 
 template <typename OutputStreamTy>
+static inline
 int handleLoginResponse(ClientContext & context,
                         InputStream & is,
                         OutputStreamTy & os)
@@ -83,6 +87,7 @@ int handleLoginResponse(ClientContext & context,
 }
 
 template <typename OutputStreamTy>
+static inline
 int handleLogoutResponse(ClientContext & context,
                          InputStream & is,
                          OutputStreamTy & os)
@@ -92,9 +97,8 @@ int handleLogoutResponse(ClientContext & context,
 
     uint32_t iStatusCode = is.readUInt32();
     if (iStatusCode == 0) {
-        if (context.client != nullptr) {
-            context.client->stop();
-        }
+        stopKvdbClient(context);
+
         return ParseStatus::Success;
     }
 
@@ -102,6 +106,7 @@ int handleLogoutResponse(ClientContext & context,
 }
 
 template <typename OutputStreamTy>
+static inline
 int handleQueryResponse(ClientContext & context,
                         InputStream & is,
                         OutputStreamTy & os)
@@ -118,6 +123,7 @@ int handleQueryResponse(ClientContext & context,
 }
 
 template <typename OutputStreamTy>
+static inline
 int handleClientResponse(ClientContext & context, const IResponse & response, OutputStreamTy & os) {
     InputStream is(response.body(), response.bodySize());
     const MessageHeader & header = response.header;

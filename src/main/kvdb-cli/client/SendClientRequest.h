@@ -45,6 +45,7 @@ using namespace boost::asio;
 namespace kvdb {
 namespace client {
 
+static inline
 int sendHankShakeRequest(ClientContext & context) {
     HandShakeRequest_v0 request;
     request.iVersion = 0x0101;
@@ -63,6 +64,7 @@ int sendHankShakeRequest(ClientContext & context) {
     return (int)totalSize;
 }
 
+static inline
 int sendLoginRequest(ClientContext & context) {
     KvdbClientConfig & config = KvdbClientApp::get_client_config();
     LoginRequest_v0 request;
@@ -84,6 +86,7 @@ int sendLoginRequest(ClientContext & context) {
     return (int)totalSize;
 }
 
+static inline
 int sendLogoutRequest(ClientContext & context) {
     LogoutRequest_v0 request;
     request.iVersion = 0x0101;
