@@ -2,6 +2,8 @@
 #include "server/Connection.h"
 
 #include <vector>
+#include <exception>
+
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -25,14 +27,14 @@ Connection::Connection(boost::asio::io_service & io_service,
       connection_manager_(manager),
       request_handler_(handler),
       request_size_(0),
-      response_size_(8192)
+      response_size_(0)
 {
-    response_buf_.reserve(response_size_);
+    response_buf_.reserve(4096);
 }
 
 Connection::~Connection(void)
 {
-    //
+    this->stop();
 }
 
 boost::asio::ip::tcp::socket & Connection::socket()
@@ -61,38 +63,51 @@ void Connection::stop()
     }
 }
 
+void Connection::stop_connection()
+{
+    this->connection_manager_.stop(this->shared_from_this());
+}
+
 void Connection::start_read_request()
 {
     std::cout << "Connection::start_read_request()" << std::endl;
     std::cout << std::endl;
 
     char header_buf[kMsgHeaderSize];
-    size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
-    if (readBytes == kMsgHeaderSize) {
-        MessageHeader header;
-        header.readHeader(header_buf);
-        uint32_t bodySize = header.bodySize();
-        if (header.verifySign() && bodySize > 0) {
-            //
-            // Receive the part data of response, if it's not completed, continue to read. 
-            //
-            request_.header = header;
-            request_buf_.reserve(bodySize);
-            request_size_ = bodySize;
-            socket_.async_read_some(boost::asio::buffer(request_buf_.data(), bodySize),
-                boost::bind(&Connection::handle_read_some, this->shared_from_this(),
-                            boost::asio::placeholders::error,
-                            boost::asio::placeholders::bytes_transferred,
-                            bodySize));
+
+    try {
+        size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
+        if (readBytes == kMsgHeaderSize) {
+            MessageHeader header;
+            header.readHeader(header_buf);
+            uint32_t bodySize = header.bodySize();
+            if (header.verifySign() && bodySize > 0) {
+                //
+                // Receive the part data of response, if it's not completed, continue to read. 
+                //
+                request_.header = header;
+                request_buf_.reserve(bodySize);
+                request_size_ = bodySize;
+                socket_.async_read_some(boost::asio::buffer(request_buf_.data(), bodySize),
+                    boost::bind(&Connection::handle_read_some, this->shared_from_this(),
+                                boost::asio::placeholders::error,
+                                boost::asio::placeholders::bytes_transferred,
+                                bodySize));
+            }
+            else {
+                // The signId is dismatch
+                std::cout << "Connection::start_read_request() Error: The signId is dismatch.\n" << std::endl;
+            }
         }
         else {
-            // The signId is dismatch
-            std::cout << "Connection::start_read_request() Error: The signId is dismatch.\n" << std::endl;
+            // Read packet header error.
+            std::cout << "Connection::start_read_request() Error: Read packet header error.\n" << std::endl;
+            this->stop_connection();
         }
     }
-    else {
-        // Read packet header error.
-        std::cout << "Connection::start_read_request() Error: Read packet header error.\n" << std::endl;
+    catch (const std::exception & ex) {
+        std::cerr << "Exception: " << ex.what() << std::endl << std::endl;
+        this->stop_connection();
     }
 }
 
@@ -118,9 +133,9 @@ void Connection::handle_read_some(const boost::system::error_code & err,
 
     if (!err) {
         if (bytes_transferred < bytes_wanted) {
-            std::cout << "KvdbClient::handle_read_some(): Receive next partment." << std::endl;
+            std::cout << "KvdbClient::handle_read_some(): Received part of the data." << std::endl;
             //
-            // Receive the data of next partment.
+            // Received part of the data.
             //
             // request_buf_.consume(bytes_transferred);
             // boost::asio::buffer(request_buf_.data(), bytes_wanted - bytes_transferred),
@@ -135,17 +150,22 @@ void Connection::handle_read_some(const boost::system::error_code & err,
         }
         else if (bytes_transferred == 0) {
             //
-            // Error: no data read.
+            // Error: no data to read.
             //
-            this->stop();
+            std::cout << "Connection::handle_read_some(): ERROR: no data to read. bytes_transferred == 0" << std::endl;
+            this->stop_connection();
         }
         else {
+            std::cout << "Connection::handle_read_some(): Received all wanted bytes already." << std::endl;
+
             response_buf_.clear();
+
             OutputStream os(response_buf_);
             request_.setBody(request_buf_.data());
             int result = request_handler_.handleRequest(context_, request_, os);
             if (result == ParseStatus::Success) {
-                if (os.data() != nullptr) {
+                response_size_ = os.size();
+                if (os.data() != nullptr && os.size() > 0) {
                     boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.size()),
                         boost::bind(&Connection::handle_write, this->shared_from_this(),
                                     boost::asio::placeholders::error,
@@ -167,8 +187,12 @@ void Connection::handle_read_some(const boost::system::error_code & err,
             }
         }
     }
-    else if (err != boost::asio::error::operation_aborted) {
-        connection_manager_.stop(this->shared_from_this());
+    else if (err == boost::asio::error::operation_aborted) {
+        std::cout << "Connection::handle_read_some() Error: operation_aborted - " << err.message() << "\n";
+    }
+    else {
+        std::cout << "Connection::handle_read_some() Error: " << err.message() << "\n";
+        this->stop_connection();
     }
 }
 
@@ -187,8 +211,12 @@ void Connection::handle_write(const boost::system::error_code & err,
 
         start_read_request();
     }
-    else if (err != boost::asio::error::operation_aborted) {
-        connection_manager_.stop(this->shared_from_this());
+    else if (err == boost::asio::error::operation_aborted) {
+        std::cout << "Connection::handle_read_some() Error: operation_aborted - " << err.message() << "\n";
+    }
+    else {
+        std::cout << "Connection::handle_write() Error: " << err.message() << "\n";
+        this->stop_connection();
     }
 }
 

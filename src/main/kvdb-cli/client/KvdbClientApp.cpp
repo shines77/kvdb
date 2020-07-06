@@ -218,7 +218,7 @@ void KvdbClientApp::net_packet_test()
         count = packet.readFrom(cis);
     }
     catch (const std::exception & ex) {
-        std::cerr << "Exception: " << ex.what() << std::endl << std::endl;;
+        std::cerr << "Exception: " << ex.what() << std::endl << std::endl;
     }
 }
 

@@ -76,6 +76,9 @@ public:
     /// Stop all asynchronous operations associated with the connection.
     void stop();
 
+    /// Stop all asynchronous operations associated with the connection.
+    void stop_connection();
+
     void shutdown_both();
 
 private:

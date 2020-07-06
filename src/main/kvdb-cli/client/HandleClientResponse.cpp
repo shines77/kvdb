@@ -17,7 +17,20 @@ int stopKvdbClient(ClientContext & context)
     if (context.client != nullptr) {
         context.client->stop();
         return ParseStatus::Success;
-    } 
+    }
+
+    return ParseStatus::Failed;
+}
+
+int startReadSomeKvdbClient(ClientContext & context)
+{
+    std::cout << "KvdbClient::kvdbClientStartReadSome()" << std::endl;
+    std::cout << std::endl;
+
+    if (context.client != nullptr) {
+        context.client->start_read();
+        return ParseStatus::Success;
+    }
 
     return ParseStatus::Failed;
 }

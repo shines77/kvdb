@@ -217,7 +217,7 @@ private:
         }
     }
 
-    void handle_accept(const boost::system::error_code & ec,
+    void handle_accept(const boost::system::error_code & err,
                        connection_ptr new_connection)
     {
         //
@@ -228,22 +228,26 @@ private:
             return;
         }
 
-        if (!ec) {
+        if (!err) {
             if (new_connection) {
                 connection_manager_.start(new_connection);
             }
 
             do_accept();
         }
+        else if (err != boost::asio::error::operation_aborted) {
+            // Operation aborted
+            std::cout << "kvdb_server::handle_accept() - Error: operation_aborted (code = "
+                      << err.value() << ") "
+                      << err.message().c_str() << std::endl;
+        }
         else {
-            if (ec != boost::asio::error::operation_aborted) {
-                // Accept error
-                std::cout << "kvdb_server::handle_accept() - Error: (code = " << ec.value() << ") "
-                          << ec.message().c_str() << std::endl;
-                if (new_connection) {
-                    this->connection_manager_.stop(new_connection);
-                    new_connection.reset();
-                }
+            // Accept error
+            std::cout << "kvdb_server::handle_accept() - Error: (code = " << err.value() << ") "
+                        << err.message().c_str() << std::endl;
+            if (new_connection) {
+                this->connection_manager_.stop(new_connection);
+                new_connection.reset();
             }
         }
     }

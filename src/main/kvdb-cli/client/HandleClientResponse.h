@@ -50,6 +50,7 @@ namespace kvdb {
 namespace client {
 
 int stopKvdbClient(ClientContext & context);
+int startReadSomeKvdbClient(ClientContext & context);
 
 template <typename OutputStreamTy>
 static inline
@@ -98,6 +99,7 @@ int handleLogoutResponse(ClientContext & context,
     uint32_t iStatusCode = is.readUInt32();
     if (iStatusCode == 0) {
         stopKvdbClient(context);
+        //startReadSomeKvdbClient(context);
 
         return ParseStatus::Success;
     }

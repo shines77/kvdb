@@ -14,6 +14,7 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <exception>
 #include <functional>
 
 #include <boost/noncopyable.hpp>
@@ -248,7 +249,17 @@ public:
         }
     }
 
-private:
+    void start_read()
+    {
+        start_read_response();
+    }
+
+    void stop_client()
+    {
+        //
+    }
+
+protected:
     void handle_resolve(const boost::system::error_code & err,
                         const boost::asio::ip::tcp::resolver::iterator & endpoint_iterator)
     {
@@ -265,8 +276,12 @@ private:
                             this,
                             boost::asio::placeholders::error));
         }
+        else if (err == boost::asio::error::operation_aborted) {
+            std::cout << "KvdbClient::handle_resolve() Error: operation_aborted - " << err.message() << "\n";
+        }
         else {
             std::cout << "KvdbClient::handle_resolve() Error: " << err.message() << "\n";
+            this->stop();
         }
     }
 
@@ -281,14 +296,18 @@ private:
             //
             sendHankShakeRequest(context_);
         }
+        else if (err == boost::asio::error::operation_aborted) {
+            std::cout << "KvdbClient::handle_connect() Error: operation_aborted - " << err.message() << "\n";
+        }
         else {
             std::cout << "KvdbClient::handle_connect() Error: " << err.message() << "\n";
+            this->stop();
         }
     }
 
     void handle_stop()
     {
-        this->stop();
+        this->stop_client();
     }
 
     void handle_write_request_done(const boost::system::error_code & err, std::size_t bytes_transferred)
@@ -301,8 +320,12 @@ private:
         if (!err) {
             start_read_response();
         }
+        else if (err == boost::asio::error::operation_aborted) {
+            std::cout << "KvdbClient::handle_write_request_done() Error: operation_aborted - " << err.message() << "\n";
+        }
         else {
             std::cout << "KvdbClient::handle_write_request_done() Error: " << err.message() << "\n";
+            this->stop();
         }
     }
 
@@ -312,33 +335,39 @@ private:
         std::cout << std::endl;
 
         char header_buf[kMsgHeaderSize];
-        size_t readBytes = boost::asio::read(context_.socket, boost::asio::buffer(header_buf));
-        if (readBytes == kMsgHeaderSize) {
-            MessageHeader header;
-            header.readHeader(header_buf);
-            uint32_t bodySize = header.bodySize();
-            if (header.verifySign() && bodySize > 0) {
-                //
-                // Receive the part data of response, if it's not completed, continue to read. 
-                //
-                context_.response.header = header;
-                context_.response_buf.reserve(bodySize);
-                context_.response_size = bodySize;
-                context_.socket.async_read_some(boost::asio::buffer(context_.response_buf.data(), bodySize),
-                    boost::bind(&KvdbClient::handle_read_some,
-                                this,
-                                boost::asio::placeholders::error,
-                                boost::asio::placeholders::bytes_transferred,
-                                bodySize));
+
+        try {
+            size_t readBytes = boost::asio::read(context_.socket, boost::asio::buffer(header_buf));
+            if (readBytes == kMsgHeaderSize) {
+                MessageHeader header;
+                header.readHeader(header_buf);
+                uint32_t bodySize = header.bodySize();
+                if (header.verifySign() && bodySize > 0) {
+                    //
+                    // Receive the part data of response, if it's not completed, continue to read. 
+                    //
+                    context_.response.header = header;
+                    context_.response_buf.reserve(bodySize);
+                    context_.response_size = bodySize;
+                    context_.socket.async_read_some(boost::asio::buffer(context_.response_buf.data(), bodySize),
+                        boost::bind(&KvdbClient::handle_read_some,
+                                    this,
+                                    boost::asio::placeholders::error,
+                                    boost::asio::placeholders::bytes_transferred,
+                                    bodySize));
+                }
+                else {
+                    // The sign is dismatch
+                    std::cout << "KvdbClient::start_read_response() Error: The sign is dismatch.\n" << std::endl;
+                }
             }
             else {
-                // The sign is dismatch
-                std::cout << "KvdbClient::handle_write_request() Error: The sign is dismatch.\n" << std::endl;
+                // Read message header error.
+                std::cout << "KvdbClient::start_read_response() Error: Read message header error.\n" << std::endl;
             }
         }
-        else {
-            // Read message header error.
-            std::cout << "KvdbClient::handle_write_request() Error: Read message header error.\n" << std::endl;
+        catch (const std::exception & ex) {
+            std::cerr << "Exception: " << ex.what() << std::endl << std::endl;
         }
     }
 
@@ -354,9 +383,9 @@ private:
 
         if (!err) {
             if (bytes_transferred < bytes_wanted) {
-                std::cout << "KvdbClient::handle_read_some(): Receive next partment." << std::endl;
+                std::cout << "KvdbClient::handle_read_some(): Received part of the data." << std::endl;
                 //
-                // Receive the data of next partment.
+                // Received part of the data.
                 //
                 // response_buf_.consume(bytes_transferred);
                 // boost::asio::buffer(response_buf_.data(), bytes_wanted - bytes_transferred),
@@ -372,12 +401,13 @@ private:
             }
             else if (bytes_transferred == 0) {
                 //
-                // Error: no data read.
+                // Error: no data to read.
                 //
+                std::cout << "KvdbClient::handle_read_some(): ERROR: no data to read. bytes_transferred == 0" << std::endl;
                 this->stop();
             }
             else {
-                std::cout << "KvdbClient::handle_read_some(): Read all wanted bytes already." << std::endl;
+                std::cout << "KvdbClient::handle_read_some(): Received all wanted bytes already." << std::endl;
                 //
                 // The connection was successful, send the request.
                 //
@@ -403,8 +433,12 @@ private:
                 }
             }
         }
+        else if (err == boost::asio::error::operation_aborted) {
+            std::cout << "KvdbClient::handle_read_some() Error: operation_aborted - " << err.message() << "\n";
+        }
         else {
             std::cout << "KvdbClient::handle_read_some() Error: " << err.message() << "\n";
+            this->stop();
         }
     }
 };
