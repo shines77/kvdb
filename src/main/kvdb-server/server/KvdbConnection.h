@@ -17,7 +17,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/smart_ptr.hpp>
 
-#include "server/common.h"
+#include "server/Common.h"
 
 using namespace boost::system;
 

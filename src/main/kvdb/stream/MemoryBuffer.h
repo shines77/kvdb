@@ -79,6 +79,20 @@ public:
         this->size_ = right.size();
         right.setSize(tmpSize);
     }
+
+    char_type & operator [] (size_type pos) {
+        assert(pos >= 0 && pos < this->size());
+        return *(this->data_ + pos);
+    }
+
+    const char_type & operator [] (size_type pos) const {
+        assert(pos >= 0 && pos < this->size());
+        return *(this->data_ + pos);
+    }
+
+    char_type & operator * () const {
+        return (*this->data_);
+    }
 };
 
 typedef BasicMemoryBuffer<char>      MemoryBuffer;

@@ -33,9 +33,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common.h">
-      <Filter>src\server</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbServer.h">
       <Filter>src\server</Filter>
     </ClInclude>
@@ -67,6 +64,9 @@
       <Filter>src\server</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\WokerThread.h">
+      <Filter>src\server</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Common.h">
       <Filter>src\server</Filter>
     </ClInclude>
   </ItemGroup>

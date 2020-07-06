@@ -18,9 +18,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\common.h">
-      <Filter>src\client</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClient.h">
       <Filter>src\client</Filter>
     </ClInclude>
@@ -28,6 +25,18 @@
       <Filter>src\client</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\KvdbClientApp.h">
+      <Filter>src\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\ClientContext.h">
+      <Filter>src\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\SendClientRequest.h">
+      <Filter>src\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\Common.h">
+      <Filter>src\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\main\kvdb-cli\client\HandleClientResponse.h">
       <Filter>src\client</Filter>
     </ClInclude>
   </ItemGroup>

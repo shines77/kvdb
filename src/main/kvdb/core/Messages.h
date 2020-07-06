@@ -27,6 +27,70 @@
 
 namespace kvdb {
 
+struct HandShakeRequest_v0 : public Request<HandShakeRequest_v0> {
+    static const uint8_t kMsgVer = 0;
+
+    uint32_t iVersion;
+
+    HandShakeRequest_v0(const char * data = nullptr)
+        : Request(Opcode::HandShakeRequest, data) {
+        init();
+    }
+    HandShakeRequest_v0(uint32_t version)
+        : Request(Opcode::HandShakeRequest, nullptr),
+          iVersion(version) {
+    }
+    virtual ~HandShakeRequest_v0() {}
+
+    void init() {
+        iVersion = 0;
+    }
+
+    template <typename InputStreamTy>
+    int read(InputStreamTy & is) {
+        int readStatus = ReadResult::Ok;
+        readStatus |= is.readUInt32(iVersion);
+        return readStatus;
+    }
+
+    template <typename OutputStreamTy>
+    void write(OutputStreamTy & os) {
+        os.writeUInt32(iVersion);
+    }
+};
+
+struct HandShakeResponse_v0 : public Response<HandShakeResponse_v0> {
+    static const uint8_t kMsgVer = 0;
+
+    int iStatusCode;
+
+    HandShakeResponse_v0(const char * data = nullptr)
+        : Response(Opcode::HandShakeResponse, data) {
+        init();
+    }
+    HandShakeResponse_v0(int statusCode)
+        : Response(Opcode::HandShakeResponse, nullptr),
+          iStatusCode(statusCode) {
+    }
+    virtual ~HandShakeResponse_v0() {}
+
+    void init() {
+        iStatusCode = StatusCode::Unknown;
+    }
+
+    template <typename InputStreamTy>
+    int read(InputStreamTy & is) {
+        int readStatus = ReadResult::Ok;
+        readStatus |= is.readInt32(iStatusCode);
+        return readStatus;
+    }
+
+    template <typename OutputStreamTy>
+    void write(OutputStreamTy & os) {
+        os.writeInt32(iStatusCode);
+    }
+};
+
 struct LoginRequest_v0 : public Request<LoginRequest_v0> {
     static const uint8_t kMsgVer = 0;
 
@@ -78,70 +142,6 @@ struct LoginResponse_v0 : public Response<LoginResponse_v0> {
           iStatusCode(statusCode) {
     }
     virtual ~LoginResponse_v0() {}
-
-    void init() {
-        iStatusCode = StatusCode::Unknown;
-    }
-
-    template <typename InputStreamTy>
-    int read(InputStreamTy & is) {
-        int readStatus = ReadResult::Ok;
-        readStatus |= is.readInt32(iStatusCode);
-        return readStatus;
-    }
-
-    template <typename OutputStreamTy>
-    void write(OutputStreamTy & os) {
-        os.writeInt32(iStatusCode);
-    }
-};
-
-struct HandShakeRequest_v0 : public Request<HandShakeRequest_v0> {
-    static const uint8_t kMsgVer = 0;
-
-    uint32_t iVersion;
-
-    HandShakeRequest_v0(const char * data = nullptr)
-        : Request(Opcode::HandShakeRequest, data) {
-        init();
-    }
-    HandShakeRequest_v0(uint32_t version)
-        : Request(Opcode::HandShakeRequest, nullptr),
-          iVersion(version) {
-    }
-    virtual ~HandShakeRequest_v0() {}
-
-    void init() {
-        iVersion = 0;
-    }
-
-    template <typename InputStreamTy>
-    int read(InputStreamTy & is) {
-        int readStatus = ReadResult::Ok;
-        readStatus |= is.readUInt32(iVersion);
-        return readStatus;
-    }
-
-    template <typename OutputStreamTy>
-    void write(OutputStreamTy & os) {
-        os.writeUInt32(iVersion);
-    }
-};
-
-struct HandShakeResponse_v0 : public Response<HandShakeResponse_v0> {
-    static const uint8_t kMsgVer = 0;
-
-    int iStatusCode;
-
-    HandShakeResponse_v0(const char * data = nullptr)
-        : Response(Opcode::HandShakeResponse, data) {
-        init();
-    }
-    HandShakeResponse_v0(int statusCode)
-        : Response(Opcode::HandShakeResponse, nullptr),
-          iStatusCode(statusCode) {
-    }
-    virtual ~HandShakeResponse_v0() {}
 
     void init() {
         iStatusCode = StatusCode::Unknown;

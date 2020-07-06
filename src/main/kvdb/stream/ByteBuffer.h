@@ -164,7 +164,9 @@ public:
         else {
             //assert(data != nullptr);
             //assert(size != 0);
+#ifndef NDEBUG
             printf("ByteBuffer<T>::copy(): data == nullptr or size = %" PRIuSIZE "\n\n", size);
+#endif
         }
     }
 

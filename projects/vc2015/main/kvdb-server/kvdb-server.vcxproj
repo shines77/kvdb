@@ -30,7 +30,7 @@
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\ConnectionContext.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbConnection.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\KvdbServer.h" />
-    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\common.h" />
+    <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Common.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\Connection.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\ConnectionManager.h" />
     <ClInclude Include="..\..\..\..\src\main\kvdb-server\server\HeaderField.h" />

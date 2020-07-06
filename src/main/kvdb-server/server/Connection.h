@@ -87,7 +87,8 @@ private:
                           std::size_t bytes_wanted);
 
     /// Handle completion of a write operation.
-    void handle_write(const boost::system::error_code & ec);
+    void handle_write(const boost::system::error_code & ec,
+                      std::size_t bytes_transferred);
 };
 
 typedef boost::shared_ptr<Connection> connection_ptr;

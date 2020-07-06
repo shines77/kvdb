@@ -14,7 +14,7 @@
 #include "kvdb/common/boost_asio_msvc.h"
 #include <boost/asio.hpp>
 
-#include "server/common.h"
+#include "server/Common.h"
 #include "server/KvdbServer.h"
 #include "server/WokerThread.h"
 

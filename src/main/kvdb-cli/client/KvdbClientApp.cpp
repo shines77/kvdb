@@ -8,7 +8,7 @@
 #include <string>
 #include <exception>
 
-#include "client/common.h"
+#include "client/Common.h"
 #include "client/KvdbClient.h"
 
 #include "kvdb/common/cmd_utils.h"

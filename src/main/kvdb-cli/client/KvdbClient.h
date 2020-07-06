@@ -25,12 +25,16 @@
 #include <boost/asio/error.hpp>
 #include <boost/asio/signal_set.hpp>
 
-#include "client/common.h"
+#include "client/Common.h"
 #include "client/KvdbClientApp.h"
+#include "client/ClientContext.h"
+#include "client/SendClientRequest.h"
+#include "client/HandleClientResponse.h"
 
-#include "kvdb/stream/ByteBuffer.h"
-#include "kvdb/stream/ConstBuffer.h"
-#include "kvdb/core/Messages.h"
+#include <kvdb/core/Messages.h>
+#include <kvdb/stream/ByteBuffer.h>
+#include <kvdb/stream/ConstBuffer.h>
+#include <kvdb/stream/ParseStatus.h>
 
 namespace kvdb {
 namespace client {
@@ -41,11 +45,11 @@ namespace client {
 class KvdbClient : public boost::enable_shared_from_this<KvdbClient>,
                    private boost::noncopyable
 {
-private:
+protected:
     boost::asio::io_service &       io_service_;
-    boost::asio::ip::tcp::socket    socket_;
-    boost::asio::ip::tcp::endpoint  remote_endpoint_;
-    boost::asio::ip::tcp::resolver::iterator endpoint_iterator_;
+
+    /// Buffer for incoming or outgoing data.
+    ClientContext                   context_;
 
     /// The signal_set is used to register for process termination notifications.
     boost::asio::signal_set         signals_;
@@ -56,28 +60,45 @@ private:
 
     std::shared_ptr<std::thread>    thread_;
 
-    /// Buffer for incoming or outgoing data.
-    std::vector<char>               request_buf__;
-    std::vector<char>               response_buf_;
-    ByteBuffer                      request_buf_;
-    std::size_t                     request_size_;
-    std::size_t                     response_size_;
+    asio_write_callback             func_handle_write_request_done_;
+    asio_read_callback              func_handle_read_some_;
 
 public:
     KvdbClient(boost::asio::io_service & io_service)
-        : io_service_(io_service), socket_(io_service), signals_(io_service),
-        address_(""), port_(0), request_size_(0), response_size_(0) {
+        : io_service_(io_service), context_(io_service), signals_(io_service),
+          address_(""), port_(0) {
         do_signal_set();
     }
     KvdbClient(boost::asio::io_service & io_service, const std::string & address, uint16_t port)
-        : io_service_(io_service), socket_(io_service), signals_(io_service),
-          address_(address), port_(port), request_size_(0), response_size_(0) {
+        : io_service_(io_service), context_(io_service), signals_(io_service),
+          address_(address), port_(port) {
         do_signal_set();
     }
 
     ~KvdbClient() {
         this->stop();
         this->wait();
+    }
+
+    ClientContext & context()             { return this->context_; }
+    const ClientContext & context() const { return this->context_; }
+
+    void init_callback() {
+        this->context_.client = this;
+
+        func_handle_write_request_done_ = boost::bind(&KvdbClient::handle_write_request_done,
+                                                      this,
+                                                      boost::asio::placeholders::error,
+                                                      boost::asio::placeholders::bytes_transferred);
+
+        func_handle_read_some_ = boost::bind(&KvdbClient::handle_read_some,
+                                             this,
+                                             boost::asio::placeholders::error,
+                                             boost::asio::placeholders::bytes_transferred,
+                                             _3);
+
+        this->context_.write_callback = func_handle_write_request_done_;
+        this->context_.read_callback  = func_handle_read_some_;
     }
 
     void do_signal_set() {
@@ -120,6 +141,8 @@ public:
             return;
         }
 
+        init_callback();
+
         try {
             //
             // Start an asynchronous resolve to translate the server and service names
@@ -129,7 +152,7 @@ public:
             remote_ip.from_string(address);
 
             boost::asio::ip::tcp::endpoint endpoint(remote_ip, port_num);
-            remote_endpoint_ = endpoint;
+            context_.remote_endpoint = endpoint;
 
             std::string port = std::to_string(port_num);
 
@@ -138,7 +161,7 @@ public:
 
             boost::asio::ip::tcp::resolver resolver(io_service_);
             boost::asio::ip::tcp::resolver::query query(address, port);
-            endpoint_iterator_ = resolver.resolve(query);
+            context_.endpoint_iterator = resolver.resolve(query);
 
             // Form the request. We specify the "Connection: close" header so that the
             // server will close the socket after transmitting the response. This will
@@ -195,15 +218,16 @@ public:
         // Attempt a connection to each endpoint in the list until we
         // successfully establish a connection.
         //
-        boost::asio::async_connect(socket_, endpoint_iterator_,
-            boost::bind(&KvdbClient::handle_connect, this,
+        boost::asio::async_connect(context_.socket, context_.endpoint_iterator,
+            boost::bind(&KvdbClient::handle_connect,
+                        this,
                         boost::asio::placeholders::error));
     }
 
     void disconnect()
     {
         std::cout << "disconnect()" << std::endl;
-        socket_.close();
+        context_.socket.close();
     }
 
     void run()
@@ -236,8 +260,9 @@ private:
             // Attempt a connection to each endpoint in the list until we
             // successfully establish a connection.
             //
-            boost::asio::async_connect(socket_, endpoint_iterator,
-                boost::bind(&KvdbClient::handle_connect, this,
+            boost::asio::async_connect(context_.socket, endpoint_iterator,
+                boost::bind(&KvdbClient::handle_connect,
+                            this,
                             boost::asio::placeholders::error));
         }
         else {
@@ -254,23 +279,7 @@ private:
             //
             // The connection was successful. Send the request.
             //
-            KvdbClientConfig & config = KvdbClientApp::client_config;
-            LoginRequest_v0 request;
-            request.sUsername = config.username;
-            request.sPassword = config.password;
-            request.sDatabase = config.database;
-
-            OutputStream os(request_buf_);
-            uint32_t totalSize = request.writeTo(os);
-            request_size_ = totalSize;
-
-            std::cout << "KvdbClient::handle_connect()" << std::endl;
-            std::cout << "request_.size() = " << totalSize << std::endl;
-            std::cout << std::endl;
-
-            boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.size()),
-                                     boost::bind(&KvdbClient::handle_write_request, this,
-                                                 boost::asio::placeholders::error));
+            sendHankShakeRequest(context_);
         }
         else {
             std::cout << "KvdbClient::handle_connect() Error: " << err.message() << "\n";
@@ -282,42 +291,54 @@ private:
         this->stop();
     }
 
-    void handle_write_request(const boost::system::error_code & err)
+    void handle_write_request_done(const boost::system::error_code & err, std::size_t bytes_transferred)
     {
-        std::cout << "KvdbClient::handle_write_request()" << std::endl;
+        std::cout << "KvdbClient::handle_write_request_done()" << std::endl;
+        std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
+        std::cout << "error_code = " << err.value() << std::endl;
         std::cout << std::endl;
 
         if (!err) {
-            char header_buf[kMsgHeaderSize];
-            size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
-            if (readBytes == kMsgHeaderSize) {
-                MessageHeader header;
-                header.readHeader(header_buf);
-                uint32_t bodySize = header.bodySize();
-                if (header.verifySign() && bodySize > 0) {
-                    //
-                    // Receive the part data of response, if it's not completed, continue to read. 
-                    //
-                    response_buf_.reserve(bodySize);
-                    response_size_ = bodySize;
-                    socket_.async_read_some(boost::asio::buffer(response_buf_.data(), bodySize),
-                        boost::bind(&KvdbClient::handle_read_some, this,
-                                    boost::asio::placeholders::error,
-                                    boost::asio::placeholders::bytes_transferred,
-                                    bodySize));
-                }
-                else {
-                    // The sign is dismatch
-                    std::cout << "KvdbClient::handle_write_request() Error: The sign is dismatch.\n" << std::endl;
-                }
+            start_read_response();
+        }
+        else {
+            std::cout << "KvdbClient::handle_write_request_done() Error: " << err.message() << "\n";
+        }
+    }
+
+    void start_read_response()
+    {
+        std::cout << "KvdbClient::start_read_response()" << std::endl;
+        std::cout << std::endl;
+
+        char header_buf[kMsgHeaderSize];
+        size_t readBytes = boost::asio::read(context_.socket, boost::asio::buffer(header_buf));
+        if (readBytes == kMsgHeaderSize) {
+            MessageHeader header;
+            header.readHeader(header_buf);
+            uint32_t bodySize = header.bodySize();
+            if (header.verifySign() && bodySize > 0) {
+                //
+                // Receive the part data of response, if it's not completed, continue to read. 
+                //
+                context_.response.header = header;
+                context_.response_buf.reserve(bodySize);
+                context_.response_size = bodySize;
+                context_.socket.async_read_some(boost::asio::buffer(context_.response_buf.data(), bodySize),
+                    boost::bind(&KvdbClient::handle_read_some,
+                                this,
+                                boost::asio::placeholders::error,
+                                boost::asio::placeholders::bytes_transferred,
+                                bodySize));
             }
             else {
-                // Read message header error.
-                std::cout << "KvdbClient::handle_write_request() Error: Read message header error.\n" << std::endl;
+                // The sign is dismatch
+                std::cout << "KvdbClient::handle_write_request() Error: The sign is dismatch.\n" << std::endl;
             }
         }
         else {
-            std::cout << "KvdbClient::handle_write_request() Error: " << err.message() << "\n";
+            // Read message header error.
+            std::cout << "KvdbClient::handle_write_request() Error: Read message header error.\n" << std::endl;
         }
     }
 
@@ -326,9 +347,9 @@ private:
                           std::size_t bytes_wanted)
     {
         std::cout << "KvdbClient::handle_read_some()" << std::endl;
-        std::cout << "error_code = " << err.value() << std::endl;
         std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
         std::cout << "bytes_wanted = " << bytes_wanted << std::endl;
+        std::cout << "error_code = " << err.value() << std::endl;
         std::cout << std::endl;
 
         if (!err) {
@@ -340,12 +361,13 @@ private:
                 // response_buf_.consume(bytes_transferred);
                 // boost::asio::buffer(response_buf_.data(), bytes_wanted - bytes_transferred),
                 //
-                socket_.async_read_some(boost::asio::buffer(&response_buf_[bytes_transferred],
+                context_.socket.async_read_some(boost::asio::buffer(&context_.response_buf[bytes_transferred],
                     bytes_wanted - bytes_transferred),
-                    boost::bind(&KvdbClient::handle_read_some, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred,
-                        bytes_wanted - bytes_transferred)
+                    boost::bind(&KvdbClient::handle_read_some,
+                                this,
+                                boost::asio::placeholders::error,
+                                boost::asio::placeholders::bytes_transferred,
+                                bytes_wanted - bytes_transferred)
                 );
             }
             else if (bytes_transferred == 0) {
@@ -355,142 +377,33 @@ private:
                 this->stop();
             }
             else {
-                std::cout << "KvdbClient::handle_read_some(): Read all wanted bytes." << std::endl;
+                std::cout << "KvdbClient::handle_read_some(): Read all wanted bytes already." << std::endl;
                 //
                 // The connection was successful, send the request.
                 //
                 // response_buf_.commit(request_size_);
                 //
 
-                KvdbClientConfig & config = KvdbClientApp::client_config;
-                HandShakeRequest_v0 request;
-                request.iVersion = 1;
-
-                OutputStream os(request_buf_);
-                uint32_t totalSize = request.writeTo(os);
-                request_size_ = totalSize;
-
-                std::cout << "KvdbClient::handle_read_some()" << std::endl;
-                std::cout << "request_.size() = " << os.size() << std::endl;
-                std::cout << std::endl;
-
-                boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.size()),
-                    boost::bind(&KvdbClient::handle_write_handshake_request, this,
-                                boost::asio::placeholders::error));
+                OutputStream os(context_.request_buf);
+                context_.response.setBody(context_.response_buf.data());
+                int result = handleClientResponse(context_, context_.response, os);
+                if (result == ParseStatus::Success) {
+                    start_read_response();
+                }
+                else if (result == ParseStatus::Failed) {
+                    //
+                }
+                else if (result == ParseStatus::TooSmall) {
+                    //
+                }
+                else {
+                    // Unknown error
+                }
             }
         }
         else {
             std::cout << "KvdbClient::handle_read_some() Error: " << err.message() << "\n";
         }
-    }
-
-    void handle_write_handshake_request(const boost::system::error_code & err)
-    {
-        std::cout << "KvdbClient::handle_write_handshake_request()" << std::endl;
-        std::cout << std::endl;
-
-        if (!err) {
-            char header_buf[kMsgHeaderSize];
-            size_t readBytes = boost::asio::read(socket_, boost::asio::buffer(header_buf));
-            if (readBytes == kMsgHeaderSize) {
-                MessageHeader header;
-                header.readHeader(header_buf);
-                uint32_t bodySize = header.bodySize();
-                if (header.verifySign() && bodySize > 0) {
-                    //
-                    // Receive the part data of response, if it's not completed, continue to read. 
-                    //
-                    response_buf_.reserve(bodySize);
-                    response_size_ = bodySize;
-                    socket_.async_read_some(boost::asio::buffer(response_buf_.data(), bodySize),
-                        boost::bind(&KvdbClient::handle_read_handshake_some, this,
-                                    boost::asio::placeholders::error,
-                                    boost::asio::placeholders::bytes_transferred,
-                                    bodySize));
-                }
-                else {
-                    // The signId is dismatch
-                    std::cout << "KvdbClient::handle_write_handshake_request() Error: The signId is dismatch.\n" << std::endl;
-                }
-            }
-            else {
-                // Read packet header error.
-                std::cout << "KvdbClient::handle_write_handshake_request() Error: Read packet header error.\n" << std::endl;
-            }
-        }
-        else {
-            std::cout << "KvdbClient::handle_write_handshake_request() Error: " << err.message() << "\n";
-        }
-    }
-
-    void handle_read_handshake_some(const boost::system::error_code & err,
-                                    std::size_t bytes_transferred,
-                                    std::size_t bytes_wanted)
-    {
-        std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;
-        std::cout << "error_code = " << err.value() << std::endl;
-        std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
-        std::cout << "bytes_wanted = " << bytes_wanted << std::endl;
-        std::cout << std::endl;
-
-        if (!err) {
-            if (bytes_transferred < bytes_wanted) {
-                std::cout << "KvdbClient::handle_read_handshake_some(): Receive next partment." << std::endl;
-                //
-                // Receive the data of next partment.
-                //
-                // response_buf_.consume(bytes_transferred);
-                // boost::asio::buffer(response_buf_.data(), bytes_wanted - bytes_transferred),
-                //
-                socket_.async_read_some(boost::asio::buffer(&response_buf_[bytes_transferred],
-                    bytes_wanted - bytes_transferred),
-                    boost::bind(&KvdbClient::handle_read_handshake_some, this,
-                        boost::asio::placeholders::error,
-                        boost::asio::placeholders::bytes_transferred,
-                        bytes_wanted - bytes_transferred)
-                );
-            }
-            else if (bytes_transferred == 0) {
-                //
-                // Error: no data read.
-                //
-                this->stop();
-            }
-            else {
-                std::cout << "KvdbClient::handle_read_handshake_some(): Read all wanted bytes." << std::endl;
-                //
-                // The connection was successful, send the request.
-                //
-                // response_buf_.commit(request_size_);
-                //
-
-                KvdbClientConfig & config = KvdbClientApp::client_config;
-                LogoutRequest_v0 request;
-                request.iVersion = 1;
-
-                OutputStream os(request_buf_);
-                uint32_t totalSize = request.writeTo(os);
-                request_size_ = totalSize;
-
-                std::cout << "KvdbClient::handle_read_handshake_some()" << std::endl;
-                std::cout << "request_.size() = " << os.size() << std::endl;
-                std::cout << std::endl;
-
-                boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.size()),
-                    boost::bind(&KvdbClient::handle_write_connect_request, this,
-                                boost::asio::placeholders::error));
-            }
-        }
-        else {
-            std::cout << "KvdbClient::handle_read_handshake_some() Error: " << err.message() << "\n";
-        }
-    }
-
-    void handle_write_connect_request(const boost::system::error_code & err)
-    {
-        std::cout << "KvdbClient::handle_write_connect_request()" << std::endl;
-        std::cout << "error_code = " << err.value() << std::endl;
-        std::cout << std::endl;
     }
 };
 

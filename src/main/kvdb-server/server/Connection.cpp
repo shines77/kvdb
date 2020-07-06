@@ -80,7 +80,7 @@ void Connection::start_read_request()
             request_buf_.reserve(bodySize);
             request_size_ = bodySize;
             socket_.async_read_some(boost::asio::buffer(request_buf_.data(), bodySize),
-                boost::bind(&Connection::handle_read_some, shared_from_this(),
+                boost::bind(&Connection::handle_read_some, this->shared_from_this(),
                             boost::asio::placeholders::error,
                             boost::asio::placeholders::bytes_transferred,
                             bodySize));
@@ -111,9 +111,9 @@ void Connection::handle_read_some(const boost::system::error_code & err,
     //
 
     std::cout << "Connection::handle_read_some()" << std::endl;
-    std::cout << "error_code = " << err.value() << std::endl;
     std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
     std::cout << "bytes_wanted = " << bytes_wanted << std::endl;
+    std::cout << "error_code = " << err.value() << std::endl;
     std::cout << std::endl;
 
     if (!err) {
@@ -147,7 +147,8 @@ void Connection::handle_read_some(const boost::system::error_code & err,
                 if (os.data() != nullptr) {
                     boost::asio::async_write(socket_, boost::asio::buffer(os.data(), os.size()),
                         boost::bind(&Connection::handle_write, this->shared_from_this(),
-                                    boost::asio::placeholders::error)
+                                    boost::asio::placeholders::error,
+                                    boost::asio::placeholders::bytes_transferred)
                     );
                 }
                 else {
@@ -170,9 +171,11 @@ void Connection::handle_read_some(const boost::system::error_code & err,
     }
 }
 
-void Connection::handle_write(const boost::system::error_code & err)
+void Connection::handle_write(const boost::system::error_code & err,
+                              std::size_t bytes_transferred)
 {
     std::cout << "Connection::handle_write()" << std::endl;
+    std::cout << "bytes_transferred = " << bytes_transferred << std::endl;
     std::cout << "error_code = " << err.value() << std::endl;
     std::cout << std::endl;
 

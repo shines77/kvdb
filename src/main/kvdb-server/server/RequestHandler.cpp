@@ -1,6 +1,7 @@
 
 #include "server/RequestHandler.h"
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -30,10 +31,12 @@ RequestHandler::~RequestHandler()
 }
 
 template <typename OutputStreamTy>
-int RequestHandler::handleHandshakeRequest(ConnectionContext & context,
+int RequestHandler::handleHandShakeRequest(ConnectionContext & context,
                                            InputStream & is,
                                            OutputStreamTy & os)
 {
+    std::cout << "RequestHandler::handleHandShakeRequest()" << std::endl << std::endl;
+
     uint32_t iVersion = is.readUInt32();
     if (iVersion >= 0) {
         HandShakeResponse_v0 response;
@@ -51,6 +54,8 @@ int RequestHandler::handleLoginRequest(ConnectionContext & context,
                                        InputStream & is,
                                        OutputStreamTy & os)
 {
+    std::cout << "RequestHandler::handleLoginRequest()" << std::endl << std::endl;
+
     std::string username, password, database;
     int result = is.readString(username);
     if (result == ParseResult::OK) {
@@ -76,6 +81,8 @@ int RequestHandler::handleLogoutRequest(ConnectionContext & context,
                                         InputStream & is,
                                         OutputStreamTy & os)
 {
+    std::cout << "RequestHandler::handleLogoutRequest()" << std::endl << std::endl;
+
     uint32_t iVersion = is.readUInt32();
     if (iVersion >= 0) {
         LogoutResponse_v0 response;
@@ -172,7 +179,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
         int result;
         switch (header.opcode()) {
             case Opcode::HandShakeRequest:
-                result = handleHandshakeRequest(context, is, os);
+                result = handleHandShakeRequest(context, is, os);
                 break;
 
             case Opcode::LoginRequest:
@@ -189,6 +196,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
 
             default:
                 // Unknown opcode message
+                std::cout << "RequestHandler::handleRequest(): Error - Unknown opcode message" << std::endl << std::endl;
                 result = ParseStatus::Failed;
                 break;
         }
@@ -213,6 +221,8 @@ int RequestHandler::handleRequest(ConnectionContext & context,
                                   const IRequest & request,
                                   PackagedOutputStream & os)
 {
+    std::cout << "RequestHandler::handleRequest()" << std::endl << std::endl;
+
     InputStream is(request.body(), request.bodySize());
     const MessageHeader & header = request.header;
 
@@ -221,7 +231,7 @@ int RequestHandler::handleRequest(ConnectionContext & context,
         int result;
         switch (header.opcode()) {
             case Opcode::HandShakeRequest:
-                result = handleHandshakeRequest(context, is, os);
+                result = handleHandShakeRequest(context, is, os);
                 break;
 
             case Opcode::LoginRequest:

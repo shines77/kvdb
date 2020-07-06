@@ -40,7 +40,7 @@ public:
 
 private:
     template <typename OutputStreamTy>
-    int handleHandshakeRequest(ConnectionContext & context, InputStream & is, OutputStreamTy & os);
+    int handleHandShakeRequest(ConnectionContext & context, InputStream & is, OutputStreamTy & os);
 
     template <typename OutputStreamTy>
     int handleLoginRequest(ConnectionContext & context, InputStream & is, OutputStreamTy & os);

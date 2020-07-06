@@ -39,6 +39,10 @@ public:
     }
     virtual ~KvdbClientApp() {}
 
+    static KvdbClientConfig & get_client_config() {
+        return KvdbClientApp::client_config;
+    }
+
     virtual void initialize() override;
     virtual void finalize() override;
 

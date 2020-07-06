@@ -22,7 +22,7 @@
 #include <boost/asio/error.hpp>
 #include <boost/asio/signal_set.hpp>
 
-#include "server/common.h"
+#include "server/Common.h"
 #include "server/IoServicePool.h"
 #include "server/KvdbConnection.h"
 #include "server/ConnectionManager.h"
