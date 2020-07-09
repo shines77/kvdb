@@ -84,7 +84,7 @@ public:
     ClientContext & context()             { return this->context_; }
     const ClientContext & context() const { return this->context_; }
 
-    void init_callback() {
+    void init_context() {
         this->context_.client = this;
 
         func_handle_write_request_done_ = boost::bind(&KvdbClient::handle_write_request_done,
@@ -142,7 +142,7 @@ public:
             return;
         }
 
-        init_callback();
+        init_context();
 
         try {
             //
@@ -252,11 +252,6 @@ public:
     void start_read()
     {
         start_read_response();
-    }
-
-    void stop_client()
-    {
-        //
     }
 
 protected:
