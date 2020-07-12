@@ -44,17 +44,17 @@ struct random_access_iterator_tag : bidirectional_iterator_tag {
 // template class iterator
 template <typename Category,
           typename T,
-          typename Diff = std::ptrdiff_t,
+          typename Difference = std::ptrdiff_t,
           typename Pointer = T *,
           typename Reference = T &>
 struct iterator {
     // base type for iterator classes
-    typedef Category iterator_category;
-    typedef T value_type;
-    typedef Diff difference_type;
+    typedef Category    iterator_category;
+    typedef T           value_type;
+    typedef Difference  difference_type;
 
-    typedef Pointer pointer;
-    typedef Reference reference;
+    typedef Pointer     pointer;
+    typedef Reference   reference;
 };
 
 namespace detail {
@@ -66,7 +66,7 @@ namespace detail {
 // remove const-ness from a fancy pointer
 template <typename Ptr>
 inline
-auto __const_cast(Ptr ptr)
+auto _const_cast(Ptr ptr)
 #if !defined(_MSC_VER) || (_MSC_VER < 1900)
                            -> typename std::pointer_traits<
                                 typename std::pointer_traits<Ptr>::template rebind<
@@ -87,7 +87,7 @@ auto __const_cast(Ptr ptr)
 // remove const-ness from a plain pointer
 template <typename T>
 inline
-auto __const_cast(T * ptr) -> const typename std::remove_const<T>::type * {
+auto _const_cast(T * ptr) -> const typename std::remove_const<T>::type * {
     return (const_cast<typename std::remove_const<T>::type *>(ptr));
 }
 
