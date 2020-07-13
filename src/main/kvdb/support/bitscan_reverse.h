@@ -52,6 +52,7 @@
 #pragma once
 #endif
 
+#include "kvdb/basic/stdint.h"
 #include <assert.h>
 
 #if defined(WIN64) || defined(_WIN64) || defined(_M_X64) || defined(_M_AMD64) \

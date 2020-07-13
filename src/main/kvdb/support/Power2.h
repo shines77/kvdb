@@ -12,6 +12,8 @@
 #include "kvdb/support/bitscan_reverse.h"
 #include "kvdb/support/bitscan_forward.h"
 
+#include <assert.h>
+
 #include <cstdint>
 #include <cstddef>
 

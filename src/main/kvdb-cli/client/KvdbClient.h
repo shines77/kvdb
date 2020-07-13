@@ -302,7 +302,7 @@ protected:
 
     void handle_stop()
     {
-        this->stop_client();
+        this->stop();
     }
 
     void handle_write_request_done(const boost::system::error_code & err, std::size_t bytes_transferred)

@@ -116,7 +116,7 @@ struct HashHelper<const char *, std::uint32_t, HashFunc_CRC32C> {
 };
 ****************************************************************************/
 
-HASH_HELPER_CHAR_ALL(HASH_HELPER_CHAR, std::uint32_t, HashFunc_CRC32C, jimi::crc32c_x64);
+HASH_HELPER_CHAR_ALL(HASH_HELPER_CHAR, std::uint32_t, HashFunc_CRC32C, kvdb::crc32::crc32c_x64);
 
 template <>
 struct HashHelper<std::string, std::uint32_t, HashFunc_CRC32C> {
@@ -174,7 +174,7 @@ struct HashHelper<const char *, std::uint32_t, HashFunc_SHA1_MSG2> {
 };
 ****************************************************************************/
 
-HASH_HELPER_CHAR_ALL(HASH_HELPER_CHAR, std::uint32_t, HashFunc_SHA1_MSG2, jimi::sha1_msg2);
+HASH_HELPER_CHAR_ALL(HASH_HELPER_CHAR, std::uint32_t, HashFunc_SHA1_MSG2, kvdb::sha1::sha1_msg2);
 
 template <>
 struct HashHelper<std::string, std::uint32_t, HashFunc_SHA1_MSG2> {
@@ -188,20 +188,20 @@ template <>
 struct HashHelper<const char *, std::uint32_t, HashFunc_SHA1> {
     static std::uint32_t getHashCode(const char * data, size_t length) {
         //alignas(16) uint32_t sha1_state[5];
-        //memcpy((void *)&sha1_state[0], (const void *)&jimi::s_sha1_state[0], sizeof(uint32_t) * 5);
-        return sha1::sha1_x86(jimi::s_sha1_state, data, length);
+        //memcpy((void *)&sha1_state[0], (const void *)&kvdb::s_sha1_state[0], sizeof(uint32_t) * 5);
+        return sha1::sha1_x86(kvdb::s_sha1_state, data, length);
     }
 };
 ****************************************************************************/
 
-HASH_HELPER_CHAR_ALL(HASH_HELPER_CHAR, std::uint32_t, HashFunc_SHA1, jimi::sha1_x86);
+HASH_HELPER_CHAR_ALL(HASH_HELPER_CHAR, std::uint32_t, HashFunc_SHA1, kvdb::sha1::sha1_x86);
 
 template <>
 struct HashHelper<std::string, std::uint32_t, HashFunc_SHA1> {
     static std::uint32_t getHashCode(const std::string & key) {
         //alignas(16) uint32_t sha1_state[5];
-        //memcpy((void *)&sha1_state[0], (const void *)&jimi::s_sha1_state[0], sizeof(uint32_t) * 5);
-        return sha1::sha1_x86(jimi::s_sha1_state, key.c_str(), key.size());
+        //memcpy((void *)&sha1_state[0], (const void *)&kvdb::s_sha1_state[0], sizeof(uint32_t) * 5);
+        return sha1::sha1_x86(kvdb::s_sha1_state, key.c_str(), key.size());
     }
 };
 

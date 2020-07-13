@@ -1,4 +1,8 @@
 
+#ifndef __SSE4_2__
+#define __SSE4_2__              1
+#endif // __SSE4_2__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -10,6 +14,17 @@
 #include <sstream>
 #include <string>
 #include <utility>
+
+#if __SSE4_2__
+
+// Support SSE 4.2: _mm_crc32_u32(), _mm_crc32_u64().
+#define SUPPORT_SSE42_CRC32C    1
+
+// Support Intel SMID SHA module: sha1 & sha256, it's higher than SSE 4.2 .
+// _mm_sha1msg1_epu32(), _mm_sha1msg2_epu32() and so on.
+#define SUPPORT_SMID_SHA        0
+
+#endif // __SSE4_2__
 
 // String compare mode
 #define STRING_COMPARE_STDC     0
