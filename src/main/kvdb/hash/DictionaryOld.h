@@ -55,36 +55,36 @@ public:
     typedef typename Hasher::index_type     index_type;
     typedef BasicDictionaryOld<Key, Value, HashFunc, Hasher, Comparer>
                                             this_type;
-    struct entry {
-        entry *     next;
-        hash_type   hash;
-        pair_type   pair;
+    struct hash_entry {
+        hash_entry * next;
+        hash_type    hash;
+        pair_type    pair;
 
-        entry() : next(nullptr), hash(0) {}
-        entry(hash_type hash_code) : next(nullptr), hash(hash_code) {}
+        hash_entry() : next(nullptr), hash(0) {}
+        hash_entry(hash_type hash_code) : next(nullptr), hash(hash_code) {}
 
-        entry(hash_type hash_code, const key_type & key,
-              const value_type & value, this_type * next_entry = nullptr)
+        hash_entry(hash_type hash_code, const key_type & key,
+              const value_type & value, hash_entry * next_entry = nullptr)
             : next(next_entry), hash(hash_code), pair(key, value) {}
-        entry(hash_type hash_code, key_type && key,
-              value_type && value, this_type * next_entry = nullptr)
+        hash_entry(hash_type hash_code, key_type && key,
+              value_type && value, hash_entry * next_entry = nullptr)
             : next(next_entry), hash(hash_code),
               pair(std::forward<key_type>(key), std::forward<value_type>(value)) {}
 
-        entry(const key_type & key, const value_type & value)
+        hash_entry(const key_type & key, const value_type & value)
             : next(nullptr), hash(0), pair(key, value) {}
-        entry(key_type && key, value_type && value)
+        hash_entry(key_type && key, value_type && value)
             : next(nullptr), hash(0),
               pair(std::forward<key_type>(key), std::forward<value_type>(value)) {}
 
-        ~entry() {
+        ~hash_entry() {
 #ifndef NDEBUG
             this->next = nullptr;
 #endif
         }
     };
 
-    typedef entry               entry_type;
+    typedef hash_entry          entry_type;
     typedef entry_type *        iterator;
     typedef const entry_type *  const_iterator;
 
@@ -95,7 +95,7 @@ public:
 
     public:
         free_list() : head_(nullptr), size_(0) {}
-        free_list(entry * head) : head_(head), size_(0) {}
+        free_list(entry_type * head) : head_(head), size_(0) {}
         ~free_list() {
 #ifndef NDEBUG
             this->clear();
@@ -123,7 +123,7 @@ public:
             this->size_ = 0;
         }
 
-        void reset(entry * head) {
+        void reset(entry_type * head) {
             this->head_ = head;
             this->size_ = 0;
         }
@@ -178,9 +178,9 @@ public:
 private:
     entry_type **   buckets_;
     entry_type *    entries_;
-    size_type       count_;
+    size_type       entry_size_;
     size_type       buckets_mask_;
-    size_type       capacity_;
+    size_type       entry_capacity_;
     free_list       freelist_;
 #if DICTIONARY_SUPPORT_VERSION
     size_type       version_;
@@ -203,7 +203,7 @@ private:
 
 public:
     BasicDictionaryOld(size_type initialCapacity = kDefaultInitialCapacity)
-        : buckets_(nullptr), entries_(nullptr), count_(0), buckets_mask_(0), capacity_(0)
+        : buckets_(nullptr), entries_(nullptr), entry_size_(0), buckets_mask_(0), entry_capacity_(0)
 #if DICTIONARY_SUPPORT_VERSION
           , version_(1) /* Since 0 means that the version attribute is not supported,
                            the initial value of version starts from 1. */
@@ -220,39 +220,41 @@ public:
         return (this->entries() != nullptr) ? (iterator)&this->entries_[0] : nullptr;
     }
     iterator end() const {
-        return (this->entries() != nullptr) ? (iterator)&this->entries_[this->capacity_] : nullptr;
+        return (this->entries() != nullptr) ? (iterator)&this->entries_[this->entry_capacity_] : nullptr;
     }
 
     iterator unsafe_begin() const {
         return (iterator)&this->entries_[0];
     }
     iterator unsafe_end() const {
-        return (iterator)&this->entries_[this->capacity_];
+        return (iterator)&this->entries_[this->entry_capacity_];
     }
 
     size_type size() const {
-        assert(this->count_ >= this->freelist_.size());
-        return (this->count_ - this->freelist_.size());
+        assert(this->entry_size_ >= this->freelist_.size());
+        return (this->entry_size_ - this->freelist_.size());
     }
-    size_type max_size() const { return (std::numeric_limits<size_type>::max)(); }
+    size_type capacity() const { return this->entries_capacity(); }
 
     size_type bucket_mask() const { return this->buckets_mask_; }
-    size_type bucket_count() const { return this->capacity_; }
-    size_type bucket_capacity() const { return this->capacity_; }
+    size_type bucket_size() const { return this->size(); }
+    size_type bucket_count() const { return this->entry_capacity_; }
 
-    size_type entries_count() const { return this->capacity_; }
+    size_type entries_size() const { return this->size(); }
+    size_type entries_count() const { return this->entry_capacity_; }
 
     entry_type ** buckets() const { return this->buckets_; }
     entry_type *  entries() const { return this->entries_; }
 
-    size_type min_bucket_capacity() const { return this_type::kMinimumCapacity; }
     size_type max_bucket_capacity() const {
         return (std::min)(this_type::kMaximumCapacity, (std::numeric_limits<size_type>::max)());
     }
-    size_type default_bucket_capacity() const { return this_type::kDefaultInitialCapacity; }
+    size_type max_size() const {
+        return this->max_bucket_capacity();
+    }
 
-    bool is_valid() const { return (this->buckets_ != nullptr); }
-    bool is_empty() const { return (this->size() == 0); }
+    bool valid() const { return (this->buckets_ != nullptr); }
+    bool empty() const { return (this->size() == 0); }
 
     size_type version() const {
 #if DICTIONARY_SUPPORT_VERSION
@@ -283,19 +285,19 @@ public:
         }
 #ifndef NDEBUG
         // Setting status
-        this->count_ = 0;
+        this->entry_size_ = 0;
         this->buckets_mask_ = 0;
-        this->capacity_ = 0;
+        this->entry_capacity_ = 0;
 #endif
     }
 
     void clear() {
         if (likely(this->buckets_ != nullptr)) {
             // Initialize the buckets's data.
-            memset((void *)this->buckets_, 0, sizeof(entry_type *) * this->capacity_);
+            memset((void *)this->buckets_, 0, sizeof(entry_type *) * this->entry_capacity_);
         }
         // Setting status
-        this->count_ = 0;
+        this->entry_size_ = 0;
         this->freelist_.clear();
     }
 
@@ -341,9 +343,9 @@ private:
 
                 // Initialize status
                 this->entries_ = new_entries;
-                this->count_ = 0;
+                this->entry_size_ = 0;
                 this->buckets_mask_ = new_capacity - 1;
-                this->capacity_ = new_capacity;
+                this->entry_capacity_ = new_capacity;
                 this->freelist_.clear();
             }
         }
@@ -362,7 +364,7 @@ private:
 #if DICTIONARY_ENTRY_USE_PLACEMENT_NEW
         assert(this->entries_ != nullptr);
         entry_type * entry = this->entries_;
-        for (size_type i = 0; i < this->count_; ++i) {
+        for (size_type i = 0; i < this->entry_size_; ++i) {
 #if DICTIONARY_ENTRY_RELEASE_ON_ERASE
             if (likely(entry->hash != kInvalidHash)) {
                 assert(entry != nullptr);
@@ -418,7 +420,7 @@ private:
             // Push the old entry to front of new list.
             old_entry->next = new_buckets[index];
             new_buckets[index] = old_entry;
-            ++(this->count_);
+            ++(this->entry_size_);
 
             // Scan next entry
             old_entry = next_entry;
@@ -429,8 +431,8 @@ private:
     void rehash_internal(size_type new_capacity) {
         assert(new_capacity > 0);
         assert((new_capacity & (new_capacity - 1)) == 0);
-        if (likely((force_shrink == false && new_capacity > this->capacity_) ||
-                   (force_shrink == true && new_capacity != this->capacity_))) {
+        if (likely((force_shrink == false && new_capacity > this->entry_capacity_) ||
+                   (force_shrink == true && new_capacity != this->entry_capacity_))) {
             // The the array of bucket's first entry.
             // entry_type ** new_buckets = new (std::nothrow) entry_type *[new_capacity];
             entry_type ** new_buckets = JSTD_NEW_ARRAY(entry_type *, new_capacity);
@@ -460,7 +462,7 @@ private:
 
                         // Copy the old entries to new entries.
                         size_type new_count = 0;
-                        for (size_type i = 0; i < this->count_; ++i) {
+                        for (size_type i = 0; i < this->entry_size_; ++i) {
                             assert(new_entry != nullptr);
                             assert(old_entry != nullptr);
                             if (likely(old_entry->hash != kInvalidHash)) {
@@ -537,12 +539,12 @@ private:
 
                     // Recalculate the bucket of all keys.
                     if (likely(this->buckets_ != nullptr)) {
-                        size_type old_count = this->count_;
-                        this->count_ = 0;
+                        size_type old_size = this->entry_size_;
+                        this->entry_size_ = 0;
                         size_type new_mask = new_capacity - 1;
 
                         entry_type ** old_buckets = this->buckets_;
-                        for (size_type i = 0; i < this->capacity_; ++i) {
+                        for (size_type i = 0; i < this->entry_capacity_; ++i) {
                             assert(old_buckets != nullptr);
                             entry_type * old_entry = *old_buckets;
                             if (likely(old_entry == nullptr)) {
@@ -558,7 +560,7 @@ private:
                                 old_buckets++;
                             }
                         }
-                        assert(this->count_ == old_count);
+                        assert(this->entry_size_ == old_size);
 
                         // Free old buckets data.
                         //operator delete((void *)this->buckets_, std::nothrow);
@@ -572,7 +574,7 @@ private:
                     this->buckets_ = new_buckets;
                     this->entries_ = new_entries;
                     this->buckets_mask_ = new_capacity - 1;
-                    this->capacity_ = new_capacity;
+                    this->entry_capacity_ = new_capacity;
                     this->freelist_.clear();
 
                     this->updateVersion();
@@ -719,17 +721,17 @@ public:
                 // Insert the new key.
                 entry_type * new_entry;
                 if (likely(this->freelist_.is_empty())) {
-                    if (likely(this->count_ >= this->capacity_)) {
+                    if (likely(this->entry_size_ >= this->entry_capacity_)) {
                         // Resize the buckets
-                        this->resize_internal(this->capacity_ * 2);
+                        this->resize_internal(this->entry_capacity_ * 2);
                         // Recalculate the bucket index.
                         index = this->hasher_.index_of(hash, this->buckets_mask_);
                     }
 
                     // Get a unused entry.
-                    new_entry = &this->entries_[this->count_];
+                    new_entry = &this->entries_[this->entry_size_];
                     assert(new_entry != nullptr);
-                    ++(this->count_);
+                    ++(this->entry_size_);
                 }
                 else {
                     // Pop a free entry from freelist.
@@ -771,17 +773,17 @@ public:
                 // Insert the new key.
                 entry_type * new_entry;
                 if (likely(this->freelist_.is_empty())) {
-                    if (likely(this->count_ >= this->capacity_)) {
+                    if (likely(this->entry_size_ >= this->entry_capacity_)) {
                         // Resize the buckets
-                        this->resize_internal(this->capacity_ * 2);
+                        this->resize_internal(this->entry_capacity_ * 2);
                         // Recalculate the index.
                         index = this->hasher_.index_of(hash, this->buckets_mask_);
                     }
 
                     // Get a unused entry.
-                    new_entry = &this->entries_[this->count_];
+                    new_entry = &this->entries_[this->entry_size_];
                     assert(new_entry != nullptr);
-                    ++(this->count_);
+                    ++(this->entry_size_);
                 }
                 else {
                     // Pop a free entry from freelist.
