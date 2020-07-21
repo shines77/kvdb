@@ -20,6 +20,9 @@ template <typename T>
 struct IAllocator {
     typedef T *         pointer;
     typedef const T *   const_pointer;
+    template T &        reference;
+    template const T &  reference;
+
     typedef std::size_t size_type;
 
     virtual pointer allocate(size_type size) = 0;

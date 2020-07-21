@@ -245,7 +245,7 @@ public:
         assert(this->entry_size_ >= this->freelist_.size());
         return (this->entry_size_ - this->freelist_.size());
     }
-    size_type capacity() const { return this->entries_capacity(); }
+    size_type capacity() const { return this->entry_capacity_; }
 
     size_type bucket_mask() const { return this->buckets_mask_; }
     size_type bucket_size() const { return this->size(); }
