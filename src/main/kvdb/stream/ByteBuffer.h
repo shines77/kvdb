@@ -130,14 +130,6 @@ public:
         }
     }
 
-    void swap(this_type & right) {
-        base_type::swap(*static_cast<base_type *>(&right));
-
-        size_type tmpCapacity = this->capacity_;
-        this->capacity_ = right.capacity();
-        right.setCapacity(tmpCapacity);
-    }
-
     void attach(const char_type * data, size_type size) {
         // Not implemented yet, std::logic_error, std::runtime_error
         std::runtime_error not_supported("BasicByteBuffer<T>::attach(): This interface is not supported.");
@@ -173,6 +165,16 @@ public:
     template <size_type N>
     void copy(const char_type(&data)[N]) {
         this->internal_copy<N>(data);
+    }
+
+    void swap(this_type & right) {
+        if (&right != this) {
+            base_type::swap(*static_cast<base_type *>(&right));
+
+            size_type tmpCapacity = this->capacity_;
+            this->capacity_ = right.capacity();
+            right.setCapacity(tmpCapacity);
+        }
     }
 
     void clean(char_type initVal = 0) {
@@ -304,5 +306,16 @@ void swap(kvdb::BasicByteBuffer<T> & left, kvdb::BasicByteBuffer<T> & right)
 {
     left.swap(right);
 }
+
+namespace std {
+
+template <typename T>
+inline
+void swap(kvdb::BasicByteBuffer<T> & left, kvdb::BasicByteBuffer<T> & right)
+{
+    left.swap(right);
+}
+
+} // namespace std
 
 #endif // KVDB_STREAM_BYTEBUFFER_H

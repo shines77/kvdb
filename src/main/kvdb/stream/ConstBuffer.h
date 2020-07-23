@@ -57,10 +57,6 @@ public:
 
     bool isConstBuffer() const { return true; }
 
-    void swap(this_type & right) {
-        base_type::swap(*static_cast<base_type *>(&right));
-    }
-
     void attach(const char_type * data, size_type size) {
         this->data_ = (char_type *)data;
         this->size_ = size;
@@ -85,6 +81,12 @@ public:
         throw not_supported;
     }
 
+    void swap(this_type & right) {
+        if (&right != this) {
+            base_type::swap(*static_cast<base_type *>(&right));
+        }
+    }
+
     void clean() {
         assert(this->data() != nullptr);
         ::memset((void *)this->data(), 0, this->size() * sizeof(char_type));
@@ -107,5 +109,16 @@ void swap(kvdb::BasicConstBuffer<T> & left, kvdb::BasicConstBuffer<T> & right)
 {
     left.swap(right);
 }
+
+namespace std {
+
+template <typename T>
+inline
+void swap(kvdb::BasicConstBuffer<T> & left, kvdb::BasicConstBuffer<T> & right)
+{
+    left.swap(right);
+}
+
+} // namespace std
 
 #endif // KVDB_STREAM_CONSTBUFFER_H

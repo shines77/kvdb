@@ -71,13 +71,15 @@ public:
     bool isValid() const { return (this->data_ != nullptr); }
 
     void swap(this_type & right) {
-        char_type * tmpData = this->data_;
-        this->data_ = right.data();
-        right.setData(tmpData);
+        if (&right != this) {
+            char_type * tmpData = this->data_;
+            this->data_ = right.data();
+            right.setData(tmpData);
 
-        size_type tmpSize = this->size_;
-        this->size_ = right.size();
-        right.setSize(tmpSize);
+            size_type tmpSize = this->size_;
+            this->size_ = right.size();
+            right.setSize(tmpSize);
+        }
     }
 
     char_type & operator [] (size_type pos) {
@@ -106,5 +108,16 @@ void swap(kvdb::BasicMemoryBuffer<T> & left, kvdb::BasicMemoryBuffer<T> & right)
 {
     left.swap(right);
 }
+
+namespace std {
+
+template <typename T>
+inline
+void swap(kvdb::BasicMemoryBuffer<T> & left, kvdb::BasicMemoryBuffer<T> & right)
+{
+    left.swap(right);
+}
+
+} // namespace std
 
 #endif // KVDB_STREAM_MEMORYBUFFER_H
