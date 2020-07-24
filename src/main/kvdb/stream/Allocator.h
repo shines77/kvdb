@@ -20,8 +20,8 @@ template <typename T>
 struct IAllocator {
     typedef T *         pointer;
     typedef const T *   const_pointer;
-    template T &        reference;
-    template const T &  reference;
+    typedef T &         reference;
+    typedef const T &   const_reference;
 
     typedef std::size_t size_type;
 

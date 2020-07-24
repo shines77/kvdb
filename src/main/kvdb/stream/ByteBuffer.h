@@ -47,7 +47,7 @@ protected:
     allocator_type  allocator_;
 
     size_type calc_capacity(size_type size) {
-        return detail::round_up_to_pow2(size);
+        return run_time::round_up_to_pow2(size);
     }
 
 public:
