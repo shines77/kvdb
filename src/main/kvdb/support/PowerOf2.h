@@ -20,9 +20,6 @@
 #include <cstddef>      // For std::size_t
 #include <cassert>
 #include <type_traits>
-
-/* Undefine the max() macro first. */
-#undef max
 #include <limits>       // For std::numeric_limits<T>::max()
 
 using namespace std;
@@ -140,7 +137,7 @@ std::size_t round_up_to_pow2(std::size_t n)
         return n;
     }
 
-    if (n <= (std::numeric_limits<std::size_t>::max() / 2 + 1)) {
+    if (n <= ((std::numeric_limits<std::size_t>::max)() / 2 + 1)) {
         unsigned long index;
 #if defined(WIN64) || defined(_WIN64) || defined(_M_X64) || defined(_M_AMD64) \
  || defined(_M_IA64) || defined(__amd64__) || defined(__x86_64__) || defined(_M_ARM64)
@@ -152,14 +149,14 @@ std::size_t round_up_to_pow2(std::size_t n)
 #endif // __amd64__
     }
     else {
-        return std::numeric_limits<std::size_t>::max();
+        return (std::numeric_limits<std::size_t>::max)();
     }
 }
 
 static inline
 std::size_t next_pow2(std::size_t n)
 {
-    if (n < (std::numeric_limits<std::size_t>::max() / 2 + 1)) {
+    if (n < ((std::numeric_limits<std::size_t>::max)() / 2 + 1)) {
         unsigned long index;
 #if defined(WIN64) || defined(_WIN64) || defined(_M_X64) || defined(_M_AMD64) \
  || defined(_M_IA64) || defined(__amd64__) || defined(__x86_64__) || defined(_M_ARM64)
@@ -171,7 +168,7 @@ std::size_t next_pow2(std::size_t n)
 #endif // __amd64__
     }
     else {
-        return std::numeric_limits<std::size_t>::max();
+        return (std::numeric_limits<std::size_t>::max)();
     }
 }
 
@@ -279,7 +276,7 @@ template <typename SizeType>
 inline SizeType next_pow2(SizeType n) {
     static_assert(std::is_integral<SizeType>::value,
                   "Error: next_pow2(SizeType n) -- SizeType must be a integral type.");
-    if (n < std::numeric_limits<SizeType>::max())
+    if (n < (std::numeric_limits<SizeType>::max)())
         return round_up_to_pow2<SizeType>(n + 1);
     else
         return n;
