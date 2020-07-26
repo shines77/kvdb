@@ -94,19 +94,19 @@ struct DefaultDictionaryComparer {
 #else // (STRING_COMPARE_MODE != STRING_COMPARE_STDC)
 
     bool key_is_equals(const key_type & key1, const key_type & key2) const {
-        return StrUtils::is_equals(key1, key2);
+        return jstd::StrUtils::is_equals(key1, key2);
     }
 
     bool value_is_equals(const value_type & value1, const value_type & value2) const {
-        return StrUtils::is_equals(value1, value2);
+        return jstd::StrUtils::is_equals(value1, value2);
     }
 
     int key_compare(const key_type & key1, const key_type & key2) const {
-        return StrUtils::compare(key1, key2);
+        return jstd::StrUtils::compare(key1, key2);
     }
 
     int value_compare(const value_type & value1, const value_type & value2) const {
-        return StrUtils::compare(value1, value2);
+        return jstd::StrUtils::compare(value1, value2);
     }
 
 #endif // STRING_COMPARE_MODE
