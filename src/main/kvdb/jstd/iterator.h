@@ -66,7 +66,7 @@ namespace detail {
 // remove const-ness from a fancy pointer
 template <typename Ptr>
 inline
-auto _const_cast(Ptr ptr)
+auto const_cast_(Ptr ptr)
 #if !defined(_MSC_VER) || (_MSC_VER < 1900)
                            -> typename std::pointer_traits<
                                 typename std::pointer_traits<Ptr>::template rebind<
@@ -87,7 +87,7 @@ auto _const_cast(Ptr ptr)
 // remove const-ness from a plain pointer
 template <typename T>
 inline
-auto _const_cast(T * ptr) -> const typename std::remove_const<T>::type * {
+auto const_cast_(T * ptr) -> const typename std::remove_const<T>::type * {
     return (const_cast<typename std::remove_const<T>::type *>(ptr));
 }
 
