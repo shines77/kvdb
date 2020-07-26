@@ -328,7 +328,7 @@ private:
     }
 
     void initialize(size_type new_capacity) {
-        size_type bucket_capacity = detail::round_up_to_pow2(new_capacity);
+        size_type bucket_capacity = run_time::round_up_to_pow2(new_capacity);
         assert(bucket_capacity > 0);
         assert((bucket_capacity & (bucket_capacity - 1)) == 0);
 
@@ -418,7 +418,7 @@ private:
         // The maximum bucket is kMaximumCapacity = 1 << 30.
         new_capacity = (new_capacity <= kMaximumCapacity) ? new_capacity : kMaximumCapacity;
         // Round up the new_capacity to power 2.
-        new_capacity = detail::round_up_to_pow2(new_capacity);
+        new_capacity = run_time::round_up_to_pow2(new_capacity);
         return new_capacity;
     }
 
@@ -426,7 +426,7 @@ private:
         // The maximum bucket is kMaximumCapacity = 1 << 30.
         new_capacity = (new_capacity <= kMaximumCapacity) ? new_capacity : kMaximumCapacity;
         // Round up the new_capacity to power 2.
-        new_capacity = detail::round_up_to_pow2(new_capacity);
+        new_capacity = run_time::round_up_to_pow2(new_capacity);
         return new_capacity;
     }
 
